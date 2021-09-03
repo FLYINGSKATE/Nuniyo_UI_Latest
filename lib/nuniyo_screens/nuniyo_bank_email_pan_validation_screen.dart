@@ -114,7 +114,6 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
