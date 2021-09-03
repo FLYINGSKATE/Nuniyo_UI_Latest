@@ -41,6 +41,13 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   bool isPanValidatedSuccessfully = false;
   bool isBankValidatedSuccessfully = false;
+  bool isEmailValidatedSuccessfully = false;
+
+
+  bool isValidInputForPan = false;
+  bool isValidInputForBank = false;
+  bool isValidInputForIFSC = false;
+  bool isValidInputForEmail = false;
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
@@ -139,18 +146,21 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                               color: _emailTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                           )
                       ),
-                      onChanged: (_phoneNumber) async {
-                        print(_phoneNumber.length);
-                        //phoneNumberString = _phoneNumber;
-                        if (_phoneNumber.length >= 10) {
-                          print(_phoneNumber);
-                          //isPhoneNumberValid = true;
-                          //phoneNumberString = _phoneNumber;
-                          //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
-                          setState((){});
+                      onChanged: (_emailID) async {
+                        print(_emailID.length);
+                        String pattern =
+                            r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
+                            r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
+                            r"{0,253}[a-zA-Z0-9])?)*$";
+                        RegExp regex = new RegExp(pattern);
+                        if (!regex.hasMatch(_emailID) || _emailID == null){
+                          print('Enter a valid email address');
+                          isValidInputForEmail = false;
                         }
-                        else{
-                          //isPhoneNumberValid = false;
+                        else {
+                          print("Noice Email");
+                          isValidInputForEmail=true;
+                          //Send Email ID to APi
                         }
                       },
                     )
@@ -249,6 +259,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                 SizedBox(height: 10,),
                 Flexible(
                     child: TextField(
+                      maxLength: 12,
                       textCapitalization: TextCapitalization.characters,
                       controller: _ifscCodeTextEditingController,
                       cursorColor: primaryColorOfApp,
@@ -274,8 +285,76 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: (){
-                      Navigator.pushNamed(context, '/personaldetailsscreen');
+                    onPressed: () async {
+
+                      isValidInputForBank = true;
+                      isValidInputForPan = true;
+                      isValidInputForEmail = true;
+                      isValidInputForIFSC = true;
+
+                      if(isValidInputForBank&&isValidInputForPan&&isValidInputForEmail&&isValidInputForIFSC){
+                        //Show Success and Move to next screen in some seconds
+                        showDialog(
+                          context: context, // <-----
+                          barrierDismissible: false,
+                          builder: (BuildContext context) {
+                            return Dialog(
+                              child: Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: new Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    CircularProgressIndicator(),
+                                    SizedBox(width: 20,),
+                                    Text(
+                                        "Please Wait",
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                        //isBankValidatedSuccessfully = await ApiRepo().fetchIsBankValid(bankAccountNumber, ifscCode);
+                        //isPanValidatedSuccessfully = await ApiRepo().fetchIsPanValid(fullName, dOB, panNumber);
+                        //isEmailValidatedSuccessfully = await ApiRepo().fetchEmailOTP(emailID);
+                        await Future.delayed(Duration(seconds: 1));
+                        if(isBankValidatedSuccessfully&&isPanValidatedSuccessfully&&isEmailValidatedSuccessfully){
+                          Navigator.pushNamed(context, '/personaldetailsscreen');
+                        }
+                        else{
+                          Navigator.pop(context);
+                          //Show error in a dialog box and then wait for 1 seconds and let user try again
+                          showDialog(
+                            context: context, // <-----
+                            barrierDismissible: false,
+                            builder: (BuildContext context) {
+                              return Dialog(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: new Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.error),
+                                      SizedBox(width: 20,),
+                                      Text(
+                                          "Something went wrong , \n Please Try Again",
+                                          style: GoogleFonts.openSans(
+                                            textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                          );
+                          await Future.delayed(Duration(seconds: 1));
+                          Navigator.pop(context);
+                        }
+
+                      }
                     },
                     color: primaryColorOfApp,
                     child: Text(

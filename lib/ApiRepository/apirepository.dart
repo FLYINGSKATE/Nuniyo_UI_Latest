@@ -1,5 +1,6 @@
 /*This class file consists of calls to API Endpoints*/
-
+import 'dart:html';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -19,6 +20,27 @@ class ApiRepo {
 
   //BASE URL : When Run In Web
   final String BASE_API_URL = 'https://localhost:5001';
+
+  //Send Mobile Number to Database
+  Future<bool> sendMobileNumber(String phoneNumber) async {
+    var headers = {
+      'Mobile_no': phoneNumber
+    };
+    var request = http.MultipartRequest('POST', Uri.parse(BASE_API_URL+'/api/Lead/GetLead?Mobile_no=$phoneNumber'));
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+      return true;
+    }
+    else {
+      print(response.reasonPhrase);
+      return false;
+    }
+  }
 
   ///Mobile Validation API
   Future<String> fetchOTP(String phoneNumber) async {
@@ -46,7 +68,6 @@ class ApiRepo {
 
   //Email Validation API
   Future<void> fetchEmailOTP(String emailID) async {
-
     var request = http.Request('POST', Uri.parse('$BASE_API_URL/api/EmailAuthentication/EmailAuthentication'));
     request.body = json.encode({
       "send_Email": emailID,
@@ -64,28 +85,15 @@ class ApiRepo {
     }
   }
 
-  ///Bank Validation API
+  ///Bank Validation API - NEW
   Future<bool> fetchIsBankValid(String bankAccountNumber,String ifscCode) async {
-
-    var request = http.Request('POST', Uri.parse(
-        '$BASE_API_URL/VerifyBankAccount?beneficiary_account_no=$bankAccountNumber&beneficiary_ifsc=$ifscCode'));
-
-    request.headers.addAll(headers);
+    var request = http.Request('POST', Uri.parse('$BASE_API_URL/VerifyBankAccount?beneficiary_account_no=$bankAccountNumber&beneficiary_ifsc=$ifscCode'));
 
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      String result = await response.stream.bytesToString();
-      Map valueMap = jsonDecode(result);
-      print(result);
-      if(valueMap["verified"]){
-        print("YOUR BANK IS VALIDATED");
-        return true;
-      }
-      else{
-        print("Something went wrong");
-        return false;
-      }
+      print(await response.stream.bytesToString());
+      return true;
     }
     else {
       print(response.reasonPhrase);
@@ -181,6 +189,20 @@ class ApiRepo {
     }
   }
 
+  Future<void> searchIFSCCodes() async{
+    var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/BARB0DBGHTW'));
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  ///////////////OLD FUNCTIONS////////////////
     //request.body = json.encode({
     //  "pan_no": "HCAPK4259Q",
     //  "full_name": "KHAN ASHRAF SALIM",
@@ -188,5 +210,34 @@ class ApiRepo {
     //});
     ///BANK AND PAN : 39981374255
     ///IFSC :SBIN0003671
+///
+/// //OLD ONE Bank Validation API
+//   /*Future<bool> fetchIsBankValid(String bankAccountNumber,String ifscCode) async {
+//
+//     var request = http.Request('POST', Uri.parse(
+//         '$BASE_API_URL/VerifyBankAccount?beneficiary_account_no=$bankAccountNumber&beneficiary_ifsc=$ifscCode'));
+//
+//     request.headers.addAll(headers);
+//
+//     http.StreamedResponse response = await request.send();
+//
+//     if (response.statusCode == 200) {
+//       String result = await response.stream.bytesToString();
+//       Map valueMap = jsonDecode(result);
+//       print(result);
+//       if(valueMap["verified"]){
+//         print("YOUR BANK IS VALIDATED");
+//         return true;
+//       }
+//       else{
+//         print("Something went wrong");
+//         return false;
+//       }
+//     }
+//     else {
+//       print(response.reasonPhrase);
+//       return false;
+//     }
+//   }*/
 
 }

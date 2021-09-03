@@ -8,7 +8,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MobileValidationLoginScreen extends StatefulWidget {
   const MobileValidationLoginScreen({Key? key}) : super(key: key);
@@ -21,6 +21,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   late String OTPFromApi;
   late String phoneNumberString;
+
+  SharedPreferences? preferences;
 
   List<Color> myGradientColor = <Color>[
     Color.fromARGB(255, 127, 0, 255),
@@ -53,6 +55,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   @override
   void initState() {
     super.initState();
+    initializePreference().whenComplete((){
+      setState(() {});
+    });
     _phoneNumberFocusNode = FocusNode();
     _otpFocusNode = FocusNode();
     _referralCodeNode = FocusNode();
@@ -139,11 +144,21 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       onChanged: (_phoneNumber) async {
                         print(_phoneNumber.length);
                         phoneNumberString = _phoneNumber;
+
+                        //Store Mobile Number in Shared Preferences
+                        this.preferences?.setString("PhoneNumber", phoneNumberString);
+
+                        print("Below Given is the Value From Shared Prefereneces");
+                        print(this.preferences?.getString("PhoneNumber"));
+
                         if (_phoneNumber.length >= 10) {
                           print(_phoneNumber);
-                          isPhoneNumberValid = true;
                           phoneNumberString = _phoneNumber;
-                          OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
+                          //Store Mobile Number in Shared Preferences
+                          this.preferences?.setString("PhoneNumber", phoneNumberString);
+
+                          isPhoneNumberValid = await ApiRepo().sendMobileNumber(_phoneNumber);
+                          //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
                           howManyTimesResendOTPPressed ++;
                           setState((){});
                         }
@@ -292,4 +307,12 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
       return false;
     }
   }
+
+  Future<void> initializePreference() async{
+    this.preferences = await SharedPreferences.getInstance();
+    //this.preferences?.setString("name", "Peter");
+    //this.preferences?.setStringList("infoList", ["developer","mobile dev"]);
+  }
 }
+
+
