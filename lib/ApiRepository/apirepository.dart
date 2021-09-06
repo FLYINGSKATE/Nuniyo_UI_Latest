@@ -43,6 +43,20 @@ class ApiRepo {
     }
   }
 
+  ///Contact OTP NEWW
+  ///var request = http.Request('POST', Uri.parse('http://localhost:44330/api/Lead/GetLead?Mobile_no=8268405887'));
+  //
+  //
+  // http.StreamedResponse response = await request.send();
+  //
+  // if (response.statusCode == 200) {
+  //   print(await response.stream.bytesToString());
+  // }
+  // else {
+  //   print(response.reasonPhrase);
+  // }
+
+
   ///Mobile Validation API
   Future<String> fetchOTP(String phoneNumber) async {
     var request = http.Request('POST', Uri.parse(BASE_API_URL+'/api/Lead/Read_Lead'));

@@ -48,6 +48,8 @@ class PanAndBankValidationState extends State<PanAndBankValidation> {
   TextEditingController _ifscCodeTextEditingController = TextEditingController();
   TextEditingController _bankTextEditingController = TextEditingController();
 
+  bool isValidIFSC = true;
+
   _selectDate(BuildContext context) async {
     final DateTime? picked = await showDatePicker(
         context: context,
@@ -319,10 +321,12 @@ class PanAndBankValidationState extends State<PanAndBankValidation> {
           children: [
             Flexible(
               child: TextField(
+
                 controller: _ifscCodeTextEditingController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   hintText: 'IFSC CODE',
+                  suffixIcon: Icon(Icons.check_circle,color: Colors.black12,size: 20.0,),
                 ),
               ),
             ),

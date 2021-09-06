@@ -1,4 +1,6 @@
 ///Sign Up Page 1
+import 'dart:async';
+
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -20,6 +22,8 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   TextEditingController _panTextEditingController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
 
+  final interval = const Duration(seconds: 1);
+
   ///Dialog Box Text Field
   TextEditingController _ifscCode2TextEditingController = TextEditingController();
   TextEditingController _bankNameTextEditingController = TextEditingController();
@@ -28,6 +32,19 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   String fullName = "KHAN ASHRAF SALIM";
 
   late FocusNode _bankNameTextFieldFocusNode,_branchNameFocusNode,_IFSCCode2TextFieldFocusNode;
+
+  bool isValidIFSCCode = false;
+
+  int howManyTimesResendOTPPressed = 0;
+
+  bool enableOTPButton = true;
+
+  String OTPErrorText = "Wrong OTP";
+  bool showOTPErrorText = false;
+
+  final int _resendOTPIntervalTime = 3;
+
+  int currentSeconds = 0;
 
   void _requestBankNameTextFieldFocusNode(){
     setState(() {
@@ -216,15 +233,18 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                     )
                 ),
                 Visibility(
-                  visible: false,
+                  visible: _shouldResendOTPBTNbeVisible(),
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                        onPressed: () {  },
-                        child: Text(
-                            "Resend OTP",style: GoogleFonts.openSans(
-                          textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),
-                    ),),),
+                        child: Text("Resend OTP",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                        onPressed: enableOTPButton ? () async {
+                          enableOTPButton = false;
+                          howManyTimesResendOTPPressed ++;
+                          setState((){});
+                          startTimer();
+                          
+                        }:null),
                   ),
                 ),
                 SizedBox(height: 10,),
@@ -296,9 +316,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       cursorColor: primaryColorOfApp,
                       style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                       focusNode: _ifscTextFieldFocusNode,
-                      onTap: _requestIfscTextFieldFocus,
+                      onTap:openIFSCConfirmDialogBox ,
                       decoration: InputDecoration(
                           counter: Offstage(),
+                          enabled:true,
+                          suffixIcon: isValidIFSCCode?Icon(Icons.check_circle,color: Colors.black):Icon(Icons.error),
                           labelText: _ifscTextFieldFocusNode.hasFocus ? 'Enter IFSC Number' : 'Enter IFSC Number',
                           labelStyle: TextStyle(
                             color: _ifscTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
@@ -315,7 +337,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       SizedBox(width: 5,),
                       TextButton(
                           onPressed: (){
-                            openIFSCDialogBox();
+                            openIFSCSearchDialogBox();
                           },
                           child: Text("Find Your IFSC Code",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),),)),
                     ],
@@ -447,7 +469,152 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   }
 
 
-  void openIFSCDialogBox() {
+  void openIFSCConfirmDialogBox() {
+    showGeneralDialog(
+      barrierLabel: "Barrier",
+      barrierDismissible: true,
+      barrierColor: Colors.black.withOpacity(0.5),
+      transitionDuration: Duration(milliseconds: 700),
+      context: context,
+      pageBuilder: (_, __, ___) {
+        return Align(
+          alignment: Alignment.center,
+          child: Container(
+            height: 400,
+            child: SingleChildScrollView (
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(0.0,10.0,0.0,0.0),
+                child: Material(
+                  color: Colors.transparent,
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(22.0,0.0,0,0),
+                    child: Column(
+                        children: [
+                          Align(
+                            alignment: Alignment.centerLeft,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                    "Confirm Bank Details",
+                                    style: GoogleFonts.openSans(
+                                      textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 20,fontWeight: FontWeight.bold),)
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.fromLTRB(0.0,0.0,10.0,0.0),
+                                  child: IconButton(icon: Icon(Icons.close),onPressed: (){Navigator.pop(context);},),
+                                ),
+                              ],
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Text(
+                                  "IFSC Code :",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+                              ),
+                              Text(
+                                  "SBINu39232323",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          Row(
+                            children: [
+                              Text(
+                                  "Bank Name :",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+                              ),
+                              Text(
+                                  "SBI Bank",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 10,),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment:CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                  "Address :",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+                              ),
+                              Flexible(
+                                child: Text(
+                                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+                                    style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            color: Colors.transparent,
+                            width: MediaQuery.of(context).size.width/1.5,
+                            height: 60,
+                            child: FlatButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              onPressed: () {Navigator.pop(context);},
+                              color: primaryColorOfApp,
+                              child: Text(
+                                  "Confirm",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
+                          Container(
+                            color: Colors.transparent,
+                            width: MediaQuery.of(context).size.width/1.5,
+                            height: 60,
+                            child: FlatButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              onPressed: () {Navigator.pop(context);},
+                              color: Colors.black12,
+                              child: Text(
+                                  "Cancel",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 20.0),
+                        ],
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center),
+                  ),
+                ),
+              ),
+            ),
+            margin: EdgeInsets.only(bottom: 20, left: 12, right: 12),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      },
+      transitionBuilder: (_, anim, __, child) {
+        return SlideTransition(
+          position: Tween(begin: Offset(0, 1), end: Offset(0, 0)).animate(anim),
+          child: child,
+        );
+      },
+    );
+  }
+  void openIFSCSearchDialogBox() {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -609,6 +776,37 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
         );
       },
     );
+  }
+
+  bool _shouldResendOTPBTNbeVisible() {
+    if(howManyTimesResendOTPPressed>0 && howManyTimesResendOTPPressed < 4 ){
+      return true;
+    }
+    else if(howManyTimesResendOTPPressed>=4){
+      OTPErrorText = "Too Many Attempts.....";
+      showOTPErrorText = true;
+      setState(() {
+
+      });
+      return false;
+    }
+    else{
+      return false;
+    }
+  }
+
+  void startTimer() {
+    var duration = interval;
+    Timer.periodic(duration, (timer) {
+      setState(() {
+        print(timer.tick);
+        currentSeconds = timer.tick;
+        if (timer.tick >= _resendOTPIntervalTime){
+          enableOTPButton = true;
+          timer.cancel();
+        }
+      });
+    });
   }
 
 }
