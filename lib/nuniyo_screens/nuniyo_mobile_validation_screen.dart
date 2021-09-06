@@ -144,20 +144,17 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       onChanged: (_phoneNumber) async {
                         print(_phoneNumber.length);
                         phoneNumberString = _phoneNumber;
-
-                        //Store Mobile Number in Shared Preferences
-                        this.preferences?.setString("PhoneNumber", phoneNumberString);
-
-                        print("Below Given is the Value From Shared Prefereneces");
-                        print(this.preferences?.getString("PhoneNumber"));
-
                         if (_phoneNumber.length >= 10) {
                           print(_phoneNumber);
                           phoneNumberString = _phoneNumber;
                           //Store Mobile Number in Shared Preferences
                           this.preferences?.setString("PhoneNumber", phoneNumberString);
+                          //Store Mobile Number in Shared Preferences
+                          this.preferences?.setString("PhoneNumber", phoneNumberString);
 
-                          isPhoneNumberValid = await ApiRepo().sendMobileNumber(_phoneNumber);
+                          print("Below Given is the Value From Shared Prefereneces");
+                          print(this.preferences?.getString("PhoneNumber"));
+                          isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
                           //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
                           howManyTimesResendOTPPressed ++;
                           setState((){});
@@ -170,21 +167,16 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                 ),
                 Flexible(
                     child: TextField(
-                      onChanged: (value){
+                      onChanged: (value) async {
                         if(value.length==4){
-                          if(value==OTPFromApi){
-                            print("Correct OTP");
-                            isValidOTP = true;
-                            setState(() {});
+                          isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
+                          showOTPErrorText= !isValidOTP;
+                          setState(() {});
+                          // if(value==OTPFromApi){
+                          //   print("Correct OTP");
+                          //   isValidOTP = true;
+                          //   setState(() {});
                           }
-                          else{
-                            print("inncorrect OTP");
-                            showOTPErrorText = true;
-                            setState(() {
-
-                            });
-                          }
-                        }
                       },
                       maxLength: 4,
                       keyboardType: TextInputType.number,
@@ -219,7 +211,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           setState((){});
                           startTimer();
                           if(phoneNumberString.length==10 && isPhoneNumberValid){
-                            OTPFromApi = await ApiRepo().fetchOTP(phoneNumberString);
+                            await ApiRepo().SendMobileNumber(phoneNumberString);
                           }
                         }:null),
                   ),

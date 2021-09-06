@@ -22,13 +22,20 @@ class ApiRepo {
 
   final String BASE_API_URL_2 = 'http://localhost:44333';
 
-  //Send Mobile Number to Database
-  Future<bool> sendMobileNumber(String phoneNumber) async {
-    var headers = {
-      'Mobile_no': phoneNumber
-    };
-    var request = http.MultipartRequest('POST', Uri.parse(BASE_API_URL+'/api/Lead/GetLead?Mobile_no=$phoneNumber'));
+  final String BASE_API_URL_3 = 'http://localhost:44330';
 
+  final String BASE_API_LINK_URL = 'https://api.nuniyo.tech';
+
+  //Send Mobile Number to Database
+  Future<bool> SendMobileNumber(String phoneNumber) async {
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Read_Lead'));
+    request.body = json.encode({
+      "mobile_No": phoneNumber,
+      "method_Name": "Check_Mobile_No"
+    });
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
@@ -43,18 +50,109 @@ class ApiRepo {
     }
   }
 
-  ///Contact OTP NEWW
-  ///var request = http.Request('POST', Uri.parse('http://localhost:44330/api/Lead/GetLead?Mobile_no=8268405887'));
-  //
-  //
-  // http.StreamedResponse response = await request.send();
-  //
-  // if (response.statusCode == 200) {
-  //   print(await response.stream.bytesToString());
-  // }
-  // else {
-  //   print(response.reasonPhrase);
-  // }
+  Future<bool> VerifyOTP(String phoneNumber,String userEnteredOTP) async{
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('https://api.nuniyo.tech/api/lead/Verify_OTP'));
+    request.body = json.encode({
+      "mobile_No": phoneNumber,
+      "otp": userEnteredOTP,
+      "method_Name": "Check_OTP"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      String result_Description = valueMap["res_Output"][0]["result_Description"];
+      print("Your OTP IS VERIFIED OR NOT DEPENDS ON "+result_Id.toString());
+      print("YOUR JWT TOKEN :"+result_Description);
+      if(result_Id==1){
+        return true;
+      }
+      else{
+        return false;
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+      return false;
+    }
+
+  }
+
+  Future<void> EKYCPanAuthenticationNSDL(String panCardNumber) async {
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_URL_3/api/NsdlPan/NSDLeKYCPanAuthentication'));
+    request.body = json.encode({
+      "pan_no": panCardNumber,
+      "full_name": "",
+      "date_of_birth": ""
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+    print(response.reasonPhrase);
+    }
+  }
+
+  Future<void> CVLKRAGetPanStatus(String panCardNumber) async{
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_URL_3/v1/api/cvlkra/Get_PanStatus'));
+    request.body = json.encode({
+      "pan_No": panCardNumber,
+      "method_Name": "Get_PanStatus"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  Future<void> VerifyEmail(String JWTToken , String phoneNumber , String emailID) async{
+    var headers = {
+      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4Nzc5NTU5ODk4IiwiZXhwIjoxNjMwOTQwOTQ5fQ.PLvorGG52kPNVxFf6z6dHaTX__uCipHgbkePZSyW5EI',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('https://api.nuniyo.tech/api/email/Email_Status'));
+    request.body = json.encode({
+      "mobile_No": "8779559898",
+      "email": "ashrafksalim1@gmail.com",
+      "method_Name": ""
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+
+  }
 
 
   ///Mobile Validation API

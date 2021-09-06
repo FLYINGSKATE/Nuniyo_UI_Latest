@@ -70,7 +70,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => BankPanEmailValidationScreen(),
+        '/': (context) => MobileValidationLoginScreen(),
         '/mobilevalidationscreen':(context)=>MobileValidationLoginScreen(),
         '/bankemailpanvalidationscreen':(context)=>BankPanEmailValidationScreen(),
         '/uploaddocumentscreen':(context)=>UploadDocumentScreen(),

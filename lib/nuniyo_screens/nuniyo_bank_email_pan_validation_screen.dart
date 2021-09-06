@@ -243,7 +243,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           howManyTimesResendOTPPressed ++;
                           setState((){});
                           startTimer();
-                          
+
                         }:null),
                   ),
                 ),
