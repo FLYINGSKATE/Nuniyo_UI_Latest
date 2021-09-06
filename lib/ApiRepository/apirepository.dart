@@ -1,5 +1,4 @@
 /*This class file consists of calls to API Endpoints*/
-import 'dart:html';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +19,8 @@ class ApiRepo {
 
   //BASE URL : When Run In Web
   final String BASE_API_URL = 'https://localhost:5001';
+
+  final String BASE_API_URL_2 = 'http://localhost:44333';
 
   //Send Mobile Number to Database
   Future<bool> sendMobileNumber(String phoneNumber) async {
@@ -44,10 +45,11 @@ class ApiRepo {
 
   ///Mobile Validation API
   Future<String> fetchOTP(String phoneNumber) async {
-    var request = http.Request('POST', Uri.parse(BASE_API_URL+'/api/MobileAuthentication/Send_OTP'));
+    var request = http.Request('POST', Uri.parse(BASE_API_URL+'/api/Lead/Read_Lead'));
+
     request.body = json.encode({
-      "contact_No": phoneNumber,
-      "otp":"",
+      "mobile_No": phoneNumber,
+      "method_Name": "Check_Mobile_No"
     });
     request.headers.addAll(headers);
 
@@ -55,9 +57,10 @@ class ApiRepo {
 
     if (response.statusCode == 200) {
       String result = await response.stream.bytesToString();
-      //Map valueMap = jsonDecode(result);
+      Map valueMap = jsonDecode(result);
       print(result);
-      //print("Your OTP IS"+valueMap["jsonotpBKC"]);
+      result = valueMap["result_Extra_Key"];
+      print("Your OTP IS"+valueMap["result_Extra_Key"]);
       return result;
     }
     else {

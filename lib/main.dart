@@ -3,6 +3,9 @@
 
 import 'dart:io';
 
+import 'package:angel_broking_demo/extra_demo_screens/FlutCam.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
+
 import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
 import 'nuniyo_screens/nuniyo_congrats_screen.dart';
 import 'nuniyo_screens/nuniyo_esign_screen.dart';
@@ -62,20 +65,18 @@ class MyApp extends StatelessWidget {
         //or simply save your changes to "hot reload" in a Flutter IDE).
         //Notice that the counter didn't reset back to zero; the application
         //is not restarted.
-
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => BankPanEmailValidationScreen(),
+        '/': (context) => WebCamScreen(),
         '/mobilevalidationscreen':(context)=>MobileValidationLoginScreen(),
         '/bankemailpanvalidationscreen':(context)=>BankPanEmailValidationScreen(),
         '/uploaddocumentscreen':(context)=>UploadDocumentScreen(),
         '/personaldetailsscreen':(context)=>PersonalDetailsScreen(),
         '/optionsscreen':(context)=>OptionsScreen(),
         '/aadharkycscreen':(context)=>AadharKYCScreen(),
-        '/rayzorpaydemoscreen':(context)=>RayzorPayDemoScreen(),
         '/esignscreen':(context)=>EsignScreen(),
         '/congratsscreen':(context)=>CongratsScreen(),
       },

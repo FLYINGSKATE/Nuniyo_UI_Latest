@@ -70,7 +70,7 @@ class _EsignScreenState extends State<EsignScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {},
+                    onPressed: () {Navigator.pushNamed(context, '/congratsscreen');},
                     color: primaryColorOfApp,
                     child: Text(
                         "eSign",
@@ -82,23 +82,88 @@ class _EsignScreenState extends State<EsignScreen> {
                 SizedBox(height: 20,),
                 Divider(thickness: 2.0,),
                 SizedBox(height: 20,),
+                ///Card Box
                 Container(
-                  color: Colors.transparent,
+                  height: 250.0,
                   width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                  decoration: new BoxDecoration(
+                    boxShadow: [ //background color of box
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5.0, // soften the shadow
+                        spreadRadius: 2.0, //extend the shadow
+                      )
+                    ],
+                  ),
+                  child: Container(
+                    height: 80,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        children: [
+                          ListTile(
+                            minLeadingWidth: 0.0,
+                            leading: Icon(Icons.person_outline_outlined),
+                            title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
+                            ),),
+                          ),
+                          Row(
+                            children: [
+                              SizedBox(width:15.0),
+                              Icon(Icons.card_giftcard,color:Colors.grey),
+                              SizedBox(width:14.0),
+                              Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                                textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
+                              ),),
+                              SizedBox(width: 40,),
+                              Icon(Icons.male,color:Colors.grey),
+                              SizedBox(width:15.0),
+                              Text("Male",style: GoogleFonts.openSans(
+                                textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
+                              ),),
+                            ],
+                          ),
+                          ListTile(
+                            minLeadingWidth: 0.0,
+                            leading: Icon(Icons.message),
+                            title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
+                            ),),
+                          ),
+                          ListTile(
+                            minLeadingWidth: 0.0,
+                            leading: Icon(Icons.location_on),
+                            title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
+                            ),),
+                          ),
+                        ],
+                      ),
                     ),
-                    onPressed: () {
-                      Navigator.pushNamed(context, '/congratsscreen');
-                    },
-                    color: primaryColorOfApp,
-                    child: Text(
-                        "Finish",
-                        style: GoogleFonts.openSans(
-                          textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
-                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 10,),
+                      Text("Your PAN",style: GoogleFonts.openSans(
+                        textStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, letterSpacing: .5,fontSize: 24),
+                      ),),
+                      SizedBox(height: 10,),
+                      Text("HCAPK4256Y",style: GoogleFonts.openSans(
+                        textStyle: TextStyle(color: Colors.black,letterSpacing: .5,fontSize: 20),
+                      ),),
+                      SizedBox(height: 10,),
+                      Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",style: GoogleFonts.openSans(
+                        textStyle: TextStyle(color: Colors.black,letterSpacing: .5,fontSize: 16),
+                      ),),
+                    ],
                   ),
                 ),
               ],

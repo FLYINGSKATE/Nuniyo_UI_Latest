@@ -49,6 +49,117 @@ class _CongratsScreenState extends State<CongratsScreen> {
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
                 ),),
                 SizedBox(height: 20,),
+                Container(
+                  height: 250.0,
+                  width: MediaQuery.of(context).size.width,
+                  decoration: new BoxDecoration(
+                    boxShadow: [ //background color of box
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 5.0, // soften the shadow
+                        spreadRadius: 2.0, //extend the shadow
+                      )
+                    ],
+                  ),
+                  child: Container(
+                    height: 80,
+                    color: Colors.white,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(10.0,30.0,0.0,0.0),
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "Username  :",textAlign: TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                    ),
+                                    Text(
+                                        "Email Id  :",textAlign: TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                    ),
+                                    Text(
+                                        "Margin  :",textAlign: TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                    ),
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "0912010182018",textAlign: TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)
+                                    ),
+                                    Text(
+                                        "youremailid@gmail.com",textAlign: TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)
+                                    ),
+                                    Row(
+                                      mainAxisAlignment: MainAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                            "Rs.0.00",textAlign: TextAlign.center,
+                                            style: GoogleFonts.openSans(
+                                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)
+                                        ),
+                                        SizedBox(width: 10,),
+                                        Text(
+                                            "Add Funds",textAlign: TextAlign.center,
+                                            style: GoogleFonts.openSans(
+                                              textStyle: TextStyle(decoration: TextDecoration.underline,color: primaryColorOfApp, letterSpacing: .5,fontSize: 16),)
+                                        ),
+
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                            SizedBox(height: 20,),
+                            Container(
+                              color: Colors.transparent,
+                              height: 60,
+                              width: MediaQuery.of(context).size.width,
+                              child: FlatButton(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                onPressed: () {},
+                                color: primaryColorOfApp,
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                        "Make Your First Trade :",textAlign:TextAlign.center,
+                                        style: GoogleFonts.openSans(
+                                          textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                                    ),
+                                    Icon(Icons.arrow_right,color: Colors.white,size: 40.0,),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
                 Column(
                   children: [
                     Container(
@@ -82,97 +193,49 @@ class _CongratsScreenState extends State<CongratsScreen> {
                         onPressed: () {},
                         color: primaryColorOfApp,
                         child: Text(
+                            "Open Commodity",textAlign:TextAlign.center,
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Container(
+                      color: Colors.transparent,
+                      height: 60,
+                      width: MediaQuery.of(context).size.width,
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        onPressed: () {},
+                        color: primaryColorOfApp,
+                        child: Text(
                             "Add a Nominee",textAlign:TextAlign.center,
                             style: GoogleFonts.openSans(
                               textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                         ),
                       ),
                     ),
-                    SizedBox(height: 30,),
-                    ///Card Box
+                    SizedBox(height: 20,),
                     Container(
-                      height: 250.0,
+                      color: Colors.transparent,
+                      height: 60,
                       width: MediaQuery.of(context).size.width,
-                      decoration: new BoxDecoration(
-                      boxShadow: [ //background color of box
-                        BoxShadow(
-                          color: Colors.grey,
-                          blurRadius: 25.0, // soften the shadow
-                          spreadRadius: 5.0, //extend the shadow
-                        )
-                      ],
-                      ),
-                      child: Container(
-                        height: 80,
-                        color: Colors.white,
-                        child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Column(
-                            children: [
-                              ListTile(
-                                minLeadingWidth: 0.0,
-                                leading: Icon(Icons.person_outline_outlined),
-                                title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
-                                ),),
-                              ),
-                              Row(
-                                children: [
-                                  SizedBox(width:15.0),
-                                  Icon(Icons.card_giftcard,color:Colors.grey),
-                                  SizedBox(width:14.0),
-                                  Text("Lorem Ipsum",style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
-                                  ),),
-                                  SizedBox(width: 40,),
-                                  Icon(Icons.male,color:Colors.grey),
-                                  SizedBox(width:15.0),
-                                  Text("Male",style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
-                                  ),),
-                                ],
-                              ),
-                              ListTile(
-                                minLeadingWidth: 0.0,
-                                leading: Icon(Icons.message),
-                                title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
-                                ),),
-                              ),
-                              ListTile(
-                                minLeadingWidth: 0.0,
-                                leading: Icon(Icons.location_on),
-                                title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
-                                  textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
-                                ),),
-                              ),
-                            ],
-                          ),
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        onPressed: () {},
+                        color: primaryColorOfApp,
+                        child: Text(
+                            "View Form",textAlign:TextAlign.center,
+                            style: GoogleFonts.openSans(
+                              textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                         ),
                       ),
                     ),
                     SizedBox(height: 20,),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          SizedBox(height: 10,),
-                          Text("Your PAN",style: GoogleFonts.openSans(
-                            textStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, letterSpacing: .5,fontSize: 24),
-                          ),),
-                          SizedBox(height: 10,),
-                          Text("HCAPK4256Y",style: GoogleFonts.openSans(
-                            textStyle: TextStyle(color: Colors.black,letterSpacing: .5,fontSize: 20),
-                          ),),
-                          SizedBox(height: 10,),
-                          Text("Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.",style: GoogleFonts.openSans(
-                            textStyle: TextStyle(color: Colors.black,letterSpacing: .5,fontSize: 16),
-                          ),),
-                        ],
-                      ),
-                    ),
                   ],
                 ),
               ],
