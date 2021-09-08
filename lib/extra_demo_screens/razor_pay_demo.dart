@@ -14,6 +14,7 @@ class RayzorPayDemoScreen extends StatefulWidget {
 
   @override
   _RayzorPayDemoScreenState createState() => _RayzorPayDemoScreenState();
+
 }
 
 class _RayzorPayDemoScreenState extends State<RayzorPayDemoScreen> {

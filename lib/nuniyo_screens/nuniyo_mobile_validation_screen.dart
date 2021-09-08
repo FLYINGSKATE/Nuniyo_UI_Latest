@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
+import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -24,11 +25,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   SharedPreferences? preferences;
 
-  List<Color> myGradientColor = <Color>[
-    Color.fromARGB(255, 127, 0, 255),
-    Color.fromARGB(255, 225, 0, 255)
-  ];
-
   bool isValidOTP = false;
   bool isPhoneNumberValid = false;
   bool enableOTPButton = true;
@@ -43,6 +39,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   int currentSeconds = 0;
 
   int howManyTimesResendOTPPressed = 0;
+
+  bool showReferralTextField = false;
 
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
@@ -114,9 +112,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     ),),
                     TextButton(
                       onPressed: (){
-                        Navigator.pushNamed(context, '/screentwo');
+                        Navigator.pushNamed(context, '/personaldetailsscreen');
                       },
-                      child:Text("Sign In",style: GoogleFonts.openSans(
+                      child:Text("Log In",style: GoogleFonts.openSans(
                       textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),
                     ),),)
                   ],
@@ -134,11 +132,11 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         counter: Offstage(),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                          child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
+                          child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.black,),
                         ),
                         labelText: _phoneNumberFocusNode.hasFocus ? 'Mobile Number' : 'Enter Mobile Number',
                           labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                              color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                              color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.black,
                           )
                       ),
                       onChanged: (_phoneNumber) async {
@@ -151,7 +149,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           this.preferences?.setString("PhoneNumber", phoneNumberString);
                           //Store Mobile Number in Shared Preferences
                           this.preferences?.setString("PhoneNumber", phoneNumberString);
-
                           print("Below Given is the Value From Shared Prefereneces");
                           print(this.preferences?.getString("PhoneNumber"));
                           isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
@@ -163,7 +160,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           //isPhoneNumberValid = false;
                         }
                       },
-                    )
+                    ),
                 ),
                 Flexible(
                     child: TextField(
@@ -176,7 +173,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           //   print("Correct OTP");
                           //   isValidOTP = true;
                           //   setState(() {});
-                          }
+                        }
                       },
                       maxLength: 4,
                       keyboardType: TextInputType.number,
@@ -190,11 +187,11 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           errorText: showOTPErrorText?"$OTPErrorText":null,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0.0,0.0,40.0,0.0),
-                            child: Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
+                            child: Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.black,),
                           ),
                           labelText: _otpFocusNode.hasFocus ? 'OTP' : 'Enter OTP',
                           labelStyle: TextStyle(
-                            color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                            color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.black,
                           )
                       ),
                     )
@@ -217,29 +214,67 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                   ),
                 ),
                 SizedBox(height: 10,),
-                Flexible(
-                    child: TextField(
-                      maxLength: 10,
-                      cursorColor: primaryColorOfApp,
-                      style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
-                      focusNode: _referralCodeNode,
-                      onTap: _requestReferralCodeFocus,
-                      decoration: InputDecoration(
-                        counter: Offstage(),
-                          suffixIcon: Padding(
-                            padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                            child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.grey,),
+                Visibility(
+                  visible: showReferralTextField,
+                  child: Flexible(
+                      child: DottedBorder(
+                          radius: Radius.circular(8.0),
+                          color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,//color of dotted/dash line
+                          strokeWidth: 3,
+                          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                          borderType: BorderType.RRect,
+                          strokeCap: StrokeCap.round,//thickness of dash/dots
+                          dashPattern: [10,8],
+                        child: TextField(
+                          maxLength: 10,
+                          cursorColor: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,
+                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
+                          focusNode: _referralCodeNode,
+                          onTap: _requestReferralCodeFocus,
+                          decoration: InputDecoration(
+                              contentPadding: EdgeInsets.fromLTRB(20, 10, 0, 12),
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              enabledBorder: InputBorder.none,
+                              errorBorder: InputBorder.none,
+                              disabledBorder: InputBorder.none,
+                              counter: Offstage(),
+                              suffixIcon: Padding(
+                                padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
+                                child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,),
+                              ),
+                              hintText: 'Referral Code ',
+
+                              labelStyle: TextStyle(
+                                color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,
+                              )
                           ),
-                          labelText: _referralCodeNode.hasFocus ? 'Referral Code' : 'Referral Code (Optional)',
-                          labelStyle: TextStyle(
-                            color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.grey,
-                          )
+                        ),
+                      )
+                  ),
+                ),
+                Visibility(
+                  visible: !showReferralTextField,
+                  child: Row(
+                    children: [
+                      Text("Do you have a ",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 16.0,letterSpacing: .5,fontWeight: FontWeight.normal)),),
+                      TextButton(
+                          child: Text("Referral Code ?",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                          onPressed: (){
+                            showReferralTextField = true;
+                            setState(() {
+                            });
+                          }
                       ),
-                    )
+                    ],
+                  ),
                 ),
                 SizedBox(height: 20,),
-                //Demo Button
-
+                Text("By Clicking on proceed I agree to all the",textAlign:TextAlign.left, style:GoogleFonts.openSans(color:Colors.black,textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5,fontWeight: FontWeight.normal)),),
+                TextButton(child: Text("Terms & Conditions",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 12,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                    onPressed: (){}
+                ),
+                SizedBox(height: 20,),
                 //Real Button
                 Container(
                   color: Colors.transparent,
@@ -251,7 +286,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      onPressed: () {Navigator.pushNamed(context, '/bankemailpanvalidationscreen'); },
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/bankemailpanvalidationscreen');
+                      },
                       color: primaryColorOfApp,
                       child: Text(
                         "Proceed",

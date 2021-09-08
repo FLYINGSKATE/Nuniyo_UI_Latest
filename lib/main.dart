@@ -3,9 +3,7 @@
 
 import 'dart:io';
 
-import 'package:angel_broking_demo/extra_demo_screens/FlutCam.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
-
+import 'nuniyo_screens/nuniyo_webcam_screen.dart';
 import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
 import 'nuniyo_screens/nuniyo_congrats_screen.dart';
 import 'nuniyo_screens/nuniyo_esign_screen.dart';
@@ -50,7 +48,7 @@ class MyApp extends StatelessWidget {
             borderSide: const BorderSide(color: Color(0xff6A4EEE), width: 2.0),
           ),
           border: OutlineInputBorder(
-              borderSide: BorderSide(),
+              borderSide: new BorderSide(width: 2.0),
               borderRadius: BorderRadius.circular(8.0)
           ),
           contentPadding: EdgeInsets.all(26.0),
@@ -78,6 +76,7 @@ class MyApp extends StatelessWidget {
         '/optionsscreen':(context)=>OptionsScreen(),
         '/aadharkycscreen':(context)=>AadharKYCScreen(),
         '/esignscreen':(context)=>EsignScreen(),
+        '/webcamscreen':(context)=>WebCamScreen(),
         '/congratsscreen':(context)=>CongratsScreen(),
       },
     );

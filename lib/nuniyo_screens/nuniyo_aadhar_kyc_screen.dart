@@ -58,7 +58,7 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/uploaddocumentscreen');
+                      Navigator.pushNamed(context, '/webcamscreen');
                     },
                     color: primaryColorOfApp,
                     child: Text(

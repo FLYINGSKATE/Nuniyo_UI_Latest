@@ -78,7 +78,7 @@ class _MobileValidationState extends State<MobileValidation> {
                             print(phone.completeNumber);
                             isPhoneNumberValid = true;
                             phoneNumberString = phone.completeNumber;
-                            OTPFromApi = await ApiRepo().fetchOTP(phone.completeNumber);
+                            //OTPFromApi = await ApiRepo().fetchOTP(phone.completeNumber);
                             setState((){});
                           }
                           else{
@@ -127,7 +127,7 @@ class _MobileValidationState extends State<MobileValidation> {
                         setState((){});
                         startTimer();
                         if(phoneNumberString.length==13 && isPhoneNumberValid){
-                          OTPFromApi = await ApiRepo().fetchOTP(phoneNumberString);
+                          //OTPFromApi = await ApiRepo().fetchOTP(phoneNumberString);
                         }
                       } : null),
                   ),

@@ -12,19 +12,21 @@ class ApiRepo {
     'Content-Type': 'application/json'
   };
 
-  /// NOTE : (Make Sure DOT NET BACKEND IS RUNNING ON LOCALHOST)
-
   //BASE URL : When Run In Android Emulators
   //final String BASE_API_URL = 'https://10.0.2.2:5001';
 
   //BASE URL : When Run In Web
   final String BASE_API_URL = 'https://localhost:5001';
 
+  String API_TOKEN = "";
+
   final String BASE_API_URL_2 = 'http://localhost:44333';
 
   final String BASE_API_URL_3 = 'http://localhost:44330';
 
   final String BASE_API_LINK_URL = 'https://api.nuniyo.tech';
+
+  SharedPreferences? preferences;
 
   //Send Mobile Number to Database
   Future<bool> SendMobileNumber(String phoneNumber) async {
@@ -54,7 +56,7 @@ class ApiRepo {
     var headers = {
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('https://api.nuniyo.tech/api/lead/Verify_OTP'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Verify_OTP'));
     request.body = json.encode({
       "mobile_No": phoneNumber,
       "otp": userEnteredOTP,
@@ -72,7 +74,10 @@ class ApiRepo {
       int result_Id = valueMap["res_Output"][0]["result_Id"];
       String result_Description = valueMap["res_Output"][0]["result_Description"];
       print("Your OTP IS VERIFIED OR NOT DEPENDS ON "+result_Id.toString());
-      print("YOUR JWT TOKEN :"+result_Description);
+      API_TOKEN = result_Description;
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString("API_TOKEN", API_TOKEN);
+      print("YOUR JWT TOKEN :"+API_TOKEN);
       if(result_Id==1){
         return true;
       }
@@ -84,36 +89,21 @@ class ApiRepo {
       print(response.reasonPhrase);
       return false;
     }
-
   }
 
-  Future<void> EKYCPanAuthenticationNSDL(String panCardNumber) async {
-    var headers = {
-      'Content-Type': 'application/json'
-    };
-    var request = http.Request('POST', Uri.parse('$BASE_API_URL_3/api/NsdlPan/NSDLeKYCPanAuthentication'));
-    request.body = json.encode({
-      "pan_no": panCardNumber,
-      "full_name": "",
-      "date_of_birth": ""
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
-    }
-    else {
-    print(response.reasonPhrase);
-    }
-  }
 
   Future<void> CVLKRAGetPanStatus(String panCardNumber) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String awt_Token= prefs.getString('API_TOKEN');
+    print(panCardNumber);
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    print("Calling Verify PAN KRA Using API"+awt_Token);
     var headers = {
+      'Authorization': 'Bearer $awt_Token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('$BASE_API_URL_3/v1/api/cvlkra/Get_PanStatus'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/cvlkra/Get_PanStatus'));
     request.body = json.encode({
       "pan_No": panCardNumber,
       "method_Name": "Get_PanStatus"
@@ -123,6 +113,50 @@ class ApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      print(result);
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      print("STATUS : "+result_Id.toString());
+      if(result_Id==1){
+        return;
+      }
+      else{
+        return;
+      }
+    }
+    else {
+      print(response.reasonPhrase);
+      return;
+    }
+
+  }
+
+  Future<void> OnPaymentSuccessPostToDatabase(int paymentPrice, String phoneNumber,String paymentID) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String awt_Token= prefs.getString('API_TOKEN');
+    print(paymentID);
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    print("Calling POST PAYMENT SUCCESS Using API"+awt_Token);
+    var headers = {
+      'Authorization': 'Bearer $awt_Token',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/RazorPay/RazorPayStatus'));
+    request.body = json.encode({
+      "inr": paymentPrice,
+      "currency": "INR",
+      "mobile_No": phoneNumber,
+      "merchantTransactionId": paymentID
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
       print(await response.stream.bytesToString());
     }
     else {
@@ -130,15 +164,20 @@ class ApiRepo {
     }
   }
 
-  Future<void> VerifyEmail(String JWTToken , String phoneNumber , String emailID) async{
+  Future<bool> VerifyEmail(String phoneNumber , String emailID) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String awt_Token= prefs.getString('API_TOKEN');
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    print("Calling Verify Email Using API"+awt_Token);
     var headers = {
-      'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI4Nzc5NTU5ODk4IiwiZXhwIjoxNjMwOTQwOTQ5fQ.PLvorGG52kPNVxFf6z6dHaTX__uCipHgbkePZSyW5EI',
+      'Authorization': 'Bearer $awt_Token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('https://api.nuniyo.tech/api/email/Email_Status'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/email/Email_Status'));
     request.body = json.encode({
-      "mobile_No": "8779559898",
-      "email": "ashrafksalim1@gmail.com",
+      "mobile_No": phoneNumber,
+      "email": emailID,
       "method_Name": ""
     });
     request.headers.addAll(headers);
@@ -146,22 +185,42 @@ class ApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      print(result);
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int status = valueMap["status"];
+      print("STATUS : "+status.toString());
+      if(status==200){
+        return true;
+      }
+      else{
+        return false;
+      }
     }
     else {
       print(response.reasonPhrase);
+      return false;
     }
-
   }
 
-
-  ///Mobile Validation API
-  Future<String> fetchOTP(String phoneNumber) async {
-    var request = http.Request('POST', Uri.parse(BASE_API_URL+'/api/Lead/Read_Lead'));
-
+  Future<bool> VerifyPAN(String phoneNumber , String panNumber) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String awt_Token= prefs.getString('API_TOKEN');
+    print(panNumber);
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    print("Calling Verify PAN Using API"+awt_Token);
+    var headers = {
+      'Authorization': 'Bearer $awt_Token',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/NsdlPan/NSDLeKYCPanAuthentication'));
     request.body = json.encode({
+      "pan_No": panNumber,
       "mobile_No": phoneNumber,
-      "method_Name": "Check_Mobile_No"
+      "method_Name": "PAN_details"
     });
     request.headers.addAll(headers);
 
@@ -169,34 +228,22 @@ class ApiRepo {
 
     if (response.statusCode == 200) {
       String result = await response.stream.bytesToString();
-      Map valueMap = jsonDecode(result);
       print(result);
-      result = valueMap["result_Extra_Key"];
-      print("Your OTP IS"+valueMap["result_Extra_Key"]);
-      return result;
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      print("STATUS : "+result_Id.toString());
+      if(result_Id==1){
+        return true;
+      }
+      else{
+        return false;
+      }
     }
     else {
       print(response.reasonPhrase);
-      return "";
-    }
-  }
-
-  //Email Validation API
-  Future<void> fetchEmailOTP(String emailID) async {
-    var request = http.Request('POST', Uri.parse('$BASE_API_URL/api/EmailAuthentication/EmailAuthentication'));
-    request.body = json.encode({
-      "send_Email": emailID,
-      "user_Token": "sssss"
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
-    }
-    else {
-      print(response.reasonPhrase);
+      return false;
     }
   }
 

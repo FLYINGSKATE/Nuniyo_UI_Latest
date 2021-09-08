@@ -4,6 +4,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../nuniyo_custom_icons.dart';
+
 class CongratsScreen extends StatefulWidget {
   const CongratsScreen({Key? key}) : super(key: key);
 
@@ -45,7 +47,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
                 WidgetHelper().DetailsTitle('Congratulations !'),
                 Center(child: Image.asset("assets/images/congratulations.png")),
                 SizedBox(height: 20,),
-                Text("Your application is complete . After verification , you will recieve your login credentials on your e-mail.",style: GoogleFonts.openSans(
+                Text("Your application is complete . After verification , you will recieve your login credentials on your e-mail.",textAlign:TextAlign.center,style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
                 ),),
                 SizedBox(height: 20,),
@@ -233,6 +235,35 @@ class _CongratsScreenState extends State<CongratsScreen> {
                             style: GoogleFonts.openSans(
                               textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                         ),
+                      ),
+                    ),
+                    SizedBox(height: 20,),
+                    Container(
+                      height: 80,
+                      width: MediaQuery.of(context).size.width,
+                      decoration: BoxDecoration(
+                          border: Border.all(color: primaryColorOfApp),
+                          borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: FlatButton(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        onPressed: () {},
+                        child:
+                        Row(
+                          children: [
+                            Icon(NuniyoCustomIcons.mobile_number_black,size: 30.0,color: primaryColorOfApp),
+                            Flexible(
+                              child: Text(
+                                  "Get an App Download Link On Mobile",textAlign:TextAlign.center,
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(color: primaryColorOfApp, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                              ),
+                            ),
+                          ],
+                        ),
+
                       ),
                     ),
                     SizedBox(height: 20,),

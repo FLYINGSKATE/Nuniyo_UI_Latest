@@ -174,7 +174,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {Navigator.pushNamed(context, '/congratsscreen');},
+                    onPressed: () {Navigator.pushNamed(context, '/uploaddocumentscreen');},
                     color: primaryColorOfApp,
                     child: Text(
                         "Proceed",

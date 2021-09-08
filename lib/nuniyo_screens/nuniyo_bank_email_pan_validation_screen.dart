@@ -6,6 +6,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /////Bank
 class BankPanEmailValidationScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   TextEditingController _ifscCodeTextEditingController = TextEditingController();
   TextEditingController _bankTextEditingController = TextEditingController();
   TextEditingController _panTextEditingController = TextEditingController();
+  TextEditingController _emailTextEditingController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
 
   final interval = const Duration(seconds: 1);
@@ -35,12 +37,12 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   bool isValidIFSCCode = false;
 
-  int howManyTimesResendOTPPressed = 0;
 
-  bool enableOTPButton = true;
+  String emailErrorText = "Please Enter a valid Email...";
+  bool showEmailErrorText = false;
 
-  String OTPErrorText = "Wrong OTP";
-  bool showOTPErrorText = false;
+  String panErrorText = "Please Enter a valid PAN Number...";
+  bool showPANErrorText = false;
 
   final int _resendOTPIntervalTime = 3;
 
@@ -94,7 +96,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
-  late FocusNode _emailTextFieldFocusNode,_otpTextFieldFocusNode,_dateTextFieldFocusNode,_panTextFieldFocusNode,_bankTextFieldFocusNode,_ifscTextFieldFocusNode;
+  late FocusNode _emailTextFieldFocusNode,_dateTextFieldFocusNode,_panTextFieldFocusNode,_bankTextFieldFocusNode,_ifscTextFieldFocusNode;
 
   @override
   void initState() {
@@ -103,7 +105,6 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
     _branchNameFocusNode = FocusNode();
     _IFSCCode2TextFieldFocusNode = FocusNode();
     _emailTextFieldFocusNode = FocusNode();
-    _otpTextFieldFocusNode = FocusNode();
     _panTextFieldFocusNode = FocusNode();
     _bankTextFieldFocusNode = FocusNode();
     _ifscTextFieldFocusNode = FocusNode();
@@ -140,19 +141,12 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
     });
   }
 
-  void _requestOtpTextFieldFocus(){
-    setState(() {
-      FocusScope.of(context).requestFocus(_otpTextFieldFocusNode);
-    });
-  }
-
   @override
   void dispose() {
     _bankNameTextFieldFocusNode.dispose();
     _branchNameFocusNode.dispose();
     _IFSCCode2TextFieldFocusNode.dispose();
     _emailTextFieldFocusNode.dispose();
-    _otpTextFieldFocusNode.dispose();
     _bankTextFieldFocusNode.dispose();
     _ifscTextFieldFocusNode.dispose();
     _panTextFieldFocusNode.dispose();
@@ -186,9 +180,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       cursorColor: primaryColorOfApp,
                       style :GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                       focusNode: _emailTextFieldFocusNode,
+                      controller: _emailTextEditingController,
                       onTap: _requestEmailIdTextFieldFocus,
                       decoration: InputDecoration(
                         counter: Offstage(),
+                        errorText: showEmailErrorText?emailErrorText:null,
                         labelText: _emailTextFieldFocusNode.hasFocus ? 'Email ID' : 'Enter Email ID',
                           labelStyle: TextStyle(fontWeight: FontWeight.bold,
                               color: _emailTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
@@ -207,8 +203,13 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                         }
                         else {
                           print("Noice Email");
-                          isValidInputForEmail=true;
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          isValidInputForEmail=await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'),_emailID);
                           //Send Email ID to APi
+                          showEmailErrorText = !isValidInputForEmail;
+                          setState(() {
+
+                          });
                         }
                       },
                     )
@@ -216,41 +217,19 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                 SizedBox(height: 10,),
                 Flexible(
                     child: TextField(
-                      maxLength: 4,
-                      keyboardType: TextInputType.number,
-                      obscureText: true,
-                      cursorColor: primaryColorOfApp,
-                      style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: 3,fontSize: 14,fontWeight: FontWeight.bold)),
-                      focusNode: _otpTextFieldFocusNode,
-                      onTap: _requestOtpTextFieldFocus,
-                      decoration: InputDecoration(
-                          counter: Offstage(),
-                          labelText: _otpTextFieldFocusNode.hasFocus ? 'OTP' : 'Enter OTP',
-                          labelStyle: GoogleFonts.openSans(textStyle:TextStyle(fontSize: 14,letterSpacing: 0.5,
-                            color: _otpTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
-                          ))
-                      ),
-                    )
-                ),
-                Visibility(
-                  visible: _shouldResendOTPBTNbeVisible(),
-                  child: Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                        child: Text("Resend OTP",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
-                        onPressed: enableOTPButton ? () async {
-                          enableOTPButton = false;
-                          howManyTimesResendOTPPressed ++;
-                          setState((){});
-                          startTimer();
-
-                        }:null),
-                  ),
-                ),
-                SizedBox(height: 10,),
-                Flexible(
-                    child: TextField(
                       maxLength: 10,
+                      onChanged: (_panNumber) async {
+                        if(_panNumber.length>=10){
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          String phoneNumber = await prefs.getString('PhoneNumber');
+                          print("We are Fetching PAN Details For the Phone Number :"+phoneNumber+" and Email ID :");
+                          isValidInputForPan=await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
+                          await ApiRepo().CVLKRAGetPanStatus(_panNumber);
+                          showPANErrorText = !isValidInputForPan;
+                          setState(() {
+                          });
+                        }
+                      },
                       textCapitalization: TextCapitalization.characters,
                       controller: _panTextEditingController,
                       cursorColor: primaryColorOfApp,
@@ -258,6 +237,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       focusNode: _panTextFieldFocusNode,
                       onTap: _requestPanTextFieldFocus,
                       decoration: InputDecoration(
+                        errorText: showPANErrorText?panErrorText:null,
                         counter: Offstage(),
                           labelText: _panTextFieldFocusNode.hasFocus ? 'Enter PAN Number' : 'Enter PAN Number',
                           labelStyle: TextStyle(
@@ -316,7 +296,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       cursorColor: primaryColorOfApp,
                       style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                       focusNode: _ifscTextFieldFocusNode,
-                      onTap:openIFSCConfirmDialogBox ,
+                      onTap:_requestIfscTextFieldFocus ,
                       decoration: InputDecoration(
                           counter: Offstage(),
                           enabled:true,
@@ -420,6 +400,8 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           );
                           await Future.delayed(Duration(seconds: 1));
                           Navigator.pop(context);
+                          ///FOR DEMO
+                          Navigator.pushNamed(context, '/personaldetailsscreen');
                         }
 
                       }
@@ -777,36 +759,4 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
       },
     );
   }
-
-  bool _shouldResendOTPBTNbeVisible() {
-    if(howManyTimesResendOTPPressed>0 && howManyTimesResendOTPPressed < 4 ){
-      return true;
-    }
-    else if(howManyTimesResendOTPPressed>=4){
-      OTPErrorText = "Too Many Attempts.....";
-      showOTPErrorText = true;
-      setState(() {
-
-      });
-      return false;
-    }
-    else{
-      return false;
-    }
-  }
-
-  void startTimer() {
-    var duration = interval;
-    Timer.periodic(duration, (timer) {
-      setState(() {
-        print(timer.tick);
-        currentSeconds = timer.tick;
-        if (timer.tick >= _resendOTPIntervalTime){
-          enableOTPButton = true;
-          timer.cancel();
-        }
-      });
-    });
-  }
-
 }

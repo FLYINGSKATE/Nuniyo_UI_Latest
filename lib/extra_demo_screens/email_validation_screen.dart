@@ -128,7 +128,7 @@ class _EmailValidationState extends State<EmailValidation> {
                       children: [
                         WidgetHelper().GradientButton(context,() {
                           Navigator.pushNamed(context, '/panandbankvalidation');
-                          ApiRepo().fetchEmailOTP(emailId);
+                          //ApiRepo().fetchEmailOTP(emailId);
                       },'Next'),
                       ],
                     ),

@@ -1,7 +1,11 @@
-import 'package:angel_broking_demo/widgets/widgets.dart';
+import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class OptionsScreen extends StatefulWidget {
   const OptionsScreen({Key? key}) : super(key: key);
@@ -14,19 +18,25 @@ class _OptionsScreenState extends State<OptionsScreen> {
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
-
-
   bool checkedValue  = false;
+
+  static const platform = const MethodChannel("razorpay_flutter");
+
+  late Razorpay _razorpay;
 
   @override
   void initState() {
     super.initState();
+    _razorpay = Razorpay();
+    _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
+    _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
+    _razorpay.on(Razorpay.EVENT_EXTERNAL_WALLET, _handleExternalWallet);
   }
-
 
   @override
   void dispose() {
     super.dispose();
+    _razorpay.clear();
   }
 
   @override
@@ -192,11 +202,12 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () {
+                      openCheckout();
                       Navigator.pushNamed(context, '/aadharkycscreen');
                     },
                     color: primaryColorOfApp,
                     child: Text(
-                        "Proceed",
+                        "Pay 200₹",
                         style: GoogleFonts.openSans(
                           textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                     ),
@@ -209,4 +220,43 @@ class _OptionsScreenState extends State<OptionsScreen> {
       ),
     );
   }
+
+  void openCheckout() async {
+    var options = {
+      'key': 'rzp_test_3ItfhafvOz0Kkx',
+      'amount': 20000,
+      'name': 'Nuniyo.',
+      'description': 'Stock Trading',
+      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'external': {
+        'wallets': ['paytm']
+      }
+    };
+
+    try {
+      _razorpay.open(options);
+    } catch (e) {
+      debugPrint('Error: e');
+    }
+  }
+
+  void _handlePaymentSuccess(PaymentSuccessResponse response) {
+    Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId!, toastLength: Toast.LENGTH_SHORT);
+    PostPayment(response.paymentId.toString());
+  }
+
+  void _handlePaymentError(PaymentFailureResponse response) {
+    Fluttertoast.showToast(msg: "ERROR: " + response.code.toString() + " - " + response.message!, toastLength: Toast.LENGTH_SHORT);
+  }
+
+  void _handleExternalWallet(ExternalWalletResponse response) {
+    Fluttertoast.showToast(msg: "EXTERNAL_WALLET: " + response.walletName!, toastLength: Toast.LENGTH_SHORT);
+  }
+
+  Future<void> PostPayment(String paymentID) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String phoneNumber = await prefs.getString('PhoneNumber');
+    ApiRepo().OnPaymentSuccessPostToDatabase(200, phoneNumber,paymentID);
+  }
+
 }
