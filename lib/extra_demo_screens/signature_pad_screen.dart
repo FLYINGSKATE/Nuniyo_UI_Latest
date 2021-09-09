@@ -23,8 +23,7 @@ class _SignaturePadScreenState extends State<SignaturePadScreen> {
   }
 
   void _handleSaveButtonPressed() async {
-    final data =
-    await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
+    final data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
     final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
     await Navigator.of(context).push(
       MaterialPageRoute(

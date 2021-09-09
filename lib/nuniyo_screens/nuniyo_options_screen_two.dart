@@ -7,14 +7,14 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class OptionsScreen extends StatefulWidget {
-  const OptionsScreen({Key? key}) : super(key: key);
+class OptionsScreenTwo extends StatefulWidget {
+  const OptionsScreenTwo({Key? key}) : super(key: key);
 
   @override
-  _OptionsScreenState createState() => _OptionsScreenState();
+  _OptionsScreenTwoState createState() => _OptionsScreenTwoState();
 }
 
-class _OptionsScreenState extends State<OptionsScreen> {
+class _OptionsScreenTwoState extends State<OptionsScreenTwo> {
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
@@ -63,51 +63,54 @@ class _OptionsScreenState extends State<OptionsScreen> {
                     Row(
                       children: [
                         SizedBox(width: 10.0,),
-                        Text("Account Opening FEE !",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
-                  child: Container(height: 5, width: 35,
-                    decoration: BoxDecoration(
-                        color: Color(0xff6A4EEE),
-                        borderRadius: BorderRadius.all(Radius.circular(20))
+                        Text("Account Opening is",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+                        Text(" ₹200",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,decoration:TextDecoration.lineThrough,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+
+                      ],
                     ),
-                  ),
-                ),
-                SizedBox(height: 20.0,),
-              ],
+                   Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
+                      child: Container(height: 5, width: 35,
+                        decoration: BoxDecoration(
+                            color: Color(0xff6A4EEE),
+                            borderRadius: BorderRadius.all(Radius.circular(20))
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.0,),
+                  ],
                 ),
                 Container(
                   height: 140,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: primaryColorOfApp,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(15))
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text("Equity",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
-                                ),
-                              ),
-                              Text("200₹",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),)
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0,0.0,0.0,0.0),
-                            child: Text("Buy and sell shares , mutual funds and derivatives on NSE and BSE",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5)),),
-                          ),
-                        ],
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: primaryColorOfApp,
                       ),
+                      borderRadius: BorderRadius.all(Radius.circular(15))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Equity",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+                              ),
+                            ),
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0,0.0,0.0,0.0),
+                          child: Text("Buy and sell shares , mutual funds and derivatives on NSE and BSE",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5)),),
+                        ),
+
+
+                      ],
                     ),
+                  ),
                 ),
                 SizedBox(height: 24.0,),
                 Divider(
@@ -120,7 +123,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     Text("Total",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color:primaryColorOfApp,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold))),
-                    Text("₹ 200 ",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color:primaryColorOfApp,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold))),
+                    Text("₹ 0",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color:primaryColorOfApp,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold))),
                   ],
                 ),
                 Divider(
@@ -144,7 +147,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                     },
                     color: primaryColorOfApp,
                     child: Text(
-                        "Pay 200₹",
+                        "Proceed",
                         style: GoogleFonts.openSans(
                           textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                     ),
@@ -184,7 +187,6 @@ class _OptionsScreenState extends State<OptionsScreen> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId!, toastLength: Toast.LENGTH_SHORT);
     PostPayment(response.paymentId.toString());
-    Navigator.pushNamed(context, '/optionsscreentwo');
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {

@@ -1,5 +1,6 @@
 ///Sign Up Page 1
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
@@ -47,6 +48,8 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   final int _resendOTPIntervalTime = 3;
 
   int currentSeconds = 0;
+
+  bool enableIFSCCodeTextField = true;
 
   void _requestBankNameTextFieldFocusNode(){
     setState(() {
@@ -290,20 +293,46 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                 SizedBox(height: 10,),
                 Flexible(
                     child: TextField(
-                      maxLength: 12,
+                      maxLength: 11,
                       textCapitalization: TextCapitalization.characters,
                       controller: _ifscCodeTextEditingController,
-                      cursorColor: primaryColorOfApp,
+                      cursorColor: ifscColorTextField(),
                       style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                       focusNode: _ifscTextFieldFocusNode,
+                      enabled: enableIFSCCodeTextField,
                       onTap:_requestIfscTextFieldFocus ,
+                      onChanged: (value) async {
+                        setState(() {
+
+                        });
+                        if(value.length==11){
+                          String response = await ApiRepo().isValidIFSC(value);
+                          if(response == "Not Found"){
+                            print("IFSC CODE WRONG");
+                            isValidIFSCCode = false;
+                            setState(() {});
+                          }
+                          else{
+                            isValidIFSCCode = true;
+                            print(response);
+                            setState(() {});
+                            Map valueMap = jsonDecode(response);
+                            String _ifscCodeR = valueMap["IFSC"];
+                            String _bankNameR = valueMap["BANK"];
+                            String _addressR = valueMap["ADDRESS"];
+                            openIFSCConfirmDialogBox(_ifscCodeR,_bankNameR,_addressR);
+                          }
+                        }
+                      },
                       decoration: InputDecoration(
                           counter: Offstage(),
+
                           enabled:true,
-                          suffixIcon: isValidIFSCCode?Icon(Icons.check_circle,color: Colors.black):Icon(Icons.error),
+                          errorText: isValidIFSCCode?null:"Enter a valid IFSC",
+                          suffixIcon: isValidIFSCCode?Icon(Icons.check_circle,color: Colors.green):Icon(Icons.error,color:Colors.red),
                           labelText: _ifscTextFieldFocusNode.hasFocus ? 'Enter IFSC Number' : 'Enter IFSC Number',
                           labelStyle: TextStyle(
-                            color: _ifscTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                            color: primaryColorOfApp,
                           )
                       ),
                     )
@@ -316,6 +345,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       Icon(Icons.search,color:primaryColorOfApp,size: 18,),
                       SizedBox(width: 5,),
                       TextButton(
+
                           onPressed: (){
                             openIFSCSearchDialogBox();
                           },
@@ -450,8 +480,23 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
     );
   }
 
+  Color ifscColorTextField(){
+    if(_ifscCodeTextEditingController.text.length ==11 && isValidIFSCCode){
+      return Colors.green;
+    }
+    else if(_ifscCodeTextEditingController.text.length ==11 && !isValidIFSCCode){
+      return Colors.red;
+    }
+    else if(_ifscTextFieldFocusNode.hasFocus){
+      return primaryColorOfApp;
+    }
+    else{
+      return Colors.grey;
+    }
+  }
 
-  void openIFSCConfirmDialogBox() {
+
+  void openIFSCConfirmDialogBox(String _ifscCodeR,String _bankNameR,String _addressR) {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
@@ -462,7 +507,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
         return Align(
           alignment: Alignment.center,
           child: Container(
-            height: 400,
+            height: 450,
             child: SingleChildScrollView (
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(0.0,10.0,0.0,0.0),
@@ -497,7 +542,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                                     textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
                               ),
                               Text(
-                                  "SBINu39232323",
+                                  _ifscCodeR,
                                   style: GoogleFonts.openSans(
                                     textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
                               ),
@@ -512,7 +557,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                                     textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
                               ),
                               Text(
-                                  "SBI Bank",
+                                  _bankNameR,
                                   style: GoogleFonts.openSans(
                                     textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
                               ),
@@ -530,7 +575,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                               ),
                               Flexible(
                                 child: Text(
-                                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry.",
+                                    _addressR,
                                     style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
                                 ),
                               ),
@@ -563,7 +608,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              onPressed: () {Navigator.pop(context);},
+                              onPressed: () {
+                                Navigator.pop(context);
+                                enableIFSCCodeTextField = false;
+                                setState(() {});
+                                },
                               color: Colors.black12,
                               child: Text(
                                   "Cancel",

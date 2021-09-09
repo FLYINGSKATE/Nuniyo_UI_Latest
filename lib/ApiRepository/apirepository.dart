@@ -91,7 +91,6 @@ class ApiRepo {
     }
   }
 
-
   Future<void> CVLKRAGetPanStatus(String panCardNumber) async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String awt_Token= prefs.getString('API_TOKEN');
@@ -132,6 +131,50 @@ class ApiRepo {
       return;
     }
 
+  }
+
+  Future<bool> PostPersonalDetails(String phoneNumber , String fatherName, String motherName , String income,String gender,String maritial_Status,
+      String politicalExposed , String occupation , String tradingExperience , String education) async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String awt_Token= prefs.getString('API_TOKEN');
+
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    print("Posting Personal Details Using API :"+awt_Token);
+
+    var headers = {
+      'Authorization': 'Bearer $awt_Token',
+      'Content-Type': 'application/json'
+    };
+
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/personal/Personal_Details'));
+
+    request.body = json.encode({
+      "mobile_No": phoneNumber,
+      "father_Name": fatherName,
+      "mother_Name": motherName,
+      "income": income,
+      "gender": gender,
+      "marital_Status": maritial_Status,
+      "politicalExposed": politicalExposed,
+      "occupation": occupation,
+      "trading_Experience": tradingExperience,
+      "education": education
+    });
+
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+      return true;
+    }
+    else {
+      print(response.reasonPhrase);
+      return false;
+    }
   }
 
   Future<void> OnPaymentSuccessPostToDatabase(int paymentPrice, String phoneNumber,String paymentID) async{
@@ -361,6 +404,21 @@ class ApiRepo {
     }
     else {
       print(response.reasonPhrase);
+    }
+  }
+
+  Future<String> isValidIFSC(String ifscCode) async{
+    var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/$ifscCode'));
+    //var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/BARB0DBGHTW'));
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      return result;
+    }
+    else {
+      print(response.reasonPhrase);
+      return "Not Found";
     }
   }
 
