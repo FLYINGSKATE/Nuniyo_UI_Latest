@@ -2,11 +2,13 @@
 import 'dart:io';
 import 'dart:ui' as ui;
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/extra_demo_screens/ImageCropperExample.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -20,7 +22,6 @@ class UploadDocumentScreen extends StatefulWidget {
 
 class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
-  List<XFile>? _imageFileListAadhar,_imageFileListPan;
 
   var headers = {
     'Authorization': 'Basic QUlZM0gxWFM1QVBUMkVNRkU1NFVXWjU2SVE4RlBLRlA6R083NUZXMllBWjZLUU0zRjFaU0dRVlVRQ1pQWEQ2T0Y='
@@ -34,34 +35,36 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   bool showDigitalPadBox = false;
 
-  set _imageFilePan(XFile? value) {
-    _imageFileListPan = value == null ? null : [value];
-  }
+  File? imageFilePan,imageFileDigitalSignature;
 
-  dynamic _pickImageErrorPan;
-  bool isVideo = false;
+  var drawnDigitalSignatureImage = null;
 
-  String? _retrieveDataError;
+  bool showDrawnDigitalSignatureImage = false;
 
-  final ImagePicker _picker = ImagePicker();
-
-  void _onImageButtonPressedForPan(ImageSource source,
-      {BuildContext? context, bool isMultiImage = false}) async {
-    try {
-      final pickedFile = await _picker.pickImage(
-        source: source,
-      );
+  Future<Null> _pickImageForPan(ImageSource source) async {
+    final pickedImage =
+    await ImagePicker().pickImage(source: source);
+    imageFilePan = pickedImage != null ? File(pickedImage.path) : null;
+    if (imageFilePan != null) {
       setState(() {
-        _imageFilePan = pickedFile;
-        print("we picked a file");
-        //Closing the dialog Choose an option to upload the pan image
-        Navigator.pop(context!);
-      });
-    } catch (e) {
-      setState(() {
-        _pickImageErrorPan = e;
+        Navigator.pop(context);
+        _cropImageForPan();
       });
     }
+
+  }
+
+  Future<Null> _pickImageForDigitalSignature(ImageSource source) async {
+    final pickedImage =
+    await ImagePicker().pickImage(source: source);
+    imageFileDigitalSignature = pickedImage != null ? File(pickedImage.path) : null;
+    if (imageFileDigitalSignature != null) {
+      setState(() {
+        Navigator.pop(context);
+        _cropImageForDigitalSignature();
+      });
+    }
+
   }
 
   @override
@@ -145,9 +148,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       IconButton(onPressed:() async {
-                        if (_imageFileListPan != null) {
+                        if (imageFilePan != null) {
                           //Uploading File to Database
-                          isPanOCRVerified = await ApiRepo().PanOCRValidation(_imageFileListPan![0].path,_imageFileListPan![0]);
+                          isPanOCRVerified = await ApiRepo().PanOCRValidation(imageFilePan!.path,imageFilePan);
                         }
                       }, icon: Icon(Icons.check_circle,size: 36.0,)),
                       SizedBox(width: 30,),
@@ -156,7 +159,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       });}, icon: Icon(Icons.remove_red_eye_outlined,size: 36.0,)),
                       SizedBox(width: 30,),
                       IconButton(onPressed:(){
-                        _imageFilePan = null;
+                         imageFilePan = null;
                       }, icon: Icon(Icons.delete,size: 36.0,)),
                     ],
                   ),
@@ -202,7 +205,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          showDigitalSignatureImageUploadOptionsDialog();
+                        },
                         color: primaryColorOfApp,
                         child: Text(
                             "Upload Image",
@@ -216,26 +221,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                 Visibility(visible: showDigitalPadBox,child: SizedBox(height: 20,)),
                 Visibility(
                   visible: showDigitalPadBox,
-                  child: Center(
-                    child:Container(
-                      height: MediaQuery.of(context).size.height/6,
-                      width: MediaQuery.of(context).size.width/3,
-                      decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Colors.grey,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(0))
-                      ),
-                      child:FutureBuilder(
-                        future: populateDigitalPadImageBox(),
-                        builder: (context, snapshot){
-                          return ListTile(
-                            title: Text("${snapshot.data.toString()}"),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                  child: Center(child:populateDigitalPadImageBox(),),
                 ),
                 Padding(
                   padding: const EdgeInsets.all(30.0),
@@ -332,6 +318,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                           borderRadius: BorderRadius.circular(8.0),
                         ),
                         onPressed: () {
+                           _handleSaveButtonPressed();
                            Navigator.pop(context);
                            setState(() {
 
@@ -391,21 +378,11 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   void _handleSaveButtonPressed() async {
     final data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
     final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (BuildContext context) {
-          return Scaffold(
-            appBar: AppBar(),
-            body: Center(
-              child: Container(
-                color: Colors.grey[300],
-                child: Image.memory(bytes!.buffer.asUint8List()),
-              ),
-            ),
-          );
-        },
-      ),
-    );
+    drawnDigitalSignatureImage = bytes;
+    showDrawnDigitalSignatureImage = true;
+    setState(() {
+
+    });
   }
 
   ///PAN CARD METHODS
@@ -449,8 +426,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           onPressed: () {
-                            isVideo = false;
-                            _onImageButtonPressedForPan(ImageSource.camera, context: context);
+                            _pickImageForPan(ImageSource.camera);
                           },
                           color: primaryColorOfApp,
                           child: Text(
@@ -472,8 +448,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           onPressed: () {
-                            isVideo = false;
-                            _onImageButtonPressedForPan(ImageSource.gallery, context: context);
+                            _pickImageForPan(ImageSource.gallery);
                           },
                           color: primaryColorOfApp,
                           child: Text(
@@ -504,18 +479,19 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       },
     );
   }
-  void showUploadedPanCardImageDialog() {
+
+  void showDigitalSignatureImageUploadOptionsDialog() {
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: Duration(milliseconds: 400),
+      transitionDuration: Duration(milliseconds: 700),
       context: context,
       pageBuilder: (_, __, ___) {
         return Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            height: 600,
+            height: 250,
             child: Column(
                 children: [
                   Padding(
@@ -525,14 +501,13 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       child: Material(
                         color: Colors.white,
                         child: Text(
-                            "Your Uploaded Pan Image",
-                            style: GoogleFonts.openSans(
-                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 20,fontWeight: FontWeight.bold),)
-                        ),),
+                          "Choose An Option!",
+                          style: GoogleFonts.openSans(
+                            textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 20,fontWeight: FontWeight.bold),)
+                      ),),
                     ),
                   ),
                   SizedBox(height: 10),
-                  PANCardImagePreviewContainer(),
                   Column(children: <Widget>[
                     Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -545,11 +520,33 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           onPressed: () {
-                            Navigator.pop(context);
+                            _pickImageForDigitalSignature(ImageSource.camera);
                           },
                           color: primaryColorOfApp,
                           child: Text(
-                              "Close",
+                              "Open Camera",
+                              style: GoogleFonts.openSans(
+                                textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                          ),
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width/1.5,
+                        color: Colors.transparent,
+                        height: 60,
+                        child: FlatButton(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          onPressed: () {
+                            _pickImageForDigitalSignature(ImageSource.gallery);
+                          },
+                          color: primaryColorOfApp,
+                          child: Text(
+                              "Upload From Gallery",
                               style: GoogleFonts.openSans(
                                 textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                           ),
@@ -576,68 +573,11 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       },
     );
   }
-  Widget PANCardImagePreviewContainer(){
-    final Text? retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-    if (_imageFileListPan != null) {
-      //Uploading File to Database
-      //PanOCRValidation(_imageFileListPan![0].path,_imageFileListPan![0]);
-
-      return Expanded(
-        child: Semantics(
-            child: ListView.builder(
-              key: UniqueKey(),
-              itemBuilder: (context, index) {
-                // Why network for web?
-                // See https://pub.dev/packages/image_picker#getting-ready-for-the-web-platform
-                return Expanded(
-                  child: Semantics(
-                    label: 'image_picker_example_picked_image',
-                    child: kIsWeb ? Image.network(_imageFileListPan![index].path) : Image.file(File(_imageFileListPan![index].path)),
-                  ),
-                );
-              },
-              itemCount: _imageFileListPan!.length,
-            ),
-            label: 'image_picker_example_picked_images'),
-      );
-    } else if (_pickImageErrorPan != null) {
-      return Text(
-        'Pick image error: $_pickImageErrorPan',
-        textAlign: TextAlign.center,
-      );
-    } else {
-      return Container(
-        decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            color: primaryColorOfApp,
-        ),
-      );
-    }
-  }
-  Text? _getRetrieveErrorWidget() {
-    if (_retrieveDataError != null) {
-      final Text result = Text(_retrieveDataError!);
-      _retrieveDataError = null;
-      return result;
-    }
-    return null;
-  }
-
-  void showUploadedDigitalImageDialog() {
-
-  }
 
   populatePanCardImageBox() {
-    final Text? retrieveError = _getRetrieveErrorWidget();
-    if (retrieveError != null) {
-      return retrieveError;
-    }
-    if (_imageFileListPan != null) {
+    if (imageFilePan != null) {
       //Uploading File to Database
-      //PanOCRValidation(_imageFileListPan![0].path,_imageFileListPan![0]);
+      //PanOCRValidation(_imageFilePanListPan![0].path,_imageFilePanListPan![0]);
       return Container(
         height: MediaQuery.of(context).size.height/6,
         width: MediaQuery.of(context).size.width/3,
@@ -645,17 +585,12 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             border: Border.all(
               color: Colors.grey,
             ),
-            borderRadius: BorderRadius.all(Radius.circular(20))
+            borderRadius: BorderRadius.all(Radius.circular(0))
         ),
-        child: kIsWeb ? Image.network(_imageFileListPan![0].path) : Image.file(File(_imageFileListPan![0].path)),
+        child: kIsWeb ? Image.network(imageFilePan!.path) : Image.file(File(imageFilePan!.path)),
       );
 
-    } else if (_pickImageErrorPan != null) {
-      return Text(
-        'Pick image error: $_pickImageErrorPan',
-        textAlign: TextAlign.center,
-      );
-    } else {
+    }  else {
       return Container(
         height: MediaQuery.of(context).size.height/6,
         width: MediaQuery.of(context).size.width/3,
@@ -670,13 +605,74 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     }
   }
 
-  populateDigitalPadImageBox() async {
-    final data = await signatureGlobalKey.currentState!.toImage(pixelRatio: 3.0);
-    final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
-    await Container(
-      color: Colors.grey[300],
-      child: Image.memory(bytes!.buffer.asUint8List()),
-    );
+  populateDigitalPadImageBox() {
+    if (imageFileDigitalSignature != null) {
+      //Uploading File to Database
+      //PanOCRValidation(_imageFilePanListPan![0].path,_imageFilePanListPan![0]);
+      return Container(
+        height: MediaQuery.of(context).size.height/6,
+        width: MediaQuery.of(context).size.width/3,
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(0))
+        ),
+        child: !showDrawnDigitalSignatureImage ? Image.file(imageFileDigitalSignature!) : Image.memory(drawnDigitalSignatureImage!.buffer.asUint8List()),
+      );
+    }  else {
+      return Container(
+        height: MediaQuery.of(context).size.height/6,
+        width: MediaQuery.of(context).size.width/3,
+        decoration: BoxDecoration(
+            border: Border.all(
+              color: Colors.grey,
+            ),
+            borderRadius: BorderRadius.all(Radius.circular(0))
+        ),
+        child: null,
+      );
+    }
+  }
+
+
+  Future<Null> _cropImageForPan() async {
+    File? croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFilePan!.path,
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: primaryColorOfApp,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'Cropper',
+        ));
+    if (croppedFile != null) {
+      imageFilePan = croppedFile;
+      setState(() {
+
+      });
+    }
+  }
+  Future<Null> _cropImageForDigitalSignature() async {
+    File? croppedFile = await ImageCropper.cropImage(
+        sourcePath: imageFileDigitalSignature!.path,
+        androidUiSettings: AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: primaryColorOfApp,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        iosUiSettings: IOSUiSettings(
+          title: 'Cropper',
+        ));
+    if (croppedFile != null) {
+      imageFileDigitalSignature = croppedFile;
+      showDrawnDigitalSignatureImage = false;
+      setState(() {
+      });
+    }
   }
 
 }

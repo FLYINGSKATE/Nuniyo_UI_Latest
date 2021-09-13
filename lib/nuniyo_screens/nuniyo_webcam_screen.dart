@@ -342,7 +342,6 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
         Future.delayed(Duration(seconds: 3), () {
           onStopButtonPressed();
         });
-
       }
     });
   }

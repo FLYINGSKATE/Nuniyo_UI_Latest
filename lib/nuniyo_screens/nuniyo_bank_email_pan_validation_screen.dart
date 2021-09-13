@@ -210,6 +210,9 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           isValidInputForEmail=await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'),_emailID);
                           //Send Email ID to APi
                           showEmailErrorText = !isValidInputForEmail;
+                          if(isValidInputForEmail){
+                            prefs.setString('EMAIL_ID',_emailID);
+                          }
                           setState(() {
 
                           });
@@ -326,13 +329,12 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       },
                       decoration: InputDecoration(
                           counter: Offstage(),
-
                           enabled:true,
-                          errorText: isValidIFSCCode?null:"Enter a valid IFSC",
-                          suffixIcon: isValidIFSCCode?Icon(Icons.check_circle,color: Colors.green):Icon(Icons.error,color:Colors.red),
+                          errorText: isValidIFSCCode&&isValidInputForIFSC?"Enter a valid IFSC":null,
+                          suffixIcon: isValidIFSCCode&&isValidInputForIFSC?Icon(Icons.error,color:Colors.red):Icon(Icons.check_circle,color: isValidIFSCCode?Colors.green:Colors.transparent),
                           labelText: _ifscTextFieldFocusNode.hasFocus ? 'Enter IFSC Number' : 'Enter IFSC Number',
                           labelStyle: TextStyle(
-                            color: primaryColorOfApp,
+                            color: _ifscTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                           )
                       ),
                     )

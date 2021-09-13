@@ -162,17 +162,25 @@ class _OptionsScreenState extends State<OptionsScreen> {
     );
   }
 
+
   void openCheckout() async {
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String phoneNumber= prefs.getString('PhoneNumber');
+    String emailID = prefs.getString('EMAIL_ID');
+
+
     var options = {
-      'key': 'rzp_test_3ItfhafvOz0Kkx',
+      'key': 'rzp_test_dojmbldJSpz91g',
       'amount': 20000,
       'name': 'Nuniyo.',
       'description': 'Stock Trading',
-      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'prefill': {'contact': '$phoneNumber', 'email': '$emailID'},
       'external': {
-        'wallets': ['paytm']
+        'wallets': ['paytm','phonepe','freecharge','airtelmoney','payzapp','mobikwik','olamoney','phonepeswitch','olamoney'],
       }
     };
+
 
     try {
       _razorpay.open(options);

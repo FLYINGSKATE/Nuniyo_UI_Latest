@@ -62,5 +62,13 @@
     <!-- Permission options for the `camera` group -->
     <key>NSCameraUsageDescription</key>
         <string>camera</string>
+
+    <!-- Permission options for the `Payment` group -->
+    <key>LSApplicationQueriesSchemes</key>
+        <array>
+        	<string>tez</string>
+            <string>phonepe</string>
+            <string>paytmmp</string>
+        </array>
 </dict>
 </plist>

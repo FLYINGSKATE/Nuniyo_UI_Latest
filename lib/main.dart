@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_options_screen_two.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_seperate_upload_screen.dart';
 
+import 'extra_demo_screens/ImageCropperExample.dart';
 import 'nuniyo_screens/nuniyo_webcam_screen.dart';
 import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
 import 'nuniyo_screens/nuniyo_congrats_screen.dart';
@@ -71,7 +72,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => BankPanEmailValidationScreen(),
+        '/': (context) => UploadDocumentScreen(),
         '/mobilevalidationscreen':(context)=>MobileValidationLoginScreen(),
         '/bankemailpanvalidationscreen':(context)=>BankPanEmailValidationScreen(),
         '/uploaddocumentscreen':(context)=>UploadDocumentScreen(),

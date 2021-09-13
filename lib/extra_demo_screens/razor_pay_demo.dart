@@ -88,14 +88,19 @@ class _RayzorPayDemoScreenState extends State<RayzorPayDemoScreen> {
 
   void openCheckout() async {
     var options = {
-      'key': 'rzp_test_3ItfhafvOz0Kkx',
-      'amount': 2000,
-      'name': 'Nuniyo.',
-      'description': 'Stock Trading',
-      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'key': 'rzp_test_dojmbldJSpz91g',
+      'amount': 100,
+      'name': 'Tech X Labs.',
+      'description': 'Nuniyo',
+      'prefill': {
+        'contact': '8888888888',
+        'email': 'test@razorpay.com'
+      },
       'external': {
-        'wallets': ['paytm']
+        'wallets': ['paytm','phonepe','freecharge','airtelmoney','payzapp','mobikwik','olamoney','phonepeswitch','olamoney'],
       }
+
+
     };
 
     try {
