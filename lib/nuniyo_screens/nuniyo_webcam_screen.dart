@@ -38,6 +38,8 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
+  bool makeStepsVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -56,7 +58,9 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   void dispose() {
     super.dispose();
   }
+
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,13 +101,15 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                 SizedBox(height: 20.0,),
               ],
             ),
-                Text("Steps to do IPV:",style: GoogleFonts.openSans(
+                TextButton(child: Text("Steps to do IPV:",style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
-                ),),
+                ),),onPressed: (){makeStepsVisible = !makeStepsVisible;setState(() {
+                  
+                });},),
                 SizedBox(height: 20,),
-                Text("1.Click on Capture button to get the OTP on screen.\n\n2.Once you see the OTP the recording will start.\n\n3.Enter the OTP in the textbox below capture button.\n\n4.Once you enter the OTP recording will stop and it will get verified.\n",style: GoogleFonts.openSans(
+                Visibility(visible:makeStepsVisible,child: Text("1.Click on Capture button to get the OTP on screen.\n\n2.Once you see the OTP the recording will start.\n\n3.Enter the OTP in the textbox below capture button.\n\n4.Once you enter the OTP recording will stop and it will get verified.\n",style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
-                ),),
+                ),),),
                 SizedBox(height: 20,),
                 ///Card Box
                 Align(
@@ -202,6 +208,20 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
     );
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // App state changed before we got the chance to initialize.
+    if (controller == null || !controller!.value.isInitialized) {
+      return;
+    }
+    if (state == AppLifecycleState.inactive) {
+      controller?.dispose();
+    } else if (state == AppLifecycleState.resumed) {
+      if (controller != null) {
+        controller = CameraController(cameras[1], ResolutionPreset.max);
+      }
+    }
+  }
 
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {

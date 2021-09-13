@@ -166,12 +166,15 @@ class _OptionsScreenTwoState extends State<OptionsScreenTwo> {
   }
 
   void openCheckout() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String phoneNumber = await prefs.getString('PhoneNumber');
+    String emailAddress = await prefs.getString('EMAIL_ID');
     var options = {
-      'key': 'rzp_test_3ItfhafvOz0Kkx',
+      'key': 'rzp_test_dojmbldJSpz91g',
       'amount': 20000,
       'name': 'Nuniyo.',
       'description': 'Stock Trading',
-      'prefill': {'contact': '8888888888', 'email': 'test@razorpay.com'},
+      'prefill': {'contact': phoneNumber, 'email': emailAddress},
       'external': {
         'wallets': ['paytm']
       }

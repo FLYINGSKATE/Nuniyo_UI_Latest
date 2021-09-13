@@ -22,6 +22,8 @@ import 'extra_demo_screens/razor_pay_demo.dart';
 import 'nuniyo_screens/nuniyo_aadhar_kyc_screen.dart';
 
 void main() {
+  ///TO hide Red Screen of Death!
+  ErrorWidget.builder = (FlutterErrorDetails details) => Container();
   ///To Override SSL Certificate when used with HTTPS Apis
   HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
@@ -72,7 +74,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/',
       routes: {
-        '/': (context) => UploadDocumentScreen(),
+        '/': (context) => WebCamScreen(),
         '/mobilevalidationscreen':(context)=>MobileValidationLoginScreen(),
         '/bankemailpanvalidationscreen':(context)=>BankPanEmailValidationScreen(),
         '/uploaddocumentscreen':(context)=>UploadDocumentScreen(),
