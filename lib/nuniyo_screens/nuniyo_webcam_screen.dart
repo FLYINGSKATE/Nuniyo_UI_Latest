@@ -8,6 +8,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:video_player/video_player.dart';
 
 
@@ -43,6 +44,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   @override
   void initState() {
     super.initState();
+    manageSteps();
     initializeCamera();
     _ambiguate(WidgetsBinding.instance)?.addObserver(this);
     controller = CameraController(cameras[1], ResolutionPreset.max);
@@ -104,7 +106,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                 TextButton(child: Text("Steps to do IPV:",style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
                 ),),onPressed: (){makeStepsVisible = !makeStepsVisible;setState(() {
-                  
+
                 });},),
                 SizedBox(height: 20,),
                 Visibility(visible:makeStepsVisible,child: Text("1.Click on Capture button to get the OTP on screen.\n\n2.Once you see the OTP the recording will start.\n\n3.Enter the OTP in the textbox below capture button.\n\n4.Once you enter the OTP recording will stop and it will get verified.\n",style: GoogleFonts.openSans(
@@ -449,6 +451,29 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
     // ignore: deprecated_member_use
     _scaffoldKey.currentState?.showSnackBar(SnackBar(content: Text(message)));
   }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/webcamscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
+  }
+
 }
 
 List<CameraDescription> cameras = [];

@@ -3,6 +3,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../nuniyo_custom_icons.dart';
 
@@ -20,6 +21,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
   @override
   void initState() {
     super.initState();
+    manageSteps();
   }
 
   @override
@@ -276,4 +278,27 @@ class _CongratsScreenState extends State<CongratsScreen> {
       ),
     );
   }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/congratsscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
+  }
+
 }

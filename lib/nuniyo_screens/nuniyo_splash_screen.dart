@@ -9,6 +9,7 @@ import 'package:geocoder/geocoder.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:get_ip_address/get_ip_address.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:io' show Platform;
 
 import 'package:sim_info/sim_info.dart';
@@ -128,19 +129,17 @@ class SplashScreenState extends State<SplashScreen> {
       _getIPAddress();
       _getCurrentLocation();
       //EMULATOR
-      //_getBioMetricsAuthentication();
+      _getBioMetricsAuthentication();
       WidgetsBinding.instance!.addPostFrameCallback((_){
-        Navigator.pushNamed(context, "/mobilevalidationscreen");
+        ContinueToStep();
       });
-
     }
     else{
       _askForPermissions();
       _getCurrentLocation();
-      Navigator.pushReplacementNamed(context, "/mobilevalidationscreen");
+      ContinueToStep();
     }
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -174,10 +173,23 @@ class SplashScreenState extends State<SplashScreen> {
     );
   }
 
+  Future<void> ContinueToStep() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey('STEP_ID')){
+      String ThisStepId = prefs.getString("STEP_ID");
+      print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
+      Navigator.pushNamed(context,ThisStepId);
+    }
+    else{
+      print("WELCOME NEW USER");
+      Navigator.pushNamed(context,'/mobilevalidationscreen');
+    }
+  }
+
   void _getBioMetricsAuthentication() async {
     bool isAuthenticated = await Authentication.authenticateWithBiometrics();
     if (isAuthenticated) {
-      Navigator.pushReplacementNamed(context, "/demoscreen");
+      ContinueToStep();
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         Authentication.customSnackBar(

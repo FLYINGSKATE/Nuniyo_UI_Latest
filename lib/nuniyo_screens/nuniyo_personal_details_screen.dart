@@ -3,6 +3,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PersonalDetailsScreen extends StatefulWidget {
   const PersonalDetailsScreen({Key? key}) : super(key: key);
@@ -27,6 +28,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    manageSteps();
     _fatherNameTextFieldFocusNode = FocusNode();
     _tradingExperienceDropDownFocusNode = FocusNode();
     _motherNameTextFieldFocusNode = FocusNode();
@@ -130,7 +132,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     child: Container(
                       height: 80,
                       child: TextField(
-                        keyboardType: TextInputType.number,
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: 0.5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _motherNameTextFieldFocusNode,
@@ -355,7 +356,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                         ),
                         onChanged: (String? newValue) {
                           setState(() {
-                            occupation = newValue!;
+                            politicallyExposed = newValue!;
                           });
                         },
                         items: <String>['Yes','No','Maybe']
@@ -378,7 +379,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {
+                    onPressed: () async {
+                      SharedPreferences prefs = await SharedPreferences.getInstance();
+                      prefs.setString("GENDER",gender);
                       Navigator.pushNamed(context, '/optionsscreen');
                     },
                     color: primaryColorOfApp,
@@ -396,4 +399,27 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
       ),
     );
   }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/personaldetailsscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
+  }
+
 }

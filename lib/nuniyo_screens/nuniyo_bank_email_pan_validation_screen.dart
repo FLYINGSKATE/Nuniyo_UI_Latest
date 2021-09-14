@@ -1,7 +1,6 @@
 ///Sign Up Page 1
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -38,9 +37,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   bool isValidIFSCCode = false;
 
-
   String emailErrorText = "Please Enter a valid Email...";
   bool showEmailErrorText = false;
+
+  bool showIFSCErrorText = false;
+  String ifscErrorText = "Please Enter a valid IFSC....";
 
   String panErrorText = "Please Enter a valid PAN Number...";
   bool showPANErrorText = false;
@@ -75,7 +76,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
         context: context,
         initialDate: DateTime(1920, 1),
         firstDate: DateTime(1920, 1),
-        lastDate: DateTime(2002));
+        lastDate: DateTime.now());
     if (picked != null && picked != selectedDate)
       setState(() {
         selectedDate = picked;
@@ -104,6 +105,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
   @override
   void initState() {
     super.initState();
+    manageSteps();
     _bankNameTextFieldFocusNode = FocusNode();
     _branchNameFocusNode = FocusNode();
     _IFSCCode2TextFieldFocusNode = FocusNode();
@@ -231,6 +233,9 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           print("We are Fetching PAN Details For the Phone Number :"+phoneNumber+" and Email ID :");
                           isValidInputForPan=await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
                           await ApiRepo().CVLKRAGetPanStatus(_panNumber);
+                          if(isValidInputForPan){
+                            prefs.setString("PAN_NO",_panNumber );
+                          }
                           showPANErrorText = !isValidInputForPan;
                           setState(() {
                           });
@@ -309,13 +314,16 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
                         });
                         if(value.length==11){
+                          isValidInputForIFSC = true;
                           String response = await ApiRepo().isValidIFSC(value);
                           if(response == "Not Found"){
                             print("IFSC CODE WRONG");
+                            showIFSCErrorText = true;
                             isValidIFSCCode = false;
                             setState(() {});
                           }
                           else{
+                            showIFSCErrorText = false;
                             isValidIFSCCode = true;
                             print(response);
                             setState(() {});
@@ -329,9 +337,8 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       },
                       decoration: InputDecoration(
                           counter: Offstage(),
-                          enabled:true,
-                          errorText: isValidIFSCCode&&isValidInputForIFSC?"Enter a valid IFSC":null,
-                          suffixIcon: isValidIFSCCode&&isValidInputForIFSC?Icon(Icons.error,color:Colors.red):Icon(Icons.check_circle,color: isValidIFSCCode?Colors.green:Colors.transparent),
+                          errorText: showIFSCErrorText?"Enter a valid IFSC":null,
+                          suffixIcon: !showIFSCErrorText?Icon(Icons.check_circle,color: isValidIFSCCode?Colors.green:Colors.transparent):Icon(Icons.error,color:Colors.red),
                           labelText: _ifscTextFieldFocusNode.hasFocus ? 'Enter IFSC Number' : 'Enter IFSC Number',
                           labelStyle: TextStyle(
                             color: _ifscTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
@@ -347,7 +354,6 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       Icon(Icons.search,color:primaryColorOfApp,size: 18,),
                       SizedBox(width: 5,),
                       TextButton(
-
                           onPressed: (){
                             openIFSCSearchDialogBox();
                           },
@@ -362,11 +368,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   child: FlatButton(
+                    disabledColor: Color(0xffD2D0E1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () async {
-
+                    onPressed:!isValidIFSCCode?null:()async {
                       isValidInputForBank = true;
                       isValidInputForPan = true;
                       isValidInputForEmail = true;
@@ -432,10 +438,13 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           );
                           await Future.delayed(Duration(seconds: 1));
                           Navigator.pop(context);
-                          ///FOR DEMO
+                          ////////////////////////////FOR DEMO////////////////////
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
+                          prefs.setString("DOB",_dateController.text);
+                          prefs.setString("BANK_AC_NO",_bankTextEditingController.text);
                           Navigator.pushNamed(context, '/personaldetailsscreen');
+                          ////////////
                         }
-
                       }
                     },
                     color: primaryColorOfApp,
@@ -592,7 +601,12 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              onPressed: () {Navigator.pop(context);},
+                              onPressed: () {
+                                isValidIFSCCode = true;
+                                isValidInputForIFSC = true;
+                                enableIFSCCodeTextField = false;
+                                Navigator.pop(context);
+                              },
                               color: primaryColorOfApp,
                               child: Text(
                                   "Confirm",
@@ -610,10 +624,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.pop(context);
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                prefs.setString("IFSC_CODE",_ifscCodeR);
                                 enableIFSCCodeTextField = false;
-                                setState(() {});
                                 },
                               color: Colors.black12,
                               child: Text(
@@ -809,5 +824,28 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
         );
       },
     );
+  }
+
+  Future<void> manageSteps() async {
+
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/bankemailpanvalidationscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
   }
 }

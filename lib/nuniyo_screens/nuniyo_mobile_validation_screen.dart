@@ -53,6 +53,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   @override
   void initState() {
     super.initState();
+    manageSteps();
     initializePreference().whenComplete((){
       setState(() {});
     });
@@ -132,11 +133,11 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         counter: Offstage(),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                          child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.black,),
+                          child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         ),
                         labelText: _phoneNumberFocusNode.hasFocus ? 'Mobile Number' : 'Enter Mobile Number',
                           labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                              color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.black,
+                              color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                           )
                       ),
                       onChanged: (_phoneNumber) async {
@@ -187,11 +188,11 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           errorText: showOTPErrorText?"$OTPErrorText":null,
                           suffixIcon: Padding(
                             padding: const EdgeInsets.fromLTRB(0.0,0.0,40.0,0.0),
-                            child: Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.black,),
+                            child: Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                           ),
                           labelText: _otpFocusNode.hasFocus ? 'OTP' : 'Enter OTP',
                           labelStyle: TextStyle(
-                            color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.black,
+                            color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                           )
                       ),
                     )
@@ -277,18 +278,19 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                 SizedBox(height: 20,),
                 //Real Button
                 Container(
-                  color: Colors.transparent,
                   width: MediaQuery.of(context).size.width,
+                  decoration: BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(10)
+                  ),
                   height: 60,
-                  child: ColorFiltered(
-                    colorFilter: ColorFilter.mode(isValidOTP?Colors.transparent:Colors.grey, BlendMode.lighten),
-                    child: FlatButton(
+                  child: FlatButton(
+                      disabledTextColor: Colors.blue,
+                      disabledColor: Color(0xffD2D0E1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      onPressed: () {
-                        Navigator.pushNamed(context, '/bankemailpanvalidationscreen');
-                      },
+                      onPressed: !isValidOTP ? null : () => {Navigator.pushNamed(context, '/bankemailpanvalidationscreen')},
                       color: primaryColorOfApp,
                       child: Text(
                         "Proceed",
@@ -297,7 +299,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       ),
                     ),
                   ),
-                ),
               ],
             ),
           ),
@@ -341,6 +342,10 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
     this.preferences = await SharedPreferences.getInstance();
     //this.preferences?.setString("name", "Peter");
     //this.preferences?.setStringList("infoList", ["developer","mobile dev"]);
+  }
+
+  void manageSteps() {
+
   }
 }
 

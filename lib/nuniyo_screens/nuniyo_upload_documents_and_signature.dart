@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
 class UploadDocumentScreen extends StatefulWidget {
@@ -79,6 +80,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   @override
   void initState() {
     super.initState();
+    manageSteps();
   }
 
   @override
@@ -320,9 +322,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                         onPressed: () {
                            _handleSaveButtonPressed();
                            Navigator.pop(context);
-                           setState(() {
-
-                           });
                         },
                         color: primaryColorOfApp,
                         child: Text(
@@ -675,4 +674,25 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     }
   }
 
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/''uploaddocumentscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
+  }
 }

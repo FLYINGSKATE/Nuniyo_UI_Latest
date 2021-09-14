@@ -4,6 +4,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class AadharKYCScreen extends StatefulWidget {
@@ -20,6 +21,7 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
   @override
   void initState() {
     super.initState();
+    manageSteps();
   }
 
   @override
@@ -78,5 +80,27 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/aadharkycscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
   }
 }

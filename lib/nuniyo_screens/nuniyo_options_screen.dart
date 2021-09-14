@@ -27,6 +27,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
   @override
   void initState() {
     super.initState();
+    manageSteps();
     _razorpay = Razorpay();
     _razorpay.on(Razorpay.EVENT_PAYMENT_SUCCESS, _handlePaymentSuccess);
     _razorpay.on(Razorpay.EVENT_PAYMENT_ERROR, _handlePaymentError);
@@ -207,6 +208,28 @@ class _OptionsScreenState extends State<OptionsScreen> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String phoneNumber = await prefs.getString('PhoneNumber');
     ApiRepo().OnPaymentSuccessPostToDatabase(200, phoneNumber,paymentID);
+  }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/optionsscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
   }
 
 }

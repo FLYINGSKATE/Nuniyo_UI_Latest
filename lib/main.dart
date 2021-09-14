@@ -3,23 +3,8 @@
 
 import 'dart:io';
 
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_options_screen_two.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_seperate_upload_screen.dart';
-
-import 'extra_demo_screens/ImageCropperExample.dart';
-import 'nuniyo_screens/nuniyo_webcam_screen.dart';
-import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
-import 'nuniyo_screens/nuniyo_congrats_screen.dart';
-import 'nuniyo_screens/nuniyo_esign_screen.dart';
-import 'nuniyo_screens/nuniyo_mobile_validation_screen.dart';
-import 'nuniyo_screens/nuniyo_options_screen.dart';
-import 'nuniyo_screens/nuniyo_personal_details_screen.dart';
-import 'nuniyo_screens/nuniyo_splash_screen.dart';
-import 'nuniyo_screens/nuniyo_upload_documents_and_signature.dart';
+import 'package:angel_broking_demo/utils/Router.dart';
 import 'package:flutter/material.dart';
-
-import 'extra_demo_screens/razor_pay_demo.dart';
-import 'nuniyo_screens/nuniyo_aadhar_kyc_screen.dart';
 
 void main() {
   ///TO hide Red Screen of Death!
@@ -73,19 +58,7 @@ class MyApp extends StatelessWidget {
         primaryColor: Color(0xff6A4EEE),
       ),
       initialRoute: '/',
-      routes: {
-        '/': (context) => WebCamScreen(),
-        '/mobilevalidationscreen':(context)=>MobileValidationLoginScreen(),
-        '/bankemailpanvalidationscreen':(context)=>BankPanEmailValidationScreen(),
-        '/uploaddocumentscreen':(context)=>UploadDocumentScreen(),
-        '/personaldetailsscreen':(context)=>PersonalDetailsScreen(),
-        '/optionsscreen':(context)=>OptionsScreen(),
-        '/optionsscreen':(context)=>OptionsScreenTwo(),
-        '/aadharkycscreen':(context)=>AadharKYCScreen(),
-        '/esignscreen':(context)=>EsignScreen(),
-        '/webcamscreen':(context)=>WebCamScreen(),
-        '/congratsscreen':(context)=>CongratsScreen(),
-      },
+      onGenerateRoute: ScreenRouter.generateRoute,
     );
   }
 }

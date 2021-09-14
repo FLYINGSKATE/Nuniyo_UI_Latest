@@ -3,6 +3,7 @@ import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 class EsignScreen extends StatefulWidget {
@@ -16,9 +17,17 @@ class _EsignScreenState extends State<EsignScreen> {
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
+  String PAN_NO = "";
+  String GENDER = "";
+  String DOB = "";
+  String EMAIL_ID = "";
+
+
   @override
   void initState() {
     super.initState();
+    manageSteps();
+    fetchDetails();
   }
 
   @override
@@ -114,21 +123,21 @@ class _EsignScreenState extends State<EsignScreen> {
                               SizedBox(width:15.0),
                               Icon(Icons.card_giftcard,color:Colors.grey),
                               SizedBox(width:14.0),
-                              Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                              Text("$DOB",style: GoogleFonts.openSans(
                                 textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
                               ),),
                               SizedBox(width: 40,),
                               Icon(Icons.male,color:Colors.grey),
                               SizedBox(width:15.0),
-                              Text("Male",style: GoogleFonts.openSans(
+                              Text("$GENDER",style: GoogleFonts.openSans(
                                 textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
                               ),),
                             ],
                           ),
                           ListTile(
                             minLeadingWidth: 0.0,
-                            leading: Icon(Icons.message),
-                            title: Text("Lorem Ipsum",style: GoogleFonts.openSans(
+                            leading: Icon(Icons.email_outlined),
+                            title: Text("$EMAIL_ID",style: GoogleFonts.openSans(
                               textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14),
                             ),),
                           ),
@@ -156,7 +165,7 @@ class _EsignScreenState extends State<EsignScreen> {
                         textStyle: TextStyle(color: Colors.black,fontWeight: FontWeight.bold, letterSpacing: .5,fontSize: 24),
                       ),),
                       SizedBox(height: 10,),
-                      Text("HCAPK4256Y",style: GoogleFonts.openSans(
+                      Text("$PAN_NO",style: GoogleFonts.openSans(
                         textStyle: TextStyle(color: Colors.black,letterSpacing: .5,fontSize: 20),
                       ),),
                       SizedBox(height: 10,),
@@ -173,4 +182,38 @@ class _EsignScreenState extends State<EsignScreen> {
       ),
     );
   }
+
+  Future<void> manageSteps() async {
+    ///REFERENCE
+    //'/mobilevalidationscreen'
+    //'/bankemailpanvalidationscreen'
+    //'/uploaddocumentscreen'
+    //'/personaldetailsscreen'
+    //'/optionsscreen'
+    //'/optionsscreen'
+    //'/aadharkycscreen'
+    //'/esignscreen'
+    //'/webcamscreen'
+    //'/congratsscreen'
+
+    ///SET STEP ID HERE
+    String ThisStepId = '/esignscreen';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('STEP_ID',ThisStepId);
+
+    String StepId = prefs.getString('STEP_ID');
+    print("You are on STEP  :"+StepId);
+  }
+
+  Future<void> fetchDetails() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    DOB = prefs.getString("DOB");
+    EMAIL_ID =prefs.getString("EMAIL_ID");
+    GENDER = prefs.getString("GENDER");
+    PAN_NO = prefs.getString("PAN_NO");
+    setState(() {
+
+    });
+  }
+
 }
