@@ -12,7 +12,6 @@ import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
 import 'package:flutter/material.dart';
 
 class ScreenRouter {
-
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       //1

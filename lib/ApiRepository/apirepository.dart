@@ -395,7 +395,17 @@ class ApiRepo {
   }
 
   Future<void> searchIFSCCodes() async{
-    var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/BARB0DBGHTW'));
+    var headers = {
+      'Authorization': 'Bearer',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/ifscmaster/IFSC_Master_Search'));
+    request.body = json.encode({
+      "bank": "icici",
+      "ifsc": "string",
+      "branch": "andheri"
+    });
+    request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
 

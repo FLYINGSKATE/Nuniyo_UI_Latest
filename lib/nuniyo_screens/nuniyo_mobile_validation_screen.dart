@@ -53,7 +53,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   @override
   void initState() {
     super.initState();
-    manageSteps();
     initializePreference().whenComplete((){
       setState(() {});
     });
@@ -290,7 +289,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8.0),
                       ),
-                      onPressed: !isValidOTP ? null : () => {Navigator.pushNamed(context, '/bankemailpanvalidationscreen')},
+                      onPressed: !isValidOTP ? null : () => {
+                        ContinueToStep()
+                      },
                       color: primaryColorOfApp,
                       child: Text(
                         "Proceed",
@@ -344,8 +345,18 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
     //this.preferences?.setStringList("infoList", ["developer","mobile dev"]);
   }
 
-  void manageSteps() {
 
+  Future<void> ContinueToStep() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if(prefs.containsKey('STEP_ID')){
+      String ThisStepId = prefs.getString("STEP_ID");
+      print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
+      Navigator.pushNamed(context,ThisStepId);
+    }
+    else{
+      print("WELCOME NEW USER");
+      Navigator.pushNamed(context,'/mobilevalidationscreen');
+    }
   }
 }
 

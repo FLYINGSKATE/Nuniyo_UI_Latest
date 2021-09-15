@@ -803,6 +803,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                             ),
                           ),
                         ),
+                        ListViewOfIFSCCode(),
                       ], mainAxisAlignment: MainAxisAlignment.spaceEvenly)
                     ],
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -847,5 +848,81 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
     String StepId = prefs.getString('STEP_ID');
     print("You are on STEP  :"+StepId);
+  }
+
+  Widget ListViewOfIFSCCode() {
+    int itemCount = 10;
+    return Material(
+      color: Colors.white,
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Align(
+              child: Padding(
+                padding: EdgeInsets.all(10),
+                child:Text(
+                    "Search Results",
+                    style: GoogleFonts.openSans(
+                      textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                ),),alignment: Alignment.centerLeft,),
+            for(int i = 0 ; i<=itemCount;i++)IFSCCard(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  IFSCCard() {
+    return Padding(
+      padding: EdgeInsets.all(10),
+      child:Column(
+        children: [
+          Row(
+            children: [
+              Text(
+                  "Bank Name",
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment:CrossAxisAlignment.start,
+            children: [
+              Text(
+                  "Address :",
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+              ),
+              Flexible(
+                child: Text(
+                    "sas",
+                    style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
+                ),
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Row(
+            children: [
+              Text(
+                  "IFSC Code :",
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18,fontWeight: FontWeight.bold),)
+              ),
+              Text(
+                  "_ifscCodeR",
+                  style: GoogleFonts.openSans(
+                    textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 18),)
+              ),
+            ],
+          ),
+          SizedBox(height: 10,),
+          Divider(height: 1,color: Colors.black,),
+        ],
+      )
+    );
   }
 }

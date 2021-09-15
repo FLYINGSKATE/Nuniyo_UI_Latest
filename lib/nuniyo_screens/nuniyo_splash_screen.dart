@@ -131,13 +131,13 @@ class SplashScreenState extends State<SplashScreen> {
       //EMULATOR
       _getBioMetricsAuthentication();
       WidgetsBinding.instance!.addPostFrameCallback((_){
-        ContinueToStep();
+        Navigator.pushNamed(context,'/mobilevalidationscreen');
       });
     }
     else{
       _askForPermissions();
       _getCurrentLocation();
-      ContinueToStep();
+      Navigator.pushNamed(context,'/mobilevalidationscreen');
     }
   }
 
@@ -173,23 +173,12 @@ class SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  Future<void> ContinueToStep() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey('STEP_ID')){
-      String ThisStepId = prefs.getString("STEP_ID");
-      print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
-      Navigator.pushNamed(context,ThisStepId);
-    }
-    else{
-      print("WELCOME NEW USER");
-      Navigator.pushNamed(context,'/mobilevalidationscreen');
-    }
-  }
+
 
   void _getBioMetricsAuthentication() async {
     bool isAuthenticated = await Authentication.authenticateWithBiometrics();
     if (isAuthenticated) {
-      ContinueToStep();
+      Navigator.pushNamed(context,'/mobilevalidationscreen');
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         Authentication.customSnackBar(

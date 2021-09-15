@@ -321,7 +321,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             tradingExperience = newValue!;
                           });
                         },
-
                         items: <String>['0 Years','1 Years','2 Years','3 Years']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
