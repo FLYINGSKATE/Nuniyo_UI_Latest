@@ -228,7 +228,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         child: TextField(
                           maxLength: 10,
                           cursorColor: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,
-                          style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
+                          style :GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                           focusNode: _referralCodeNode,
                           onTap: _requestReferralCodeFocus,
                           decoration: InputDecoration(
@@ -241,10 +241,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                               counter: Offstage(),
                               suffixIcon: Padding(
                                 padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                                child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,),
+                                child: Padding(padding:EdgeInsets.fromLTRB(0, 0, 0, 16.0),child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,),)
                               ),
                               hintText: 'Referral Code ',
-
                               labelStyle: TextStyle(
                                 color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,
                               )
@@ -355,7 +354,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
     }
     else{
       print("WELCOME NEW USER");
-      Navigator.pushNamed(context,'/mobilevalidationscreen');
+      Navigator.pushNamed(context,'/bankemailpanvalidationscreen');
     }
   }
 }

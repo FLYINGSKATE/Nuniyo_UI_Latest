@@ -193,7 +193,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId!, toastLength: Toast.LENGTH_SHORT);
     PostPayment(response.paymentId.toString());
-    Navigator.pushNamed(context, '/optionsscreentwo');
+    Navigator.pushNamed(context, '/aadharkycscreen');
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {

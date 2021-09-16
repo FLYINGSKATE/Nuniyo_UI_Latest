@@ -361,7 +361,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
     startVideoRecording().then((_) {
       if (mounted) {
         setState(() {});
-        Future.delayed(Duration(seconds: 3), () {
+        Future.delayed(Duration(seconds: 12), () {
           onStopButtonPressed();
         });
       }
@@ -374,12 +374,12 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
       if (file != null) {
         showInSnackBar('Video recorded to ${file.path}');
         videoFile = file;
-        _startVideoPlayer();
+        //_startVideoPlayer();
       }
     });
   }
 
-  Future<void> _startVideoPlayer() async {
+  /*Future<void> _startVideoPlayer() async {
     if (videoFile == null) {
       return;
     }
@@ -404,7 +404,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
       });
     }
     await vController.play();
-  }
+  }*/
 
   Future<void> startVideoRecording() async {
     final CameraController? cameraController = controller;

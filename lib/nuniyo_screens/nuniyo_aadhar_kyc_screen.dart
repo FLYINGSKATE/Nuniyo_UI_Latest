@@ -1,10 +1,13 @@
 //Aadhar KYC
 
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_web_view.dart';
+import 'package:angel_broking_demo/extra_demo_screens/web_view.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 
 class AadharKYCScreen extends StatefulWidget {
@@ -60,7 +63,11 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () {
-                      Navigator.pushNamed(context, '/webcamscreen');
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => BrowserViewX()),
+                      );
+                      //Navigator.pushNamed(context, '/personaldetailsscreen');
                     },
                     color: primaryColorOfApp,
                     child: Text(

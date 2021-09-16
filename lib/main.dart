@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      initialRoute: '/bankpanandemailvalidationscreen',
+      initialRoute: '/',
       onGenerateRoute: ScreenRouter.generateRoute,
     );
   }

@@ -381,7 +381,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     onPressed: () async {
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
-                      Navigator.pushNamed(context, '/optionsscreen');
+                      Navigator.pushNamed(context, '/webcamscreen');
                     },
                     color: primaryColorOfApp,
                     child: Text(

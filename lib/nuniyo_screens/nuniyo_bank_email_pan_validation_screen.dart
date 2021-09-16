@@ -408,7 +408,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                         //isEmailValidatedSuccessfully = await ApiRepo().fetchEmailOTP(emailID);
                         await Future.delayed(Duration(seconds: 1));
                         if(isBankValidatedSuccessfully&&isPanValidatedSuccessfully&&isEmailValidatedSuccessfully){
-                          Navigator.pushNamed(context, '/personaldetailsscreen');
+                          Navigator.pushNamed(context, '/optionsscreen');
                         }
                         else{
                           Navigator.pop(context);
@@ -442,7 +442,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           prefs.setString("DOB",_dateController.text);
                           prefs.setString("BANK_AC_NO",_bankTextEditingController.text);
-                          Navigator.pushNamed(context, '/personaldetailsscreen');
+                          Navigator.pushNamed(context, '/optionsscreen');
                           ////////////
                         }
                       }

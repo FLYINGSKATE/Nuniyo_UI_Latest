@@ -1,6 +1,7 @@
 ///Upload Document Screen
 import 'dart:io';
 import 'dart:ui' as ui;
+import 'dart:ui';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/extra_demo_screens/ImageCropperExample.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
@@ -11,6 +12,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
@@ -36,7 +38,12 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   bool showDigitalPadBox = false;
 
-  File? imageFilePan,imageFileDigitalSignature;
+  File? imageFilePan;
+
+  bool tempPanUploaded = false;
+  bool tempDigitalPadUploaded = false;
+
+  File? imageFileDigitalSignature = new File("/assets/images/congratulations.png");
 
   var drawnDigitalSignatureImage = null;
 
@@ -56,8 +63,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   }
 
   Future<Null> _pickImageForDigitalSignature(ImageSource source) async {
-    final pickedImage =
-    await ImagePicker().pickImage(source: source);
+    final pickedImage = await ImagePicker().pickImage(source: source);
     imageFileDigitalSignature = pickedImage != null ? File(pickedImage.path) : null;
     if (imageFileDigitalSignature != null) {
       setState(() {
@@ -144,28 +150,34 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                     child:populatePanCardImageBox(),
                   ),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
+                SizedBox(height: 30.0,),
+                Visibility(
+                  visible: tempPanUploaded,
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(onPressed:() async {
-                        if (imageFilePan != null) {
-                          //Uploading File to Database
-                          isPanOCRVerified = await ApiRepo().PanOCRValidation(imageFilePan!.path,imageFilePan);
-                        }
-                      }, icon: Icon(Icons.check_circle,size: 36.0,)),
-                      SizedBox(width: 30,),
-                      IconButton(onPressed:(){ showPanCardImageBox = !showPanCardImageBox;setState(() {
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(onPressed:() async {
+                      if (imageFilePan != null) {
+                        //Uploading File to Database
+                        isPanOCRVerified = await ApiRepo().PanOCRValidation(imageFilePan!.path,imageFilePan);
+                      }
+                    }, icon: Icon(Icons.check_circle,size: 36.0,color: Colors.green,)),
+                    SizedBox(width: 30,),
+                    IconButton(onPressed:(){ showPanCardImageBox = !showPanCardImageBox;setState(() {
 
-                      });}, icon: Icon(Icons.remove_red_eye_outlined,size: 36.0,)),
-                      SizedBox(width: 30,),
-                      IconButton(onPressed:(){
-                         imageFilePan = null;
-                      }, icon: Icon(Icons.delete,size: 36.0,)),
-                    ],
-                  ),
-                ),
+                    });}, icon: Icon(Icons.remove_red_eye_outlined,size: 36.0,color: primaryColorOfApp,)),
+                    SizedBox(width: 30,),
+                    IconButton(onPressed:(){
+                      imageFilePan = null;
+                      tempPanUploaded = false;
+                      setState(() {
+
+                      });
+                      showPanCardImageBox = false;
+                    }, icon: Icon(Icons.delete,size: 36.0,color: Colors.red,)),
+                  ],
+                ),),
+                SizedBox(height: 30.0,),
                 Divider(thickness: 2.0,),
                 Text("Signature",style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 22,fontWeight: FontWeight.bold),
@@ -225,24 +237,27 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                   visible: showDigitalPadBox,
                   child: Center(child:populateDigitalPadImageBox(),),
                 ),
-                Padding(
-                  padding: const EdgeInsets.all(30.0),
+                SizedBox(height: 30.0,),
+                Visibility(
+                  visible: tempDigitalPadUploaded,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      IconButton(onPressed:(){}, icon: Icon(Icons.check_circle,size: 36.0,)),
+                      IconButton(onPressed:(){}, icon: Icon(Icons.check_circle,size: 36.0,color: Colors.green,)),
                       SizedBox(width: 30,),
                       IconButton(onPressed:(){
                         showDigitalPadBox = !showDigitalPadBox;
                         setState(() {});
-                      }, icon: Icon(Icons.remove_red_eye_outlined,size: 36.0,)),
+                      }, icon: Icon(Icons.remove_red_eye_outlined,size: 36.0,color: primaryColorOfApp,)),
                       SizedBox(width: 30,),
                       IconButton(onPressed:(){
-                        _handleClearButtonPressed();
-                      }, icon: Icon(Icons.delete,size: 36.0,)),
+                        tempDigitalPadUploaded = false;
+                        showDigitalPadBox = false;
+                        setState(() {});
+                      }, icon: Icon(Icons.delete,size: 36.0,color: Colors.red,)),
                     ],
-                  ),
-                ),
+                  ),),
+                SizedBox(height: 30.0,),
                 SizedBox(height: 10,),
                 Container(
                   color: Colors.transparent,
@@ -321,6 +336,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                         ),
                         onPressed: () {
                            _handleSaveButtonPressed();
+                           setState(() {
+
+                           });
                            Navigator.pop(context);
                         },
                         color: primaryColorOfApp,
@@ -379,10 +397,13 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     final bytes = await data.toByteData(format: ui.ImageByteFormat.png);
     drawnDigitalSignatureImage = bytes;
     showDrawnDigitalSignatureImage = true;
+    print(data);
+    tempDigitalPadUploaded  = true;
     setState(() {
-
+      drawnDigitalSignatureImage = bytes;
     });
   }
+
 
   ///PAN CARD METHODS
   void showPanCardImageUploadOptionsDialog() {
@@ -617,7 +638,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             ),
             borderRadius: BorderRadius.all(Radius.circular(0))
         ),
-        child: !showDrawnDigitalSignatureImage ? Image.file(imageFileDigitalSignature!) : Image.memory(drawnDigitalSignatureImage!.buffer.asUint8List()),
+        child: showDrawnDigitalSignatureImage ? Image.memory(drawnDigitalSignatureImage!.buffer.asUint8List()):Image.file(imageFileDigitalSignature!),
       );
     }  else {
       return Container(
@@ -649,6 +670,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
         ));
     if (croppedFile != null) {
       imageFilePan = croppedFile;
+      tempPanUploaded = true;
       setState(() {
 
       });
@@ -669,6 +691,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     if (croppedFile != null) {
       imageFileDigitalSignature = croppedFile;
       showDrawnDigitalSignatureImage = false;
+      tempDigitalPadUploaded  = true;
       setState(() {
       });
     }
@@ -688,7 +711,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     //'/congratsscreen'
 
     ///SET STEP ID HERE
-    String ThisStepId = '/''uploaddocumentscreen';
+    String ThisStepId = '/uploaddocumentscreen';
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString('STEP_ID',ThisStepId);
 
