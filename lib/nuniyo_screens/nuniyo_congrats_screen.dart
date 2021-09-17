@@ -31,7 +31,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
@@ -244,8 +244,8 @@ class _CongratsScreenState extends State<CongratsScreen> {
                       height: 80,
                       width: MediaQuery.of(context).size.width,
                       decoration: BoxDecoration(
-                          border: Border.all(color: primaryColorOfApp),
-                          borderRadius: BorderRadius.circular(8.0),
+                        border: Border.all(color: primaryColorOfApp),
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
                       child: FlatButton(
                         shape: RoundedRectangleBorder(
@@ -276,7 +276,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
           ),
         ),
       ),
-    );
+    ), onWillPop: _onWillPop);
   }
 
   Future<void> manageSteps() async {
@@ -301,4 +301,8 @@ class _CongratsScreenState extends State<CongratsScreen> {
     print("You are on STEP  :"+StepId);
   }
 
+
+  Future<bool> _onWillPop() {
+    return Future.value(false);
+  }
 }

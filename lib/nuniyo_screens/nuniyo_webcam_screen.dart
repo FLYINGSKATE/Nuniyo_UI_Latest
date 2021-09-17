@@ -63,9 +63,16 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
+  Future<bool> _onWillPop() {
+    setState(() {
+
+    });
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
@@ -80,29 +87,29 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-              Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(height: 20.0,),
-                Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    SizedBox(width: 10.0,),
-                    Text("Front Cam Verification (IPV)",textAlign:TextAlign.left,
-                      style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 20.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+                    SizedBox(height: 20.0,),
+                    Row(
+                      children: [
+                        SizedBox(width: 10.0,),
+                        Text("Front Cam Verification (IPV)",textAlign:TextAlign.left,
+                          style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 20.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+                      ],
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
+                      child: Container(height: 5, width: 35,
+                        decoration: BoxDecoration(
+                            color: Color(0xff6A4EEE),
+                            borderRadius: BorderRadius.all(Radius.circular(20))
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.0,),
                   ],
                 ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
-                  child: Container(height: 5, width: 35,
-                    decoration: BoxDecoration(
-                        color: Color(0xff6A4EEE),
-                        borderRadius: BorderRadius.all(Radius.circular(20))
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20.0,),
-              ],
-            ),
                 TextButton(child: Text("Steps to do IPV:",style: GoogleFonts.openSans(
                   textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
                 ),),onPressed: (){makeStepsVisible = !makeStepsVisible;setState(() {
@@ -195,8 +202,8 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
-                      child: Text("Retry",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
-                      onPressed: (){},),
+                    child: Text("Retry",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
+                    onPressed: (){},),
                 ),
                 SizedBox(height: 10,),
                 Text("type and scrambled it to make a type specimen book.",textAlign: TextAlign.center,style: GoogleFonts.openSans(
@@ -207,7 +214,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
           ),
         ),
       ),
-    );
+    ), onWillPop: _onWillPop);
   }
 
   @override

@@ -4,7 +4,6 @@ import 'package:webviewx/webviewx.dart';
 class BrowserViewX extends StatefulWidget {
   const BrowserViewX({Key? key}) : super(key: key);
 
-
   @override
   _BrowserViewXState createState() => _BrowserViewXState();
 }
@@ -48,6 +47,8 @@ class _BrowserViewXState extends State<BrowserViewX> {
       ),
     )) ?? false;
   }
+
+
 
 
   @override

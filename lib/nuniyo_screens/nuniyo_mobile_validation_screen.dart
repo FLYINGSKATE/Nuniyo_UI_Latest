@@ -89,7 +89,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
@@ -115,52 +115,52 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         Navigator.pushNamed(context, '/personaldetailsscreen');
                       },
                       child:Text("Log In",style: GoogleFonts.openSans(
-                      textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),
-                    ),),)
+                        textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),
+                      ),),)
                   ],
                 ),
                 SizedBox(height: 20,),
                 Flexible(
-                    child: TextField(
-                      maxLength: 10,
-                      keyboardType: TextInputType.number,
-                      cursorColor: primaryColorOfApp,
-                      style :GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
-                      focusNode: _phoneNumberFocusNode,
-                      onTap: _requestPhoneFocus,
-                      decoration: InputDecoration(
+                  child: TextField(
+                    maxLength: 10,
+                    keyboardType: TextInputType.number,
+                    cursorColor: primaryColorOfApp,
+                    style :GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                    focusNode: _phoneNumberFocusNode,
+                    onTap: _requestPhoneFocus,
+                    decoration: InputDecoration(
                         counter: Offstage(),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
                           child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         ),
                         labelText: _phoneNumberFocusNode.hasFocus ? 'Mobile Number' : 'Enter Mobile Number',
-                          labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                              color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
-                          )
-                      ),
-                      onChanged: (_phoneNumber) async {
-                        print(_phoneNumber.length);
-                        phoneNumberString = _phoneNumber;
-                        if (_phoneNumber.length >= 10) {
-                          print(_phoneNumber);
-                          phoneNumberString = _phoneNumber;
-                          //Store Mobile Number in Shared Preferences
-                          this.preferences?.setString("PhoneNumber", phoneNumberString);
-                          //Store Mobile Number in Shared Preferences
-                          this.preferences?.setString("PhoneNumber", phoneNumberString);
-                          print("Below Given is the Value From Shared Prefereneces");
-                          print(this.preferences?.getString("PhoneNumber"));
-                          isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
-                          //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
-                          howManyTimesResendOTPPressed ++;
-                          setState((){});
-                        }
-                        else{
-                          //isPhoneNumberValid = false;
-                        }
-                      },
+                        labelStyle: TextStyle(fontWeight: FontWeight.bold,
+                          color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                        )
                     ),
+                    onChanged: (_phoneNumber) async {
+                      print(_phoneNumber.length);
+                      phoneNumberString = _phoneNumber;
+                      if (_phoneNumber.length >= 10) {
+                        print(_phoneNumber);
+                        phoneNumberString = _phoneNumber;
+                        //Store Mobile Number in Shared Preferences
+                        this.preferences?.setString("PhoneNumber", phoneNumberString);
+                        //Store Mobile Number in Shared Preferences
+                        this.preferences?.setString("PhoneNumber", phoneNumberString);
+                        print("Below Given is the Value From Shared Prefereneces");
+                        print(this.preferences?.getString("PhoneNumber"));
+                        isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
+                        //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
+                        howManyTimesResendOTPPressed ++;
+                        setState((){});
+                      }
+                      else{
+                        //isPhoneNumberValid = false;
+                      }
+                    },
+                  ),
                 ),
                 Flexible(
                     child: TextField(
@@ -218,13 +218,13 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                   visible: showReferralTextField,
                   child: Flexible(
                       child: DottedBorder(
-                          radius: Radius.circular(8.0),
-                          color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,//color of dotted/dash line
-                          strokeWidth: 3,
-                          padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
-                          borderType: BorderType.RRect,
-                          strokeCap: StrokeCap.round,//thickness of dash/dots
-                          dashPattern: [10,8],
+                        radius: Radius.circular(8.0),
+                        color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,//color of dotted/dash line
+                        strokeWidth: 3,
+                        padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
+                        borderType: BorderType.RRect,
+                        strokeCap: StrokeCap.round,//thickness of dash/dots
+                        dashPattern: [10,8],
                         child: TextField(
                           maxLength: 10,
                           cursorColor: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,
@@ -240,8 +240,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                               disabledBorder: InputBorder.none,
                               counter: Offstage(),
                               suffixIcon: Padding(
-                                padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                                child: Padding(padding:EdgeInsets.fromLTRB(0, 0, 0, 16.0),child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,),)
+                                  padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
+                                  child: Padding(padding:EdgeInsets.fromLTRB(0, 0, 0, 16.0),child: Icon(NuniyoCustomIcons.referral_code_black,size: 26.0,color: _referralCodeNode.hasFocus ?primaryColorOfApp : Colors.black,),)
                               ),
                               hintText: 'Referral Code ',
                               labelStyle: TextStyle(
@@ -283,28 +283,28 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                   ),
                   height: 60,
                   child: FlatButton(
-                      disabledTextColor: Colors.blue,
-                      disabledColor: Color(0xffD2D0E1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      onPressed: !isValidOTP ? null : () => {
-                        ContinueToStep()
-                      },
-                      color: primaryColorOfApp,
-                      child: Text(
+                    disabledTextColor: Colors.blue,
+                    disabledColor: Color(0xffD2D0E1),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    onPressed: !isValidOTP ? null : () => {
+                      ContinueToStep()
+                    },
+                    color: primaryColorOfApp,
+                    child: Text(
                         "Proceed",
                         style: GoogleFonts.openSans(
                           textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
-                      ),
                     ),
                   ),
+                ),
               ],
             ),
           ),
         ),
       ),
-    );
+    ), onWillPop: _onWillPop);
   }
 
   void startTimer() {
@@ -356,6 +356,10 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
       print("WELCOME NEW USER");
       Navigator.pushNamed(context,'/bankemailpanvalidationscreen');
     }
+  }
+
+  Future<bool> _onWillPop() {
+    return Future.value(false);
   }
 }
 

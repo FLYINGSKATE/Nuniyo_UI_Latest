@@ -146,6 +146,10 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
     });
   }
 
+  Future<bool> _onWillPop() {
+    return Future.value(false);
+  }
+
   @override
   void dispose() {
     _bankNameTextFieldFocusNode.dispose();
@@ -162,7 +166,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
@@ -188,11 +192,11 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       controller: _emailTextEditingController,
                       onTap: _requestEmailIdTextFieldFocus,
                       decoration: InputDecoration(
-                        counter: Offstage(),
-                        errorText: showEmailErrorText?emailErrorText:null,
-                        labelText: _emailTextFieldFocusNode.hasFocus ? 'Email ID' : 'Enter Email ID',
+                          counter: Offstage(),
+                          errorText: showEmailErrorText?emailErrorText:null,
+                          labelText: _emailTextFieldFocusNode.hasFocus ? 'Email ID' : 'Enter Email ID',
                           labelStyle: TextStyle(fontWeight: FontWeight.bold,
-                              color: _emailTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                            color: _emailTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                           )
                       ),
                       onChanged: (_emailID) async {
@@ -248,8 +252,8 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
                       focusNode: _panTextFieldFocusNode,
                       onTap: _requestPanTextFieldFocus,
                       decoration: InputDecoration(
-                        errorText: showPANErrorText?panErrorText:null,
-                        counter: Offstage(),
+                          errorText: showPANErrorText?panErrorText:null,
+                          counter: Offstage(),
                           labelText: _panTextFieldFocusNode.hasFocus ? 'Enter PAN Number' : 'Enter PAN Number',
                           labelStyle: TextStyle(
                             color: _panTextFieldFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
@@ -488,7 +492,7 @@ class _BankPanEmailValidationScreenState extends State<BankPanEmailValidationScr
           ),
         ),
       ),
-    );
+    ), onWillPop: _onWillPop);
   }
 
   Color ifscColorTextField(){

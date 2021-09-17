@@ -45,11 +45,14 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   File? imageFileDigitalSignature = new File("/assets/images/congratulations.png");
 
+
+
   var drawnDigitalSignatureImage = null;
 
   bool showDrawnDigitalSignatureImage = false;
 
   Future<Null> _pickImageForPan(ImageSource source) async {
+
     final pickedImage =
     await ImagePicker().pickImage(source: source);
     imageFilePan = pickedImage != null ? File(pickedImage.path) : null;

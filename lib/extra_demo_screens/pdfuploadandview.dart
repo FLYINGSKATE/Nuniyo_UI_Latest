@@ -1,33 +1,23 @@
-//Entry Point of this App
-//This File also consist of Routes to different different screens
-
 import 'dart:io';
 
-import 'package:angel_broking_demo/utils/Router.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 
-import 'extra_demo_screens/pdfuploadandview.dart';
+class FilePicTest extends StatefulWidget {
+  const FilePicTest({Key? key}) : super(key: key);
 
-void main() {
-  ///TO hide Red Screen of Death!
-  ErrorWidget.builder = (FlutterErrorDetails details) => Container();
-  ///To Override SSL Certificate when used with HTTPS Apis
-  HttpOverrides.global = new MyHttpOverrides();
-  runApp(MyApp());
-}
-
-class MyHttpOverrides extends HttpOverrides {
   @override
-  HttpClient createHttpClient(SecurityContext? context) {
-    return super.createHttpClient(context)
-      ..badCertificateCallback = (X509Certificate cert, String host,
-          int port) => true;
-  }
+  _FilePicTestState createState() => _FilePicTestState();
 }
 
-class MyApp extends StatelessWidget {
+class _FilePicTestState extends State<FilePicTest> {
 
-  // This widget is the root of your application.
+  FilePickerResult? result;
+
+  late PlatformFile file;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -59,8 +49,36 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      initialRoute: '/',
-      onGenerateRoute: ScreenRouter.generateRoute,
+      home: Scaffold(
+        body: Column(
+          children: [
+            TextButton(onPressed: PickImage,child: Text("Upload it"),),
+            Container(
+              height: 200,
+              width: 200,
+              child: true?SfPdfViewer.file(File(file.path.toString())):null,
+            )
+          ],
+        )
+      ),
     );
+  }
+
+
+  PickImage() async {
+
+    result = await FilePicker.platform.pickFiles(type: FileType.custom,
+      allowedExtensions: ['pdf'],);
+
+    if(result != null) {
+      file = result!.files.first;
+      print(file.name);
+      print(file.bytes);
+      print(file.size);
+      print(file.extension);
+      print(file.path);
+    } else {
+      // User canceled the picker
+    }
   }
 }

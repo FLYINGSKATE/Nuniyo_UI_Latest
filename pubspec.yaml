@@ -33,6 +33,7 @@ dependencies:
   url_launcher: ^6.0.9
   intl_phone_field: ^2.0.1
   file_picker: ^3.0.4
+
   shared_preferences: 0.5.6
   http: ^0.13.3
   expandable: ^5.0.1
@@ -61,6 +62,8 @@ dependencies:
   dotted_border: ^2.0.0+1
   image_cropper: ^1.4.1
   webviewx: ^0.2.1
+  get: ^4.3.8
+  syncfusion_flutter_pdfviewer: ^19.2.62-beta
 
 
 
