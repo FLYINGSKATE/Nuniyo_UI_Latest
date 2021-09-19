@@ -92,11 +92,7 @@ class ApiRepo {
   }
 
   Future<void> CVLKRAGetPanStatus(String panCardNumber) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String awt_Token= prefs.getString('API_TOKEN');
-    print(panCardNumber);
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    String awt_Token= await GetCurrentAWTToken();
     print("Calling Verify PAN KRA Using API"+awt_Token);
     var headers = {
       'Authorization': 'Bearer $awt_Token',
@@ -130,17 +126,12 @@ class ApiRepo {
       print(response.reasonPhrase);
       return;
     }
-
   }
 
   Future<bool> PostPersonalDetails(String phoneNumber , String fatherName, String motherName , String income,String gender,String maritial_Status,
       String politicalExposed , String occupation , String tradingExperience , String education) async{
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String awt_Token= prefs.getString('API_TOKEN');
-
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    String awt_Token= await GetCurrentAWTToken();
     print("Posting Personal Details Using API :"+awt_Token);
 
     var headers = {
@@ -148,7 +139,7 @@ class ApiRepo {
       'Content-Type': 'application/json'
     };
 
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/personal/Personal_Details'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/personal/Personal_Details'));
 
     request.body = json.encode({
       "mobile_No": phoneNumber,
@@ -177,12 +168,48 @@ class ApiRepo {
     }
   }
 
-  Future<void> OnPaymentSuccessPostToDatabase(int paymentPrice, String phoneNumber,String paymentID) async{
+
+  Future<String> GetCurrentAWTToken() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String awt_Token= prefs.getString('API_TOKEN');
-    print(paymentID);
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
     print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    return awt_Token;
+  }
+
+  Future<void> leadLocation(String phoneNumber,String ipAddress,String city,String country,String state,String latitude,String longitude) async{
+
+    String awt_Token= await GetCurrentAWTToken();
+
+    print("Posting LOCATION Details Using API TOKEN :"+awt_Token);
+
+    var headers = {
+      'Authorization': 'Bearer $awt_Token',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Lead_Location'));
+    request.body = json.encode({
+      "mobile_No": phoneNumber,
+      "ip": ipAddress,
+      "city": city,
+      "country": country,
+      "state": state,
+      "latitude": latitude,
+      "longitude": longitude,
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+    print(response.reasonPhrase);
+    }
+  }
+
+  Future<void> OnPaymentSuccessPostToDatabase(int paymentPrice, String phoneNumber,String paymentID) async{
+    String awt_Token= await GetCurrentAWTToken();
     print("Calling POST PAYMENT SUCCESS Using API"+awt_Token);
     var headers = {
       'Authorization': 'Bearer $awt_Token',
@@ -208,10 +235,7 @@ class ApiRepo {
   }
 
   Future<bool> VerifyEmail(String phoneNumber , String emailID) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String awt_Token= prefs.getString('API_TOKEN');
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    String awt_Token= await GetCurrentAWTToken();
     print("Calling Verify Email Using API"+awt_Token);
     var headers = {
       'Authorization': 'Bearer $awt_Token',
@@ -249,11 +273,7 @@ class ApiRepo {
   }
 
   Future<bool> VerifyPAN(String phoneNumber , String panNumber) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String awt_Token= prefs.getString('API_TOKEN');
-    print(panNumber);
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + prefs.getString('API_TOKEN'));
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
+    String awt_Token= await GetCurrentAWTToken();
     print("Calling Verify PAN Using API"+awt_Token);
     var headers = {
       'Authorization': 'Bearer $awt_Token',
@@ -394,12 +414,17 @@ class ApiRepo {
     }
   }
 
-  Future<void> searchIFSCCodes() async{
+  Future<Map<dynamic,dynamic>> searchIFSCCodes(String bankName , String branchName) async{
+    Map valueMap = Map();
+    String awt_Token= await GetCurrentAWTToken();
+
+    print("Calling IFSC Search Using API"+awt_Token);
+
     var headers = {
-      'Authorization': 'Bearer',
+      'Authorization': 'Bearer $awt_Token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/ifscmaster/IFSC_Master_Search'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/ifscmaster/IFSC_Master_Search'));
     request.body = json.encode({
       "bank": "icici",
       "ifsc": "string",
@@ -410,10 +435,17 @@ class ApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+
+      return valueMap;
+
     }
     else {
       print(response.reasonPhrase);
+      return valueMap;
     }
   }
 
@@ -432,42 +464,20 @@ class ApiRepo {
     }
   }
 
-  ///////////////OLD FUNCTIONS////////////////
-    //request.body = json.encode({
-    //  "pan_no": "HCAPK4259Q",
-    //  "full_name": "KHAN ASHRAF SALIM",
-    //  "date_of_birth": "31-03-2000"
-    //});
-    ///BANK AND PAN : 39981374255
-    ///IFSC :SBIN0003671
-///
-/// //OLD ONE Bank Validation API
-//   /*Future<bool> fetchIsBankValid(String bankAccountNumber,String ifscCode) async {
-//
-//     var request = http.Request('POST', Uri.parse(
-//         '$BASE_API_URL/VerifyBankAccount?beneficiary_account_no=$bankAccountNumber&beneficiary_ifsc=$ifscCode'));
-//
-//     request.headers.addAll(headers);
-//
-//     http.StreamedResponse response = await request.send();
-//
-//     if (response.statusCode == 200) {
-//       String result = await response.stream.bytesToString();
-//       Map valueMap = jsonDecode(result);
-//       print(result);
-//       if(valueMap["verified"]){
-//         print("YOUR BANK IS VALIDATED");
-//         return true;
-//       }
-//       else{
-//         print("Something went wrong");
-//         return false;
-//       }
-//     }
-//     else {
-//       print(response.reasonPhrase);
-//       return false;
-//     }
-//   }*/
+  UploadDocumentForOCR() async {
+    var request = http.MultipartRequest('POST', Uri.parse('http://localhost:44330/v1/api/documentupload/Document_Upload_PAN'));
+    request.fields.addAll({
+      'Mobile_No': '8268405887'
+    });
+    request.files.add(await http.MultipartFile.fromPath('front_part', '/C:/Users/admin/Downloads/WhatsApp Image 2021-09-12 at 11.57.00 PM.jpeg'));
 
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+    print(await response.stream.bytesToString());
+    }
+    else {
+    print(response.reasonPhrase);
+    }
+  }
 }

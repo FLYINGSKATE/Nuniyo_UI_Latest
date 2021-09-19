@@ -1,3 +1,4 @@
+import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -337,7 +338,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   height: 75.0,
                   child: InputDecorator(
                     decoration: InputDecoration(
-
                         labelText: _politicallyExposedDropDownFocusNode.hasFocus ? 'Politically Exposed' : 'Politically Exposed',
                         labelStyle: GoogleFonts.openSans(textStyle:TextStyle(fontSize: 14,letterSpacing: 0.5,
                           color: _politicallyExposedDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
@@ -379,6 +379,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () async {
+                      ApiRepo().PostPersonalDetails("phoneNumber", "Salim", "Shamim", "income", gender, "Single", "politicalExposed", occupation, tradingExperience, "Bsc CS");
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
                       Navigator.pushNamed(context, '/webcamscreen');

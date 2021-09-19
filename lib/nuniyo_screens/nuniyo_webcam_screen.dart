@@ -41,19 +41,31 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
 
   bool makeStepsVisible = false;
 
+  String RecordingStatus = "Start Recording";
+
+  bool showRecordingButton = false;
+
   @override
   void initState() {
     super.initState();
     manageSteps();
     initializeCamera();
-    _ambiguate(WidgetsBinding.instance)?.addObserver(this);
-    controller = CameraController(cameras[1], ResolutionPreset.max);
-    controller!.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
+    setState(() {
     });
+    _ambiguate(WidgetsBinding.instance)?.addObserver(this);
+    if(cameras.isNotEmpty){
+      controller = CameraController(cameras[1], ResolutionPreset.max);
+      controller!.initialize().then((_) {
+        if (!mounted) {
+          print("we came here");
+          return;
+        }
+      });
+    }
+    else{
+
+    }
+
   }
 
   @override
@@ -64,9 +76,8 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   Future<bool> _onWillPop() {
-    setState(() {
-
-    });
+    initializeCamera();
+    setState(() {});
     return Future.value(false);
   }
 
@@ -171,7 +182,38 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                     ),
                   ),
                 ),
-                _captureControlRowWidget(),
+                Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: <Widget>[
+                      _thumbnailWidget(),
+                    ],
+                  ),
+                ),
+                Container(
+
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: primaryColorOfApp,
+                      ),
+                      borderRadius: BorderRadius.all(Radius.circular(8))
+                  ),
+                  width: MediaQuery.of(context).size.width,
+                  height: 60,
+                  child: FlatButton(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    onPressed:!showRecordingButton?null: () {_onWillPop();onVideoRecordButtonPressed();},
+                    color: Colors.transparent,
+                    child: Text(
+                        "$RecordingStatus",
+                        style: GoogleFonts.openSans(
+                          textStyle: TextStyle(color: primaryColorOfApp, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                    ),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: Row(
@@ -203,7 +245,11 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                   alignment: Alignment.center,
                   child: TextButton(
                     child: Text("Retry",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
-                    onPressed: (){},),
+                    onPressed: (){
+                      _onWillPop();
+                      onVideoRecordButtonPressed();
+                      _onWillPop();
+                    },),
                 ),
                 SizedBox(height: 10,),
                 Text("type and scrambled it to make a type specimen book.",textAlign: TextAlign.center,style: GoogleFonts.openSans(
@@ -234,17 +280,27 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
 
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
-    final CameraController? cameraController = controller;
+    CameraController? cameraController = controller;
 
     if (cameraController == null || !cameraController.value.isInitialized) {
-      return const Text(
-        'Tap a camera',
+      return Container(
+              height: 200,
+              child:TextButton(
+          onPressed: (){
+            initializeRecorder();
+            showRecordingButton = true;
+            setState(() {
+
+            });
+          },
+          child:Text(
+        'Tap to Start camera',
         style: TextStyle(
           color: Colors.white,
           fontSize: 24.0,
           fontWeight: FontWeight.w900,
         ),
-      );
+      )));
     } else {
       return Listener(
         onPointerDown: (_) => _pointers++,
@@ -337,39 +393,25 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   Widget _captureControlRowWidget() {
     final CameraController? cameraController = controller;
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      mainAxisSize: MainAxisSize.max,
-      children: <Widget>[
-
-        IconButton(
-          icon: const Icon(Icons.videocam),
-          color: Colors.blue,
-          onPressed: cameraController != null &&
-              cameraController.value.isInitialized &&
-              !cameraController.value.isRecordingVideo
-              ? onVideoRecordButtonPressed
-              : null,
-        ),
-        IconButton(
-          icon: const Icon(Icons.stop),
-          color: Colors.red,
-          onPressed: cameraController != null &&
-              cameraController.value.isInitialized &&
-              cameraController.value.isRecordingVideo
-              ? onStopButtonPressed
-              : null,
-        ),
-      ],
-    );
+    return Container();
   }
 
   void onVideoRecordButtonPressed() {
     startVideoRecording().then((_) {
       if (mounted) {
         setState(() {});
+        print("WAIT 12 Seconds");
+        RecordingStatus = "RECORDING .....";
+        setState(() {
+
+        });
         Future.delayed(Duration(seconds: 12), () {
           onStopButtonPressed();
+          print("DONE WAITING");
+          RecordingStatus = "DONE RECORDING";
+          setState(() {
+
+          });
         });
       }
     });
@@ -481,19 +523,35 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
     print("You are on STEP  :"+StepId);
   }
 
+
+  Future<void> initializeCamera() async {
+    // Fetch the available cameras before initializing the app.
+    try {
+
+      WidgetsFlutterBinding.ensureInitialized();
+      cameras = await availableCameras();
+    } on CameraException catch (e) {
+      logError(e.code, e.description);
+    }
+  }
+
+  initializeRecorder() {
+    controller = CameraController(cameras[1], ResolutionPreset.max);
+    controller!.initialize().then((_) {
+      if (!mounted) {
+        print("we came here");
+        return;
+      }
+      else{
+        _onWillPop();
+      }
+    });
+  }
+
 }
 
 List<CameraDescription> cameras = [];
 
-Future<void> initializeCamera() async {
-  // Fetch the available cameras before initializing the app.
-  try {
-    WidgetsFlutterBinding.ensureInitialized();
-    cameras = await availableCameras();
-  } on CameraException catch (e) {
-    logError(e.code, e.description);
-  }
-}
 
 /// This allows a value of type T or T? to be treated as a value of type T?.
 ///

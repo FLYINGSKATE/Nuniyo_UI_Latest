@@ -26,6 +26,17 @@ class SplashScreenState extends State<SplashScreen> {
   /// are denied the `Future` will return an error.
   static final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
   Map<String, dynamic> _deviceData = <String, dynamic>{};
+
+  //"mobile_No": "8268405887",
+  //"ip": "1232232",
+  //"city": "mumbai",
+  //"country": "india",
+  //"state": "maharashtra",
+  //"latitude": "122",
+  //"longitude": "232"
+
+
+
   ///
   ///
   Future<Position> _determinePosition() async {
@@ -77,6 +88,10 @@ class SplashScreenState extends State<SplashScreen> {
       /// Get the IpAddress based on requestType.
       dynamic data = await ipAddress.getIpAddress();
       print("||||||||||||AAAPKA IP ADDRESS HAI :-"+data.toString());
+
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      prefs.setString("IP_ADDRESS", data.toString());
+
       print(data.toString());
     } on IpAddressException catch (exception) {
       /// Handle the exception.
@@ -106,6 +121,8 @@ class SplashScreenState extends State<SplashScreen> {
     print("CURRENT POSITION :LATITUDE "+_currentPosition.latitude.toString() + "LONGITUDE : "+_currentPosition.longitude.toString());
     // this will get the coordinates from the lat-long using Geocoder Coordinates
 
+
+
     final coordinates = Coordinates(_currentPosition.latitude, _currentPosition.longitude);
     showToastNotification(_currentPosition.latitude.toString());
     showToastNotification("CURRENT POSITION :LATITUDE "+_currentPosition.latitude.toString() + "LONGITUDE : "+_currentPosition.longitude.toString());
@@ -114,7 +131,13 @@ class SplashScreenState extends State<SplashScreen> {
     var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
     var first = addresses.first;
     print(first.countryName);
-    showToastNotification("Current Location : "+first.countryName+"-"+first.locality+"|"+first.subLocality+","+first.postalCode);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("COUNTRY", first.countryName);
+    prefs.setString("STATE",first.adminArea);
+    prefs.setString("CITY",first.locality);
+    prefs.setString("LONGITUDE", _currentPosition.longitude.toString());
+    prefs.setString("LATITUDE", _currentPosition.latitude.toString());
+    showToastNotification("Current Location : "+first.countryName+"-SUBADMIN AREA -"+first.subAdminArea+"-locality"+first.locality+"|"+first.subLocality+","+first.postalCode+"AADMIN AREA"+first.adminArea);
   }
 
   @override

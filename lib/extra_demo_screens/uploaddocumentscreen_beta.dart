@@ -18,14 +18,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 
-class UploadDocumentScreen extends StatefulWidget {
-  const UploadDocumentScreen({Key? key}) : super(key: key);
+class UploadDemo extends StatefulWidget {
+  const UploadDemo({Key? key}) : super(key: key);
 
   @override
-  _UploadDocumentScreenState createState() => _UploadDocumentScreenState();
+  _UploadDemoState createState() => _UploadDemoState();
 }
 
-class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
+class _UploadDemoState extends State<UploadDemo> {
 
 
   var headers = {
@@ -56,14 +56,11 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
 
   bool showDrawnDigitalSignatureImage = false;
 
-  bool isPANImageFromCamera = false;
-  bool isDigitalSignatureFromCamera = false;
-
   Future<Null> _pickImageForPan(ImageSource source) async {
     if(source == ImageSource.gallery){
       print("Lets PIck Image From Gallery");
       result = await FilePicker.platform.pickFiles(type: FileType.custom,
-        allowedExtensions: ['pdf','png','jpg','jpeg'],);
+        allowedExtensions: ['pdf','png'],);
       if(result != null) {
         pdfPanImagefile = result!.files.first;
         print(pdfPanImagefile.name);
@@ -75,7 +72,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           imageFilePan = File(pdfPanImagefile.path.toString());
           if (imageFilePan != null) {
             setState(() {
-              isPANImageFromCamera  = false;
               Navigator.pop(context);
               _cropImageForPan();
             });
@@ -84,7 +80,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
         else{
           //No Cropping for PDF Directly View it
           Navigator.pop(context);
-          isPANImageFromCamera = false;
           tempPanUploaded = true;
           setState(() {
           });
@@ -101,7 +96,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       imageFilePan = pickedImage != null ? File(pickedImage.path) : null;
       if (imageFilePan != null) {
         setState(() {
-          isPANImageFromCamera = true;
           Navigator.pop(context);
           _cropImageForPan();
         });
@@ -113,7 +107,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     if(source == ImageSource.gallery){
       print("Lets PIck Image From Gallery");
       result = await FilePicker.platform.pickFiles(type: FileType.custom,
-        allowedExtensions: ['pdf','png','jpg','jpeg'],);
+        allowedExtensions: ['pdf','png'],);
       if(result != null) {
         pdfPanDigitalSignaturefile = result!.files.first;
         print(pdfPanDigitalSignaturefile.name);
@@ -132,7 +126,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
         }
         else{
           //No Cropping for PDF Directly View it
-          isDigitalSignatureFromCamera = false;
           showDrawnDigitalSignatureImage = false;
           Navigator.pop(context);
           tempDigitalPadUploaded = true;
@@ -151,7 +144,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       imageFileDigitalSignature = pickedImage != null ? File(pickedImage.path) : null;
       if (imageFileDigitalSignature != null) {
         setState(() {
-          isDigitalSignatureFromCamera = true;
           showDrawnDigitalSignatureImage = false;
           Navigator.pop(context);
           _cropImageForDigitalSignature();
@@ -340,7 +332,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       IconButton(onPressed:(){
                         tempDigitalPadUploaded = false;
                         showDigitalPadBox = false;
-
                         setState(() {});
                       }, icon: Icon(Icons.delete,size: 36.0,color: Colors.red,)),
                     ],
@@ -764,7 +755,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
       });
     }
   }
-
   Future<Null> _cropImageForDigitalSignature() async {
     File? croppedFile = await ImageCropper.cropImage(
         sourcePath: imageFileDigitalSignature!.path,

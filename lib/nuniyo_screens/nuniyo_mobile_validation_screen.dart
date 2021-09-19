@@ -165,7 +165,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                 Flexible(
                     child: TextField(
                       onChanged: (value) async {
-                        if(value.length==4){
+                        if(value.length==6){
                           isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
                           showOTPErrorText= !isValidOTP;
                           setState(() {});
@@ -175,7 +175,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                           //   setState(() {});
                         }
                       },
-                      maxLength: 4,
+                      maxLength: 6,
                       keyboardType: TextInputType.number,
                       obscureText: true,
                       cursorColor: primaryColorOfApp,
@@ -288,8 +288,24 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: !isValidOTP ? null : () => {
-                      ContinueToStep()
+                    onPressed: !isValidOTP ? null : () async{
+                      if(this.preferences!.containsKey('COUNTRY')){
+                        print("FETCHED LOCATION ARE IN SHARED PREFERENCE");
+                        String ip_address = this.preferences!.getString("IP_ADDRESS");
+                        String country = this.preferences!.getString("COUNTRY");
+                        String city = this.preferences!.getString("CITY");
+                        String state = this.preferences!.getString("STATE");
+                        String longitude = this.preferences!.getString("LONGITUDE");
+                        String latitude = this.preferences!.getString("LATITUDE");
+                        print(ip_address);
+                        print(country);
+                        print(city);
+                        print(state);
+                        print(latitude);
+                        print(latitude);
+                        await ApiRepo().leadLocation(phoneNumberString, ip_address, city, country, state, latitude, longitude);
+                      }
+                      ContinueToStep();
                     },
                     color: primaryColorOfApp,
                     child: Text(
