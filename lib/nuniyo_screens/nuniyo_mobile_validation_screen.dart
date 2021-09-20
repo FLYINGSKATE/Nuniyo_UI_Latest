@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_terms_and_conditions_webview.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/cupertino.dart';
@@ -41,6 +42,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   int howManyTimesResendOTPPressed = 0;
 
   bool showReferralTextField = false;
+
+  bool tncChecked = false;
 
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
@@ -270,8 +273,26 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                 ),
                 SizedBox(height: 20,),
                 Text("By Clicking on proceed I agree to all the",textAlign:TextAlign.left, style:GoogleFonts.openSans(color:Colors.black,textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5,fontWeight: FontWeight.normal)),),
-                TextButton(child: Text("Terms & Conditions",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 12,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
-                    onPressed: (){}
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 24.0,
+                      width: 24.0,
+                      child: Checkbox(
+                        value: this.tncChecked,
+                        onChanged: (value) {
+                          setState(() {
+                            this.tncChecked = value!;
+                          });
+                        },
+                      ),
+                    ),
+                    TextButton(child: Text("Terms & Conditions",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 12,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                        onPressed: (){
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndConditions() ));
+                        }
+                    ),
+                  ],
                 ),
                 SizedBox(height: 20,),
                 //Real Button

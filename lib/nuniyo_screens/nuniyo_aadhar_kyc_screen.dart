@@ -1,6 +1,6 @@
 //Aadhar KYC
 
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_web_view.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_digilocker_web_view.dart';
 import 'package:angel_broking_demo/extra_demo_screens/web_view.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';

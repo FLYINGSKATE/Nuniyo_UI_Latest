@@ -329,6 +329,9 @@ class _BankPanEmailValidationScreenState
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold)),
                             onTap: _requestDateTextFieldFocus,
+                            onChanged: (value){
+
+                            },
                             decoration: InputDecoration(
                               labelText: _dateTextFieldFocusNode.hasFocus
                                   ? 'Enter DOB'

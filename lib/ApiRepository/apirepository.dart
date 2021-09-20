@@ -92,10 +92,10 @@ class ApiRepo {
   }
 
   Future<void> CVLKRAGetPanStatus(String panCardNumber) async{
-    String awt_Token= await GetCurrentAWTToken();
-    print("Calling Verify PAN KRA Using API"+awt_Token);
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Verify PAN KRA Using API"+JWT_TOKEN);
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/cvlkra/Get_PanStatus'));
@@ -131,11 +131,11 @@ class ApiRepo {
   Future<bool> PostPersonalDetails(String phoneNumber , String fatherName, String motherName , String income,String gender,String maritial_Status,
       String politicalExposed , String occupation , String tradingExperience , String education) async{
 
-    String awt_Token= await GetCurrentAWTToken();
-    print("Posting Personal Details Using API :"+awt_Token);
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Posting Personal Details Using API :"+JWT_TOKEN);
 
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
 
@@ -167,23 +167,50 @@ class ApiRepo {
       return false;
     }
   }
+  
+  Future<void> SolicitFetch() async{
+    String JWT_TOKEN= await GetCurrentJWTToken();
+
+    print("SOLICIT FETCH Using API TOKEN :"+JWT_TOKEN);
+    
+    var headers = {
+      'Authorization': 'Bearer $JWT_TOKEN',
+      'Content-Type': 'application/json'
+    };
+    
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/cvlkra/SolicitPANDetailsFetchALLKRA'));
+    request.body = json.encode({
+      "apP_PAN_NO": "hocpk1290f",
+      "apP_DOB_INCORP": "19/08/1998"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+    print(response.reasonPhrase);
+    }
+  }
 
 
-  Future<String> GetCurrentAWTToken() async{
+  Future<String> GetCurrentJWTToken() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String awt_Token= prefs.getString('API_TOKEN');
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + awt_Token);
-    return awt_Token;
+    String JWT_TOKEN= prefs.getString('API_TOKEN');
+    print("AWT STORED INSIDE SHARED PREFERENCES :" + JWT_TOKEN);
+    return JWT_TOKEN;
   }
 
   Future<void> leadLocation(String phoneNumber,String ipAddress,String city,String country,String state,String latitude,String longitude) async{
 
-    String awt_Token= await GetCurrentAWTToken();
+    String JWT_TOKEN= await GetCurrentJWTToken();
 
-    print("Posting LOCATION Details Using API TOKEN :"+awt_Token);
+    print("Posting LOCATION Details Using API TOKEN :"+JWT_TOKEN);
 
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Lead_Location'));
@@ -209,10 +236,10 @@ class ApiRepo {
   }
 
   Future<void> OnPaymentSuccessPostToDatabase(int paymentPrice, String phoneNumber,String paymentID) async{
-    String awt_Token= await GetCurrentAWTToken();
-    print("Calling POST PAYMENT SUCCESS Using API"+awt_Token);
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling POST PAYMENT SUCCESS Using API"+JWT_TOKEN);
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/RazorPay/RazorPayStatus'));
@@ -235,10 +262,10 @@ class ApiRepo {
   }
 
   Future<bool> VerifyEmail(String phoneNumber , String emailID) async{
-    String awt_Token= await GetCurrentAWTToken();
-    print("Calling Verify Email Using API"+awt_Token);
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Verify Email Using API"+JWT_TOKEN);
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/email/Email_Status'));
@@ -273,10 +300,10 @@ class ApiRepo {
   }
 
   Future<bool> VerifyPAN(String phoneNumber , String panNumber) async{
-    String awt_Token= await GetCurrentAWTToken();
-    print("Calling Verify PAN Using API"+awt_Token);
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Verify PAN Using API"+JWT_TOKEN);
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/NsdlPan/NSDLeKYCPanAuthentication'));
@@ -416,12 +443,12 @@ class ApiRepo {
 
   Future<Map<dynamic,dynamic>> searchIFSCCodes(String bankName , String branchName) async{
     Map valueMap = Map();
-    String awt_Token= await GetCurrentAWTToken();
+    String JWT_TOKEN= await GetCurrentJWTToken();
 
-    print("Calling IFSC Search Using API"+awt_Token);
+    print("Calling IFSC Search Using API"+JWT_TOKEN);
 
     var headers = {
-      'Authorization': 'Bearer $awt_Token',
+      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/ifscmaster/IFSC_Master_Search'));

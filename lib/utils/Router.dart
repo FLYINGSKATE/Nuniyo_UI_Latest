@@ -1,4 +1,4 @@
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_web_view.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_digilocker_web_view.dart';
 import 'package:angel_broking_demo/extra_demo_screens/web_view.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_aadhar_kyc_screen.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';

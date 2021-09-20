@@ -6,12 +6,13 @@ class BrowserViewX extends StatefulWidget {
 
   @override
   _BrowserViewXState createState() => _BrowserViewXState();
+
 }
 
 class _BrowserViewXState extends State<BrowserViewX> {
 
   late WebViewXController webviewController;
-
+  String webURL = "";
 
   @override
   void initState() {
