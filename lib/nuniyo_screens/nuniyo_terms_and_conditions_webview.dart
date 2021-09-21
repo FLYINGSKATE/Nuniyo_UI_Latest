@@ -31,10 +31,10 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Nuniyo'),
+        title: const Text('Tech X Labs'),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         leading: IconButton(
-          onPressed: () {},
+          onPressed: () {Navigator.pop(context);},
           icon: Icon(Icons.arrow_back_rounded),
         ),
       ),

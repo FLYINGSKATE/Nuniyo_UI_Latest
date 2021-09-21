@@ -56,7 +56,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
   Widget build(BuildContext context) {
     return WillPopScope(child: Scaffold(
       appBar: AppBar(
-        title: const Text('Nuniyo'),
+        title: const Text('Tech X Labs'),
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         leading: IconButton(
           onPressed: () {},

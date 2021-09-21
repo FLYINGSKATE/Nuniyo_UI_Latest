@@ -17,11 +17,21 @@ class CongratsScreen extends StatefulWidget {
 class _CongratsScreenState extends State<CongratsScreen> {
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
+  String emailAddress = "youremailid@somedomain.com";
 
   @override
   void initState() {
     super.initState();
     manageSteps();
+    fetchInitialData();
+  }
+
+  fetchInitialData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    emailAddress = await prefs.getString('EMAIL_ID');
+    setState(() {
+
+    });
   }
 
   @override
@@ -35,7 +45,7 @@ class _CongratsScreenState extends State<CongratsScreen> {
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
         backgroundColor: Color(0xffF0ECFF),
         elevation: 0,
       ),
@@ -107,9 +117,9 @@ class _CongratsScreenState extends State<CongratsScreen> {
                                           textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)
                                     ),
                                     Text(
-                                        "youremailid@gmail.com",textAlign: TextAlign.center,
+                                        "$emailAddress",textAlign: TextAlign.center,
                                         style: GoogleFonts.openSans(
-                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)
+                                          textStyle: TextStyle(color: Colors.black, letterSpacing: .5),)
                                     ),
                                     Row(
                                       mainAxisAlignment: MainAxisAlignment.start,

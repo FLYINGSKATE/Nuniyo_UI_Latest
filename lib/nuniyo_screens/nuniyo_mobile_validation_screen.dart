@@ -1,7 +1,5 @@
 //Mobile Validation
-
 import 'dart:async';
-
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_terms_and_conditions_webview.dart';
@@ -44,6 +42,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   bool showReferralTextField = false;
 
   bool tncChecked = false;
+
+  bool showTNCError = false;
 
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
@@ -96,7 +96,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
         backgroundColor: Color(0xffF0ECFF),
         elevation: 0,
       ),
@@ -280,9 +280,16 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       width: 24.0,
                       child: Checkbox(
                         value: this.tncChecked,
+                        checkColor: Colors.white,
+                        activeColor: primaryColorOfApp,
+                        fillColor: showTNCError?MaterialStateProperty.all(Colors.red):null,
                         onChanged: (value) {
                           setState(() {
                             this.tncChecked = value!;
+                            if(tncChecked==true){
+                              showTNCError = false;
+                            }
+                            print(tncChecked);
                           });
                         },
                       ),
@@ -310,6 +317,13 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: !isValidOTP ? null : () async{
+                      if(!tncChecked){
+                        showTNCError = true;
+                        setState(() {
+
+                        });
+                        return;
+                      }
                       if(this.preferences!.containsKey('COUNTRY')){
                         print("FETCHED LOCATION ARE IN SHARED PREFERENCE");
                         String ip_address = this.preferences!.getString("IP_ADDRESS");

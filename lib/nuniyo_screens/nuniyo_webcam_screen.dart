@@ -87,7 +87,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
         backgroundColor: Color(0xffF0ECFF),
         elevation: 0,
       ),

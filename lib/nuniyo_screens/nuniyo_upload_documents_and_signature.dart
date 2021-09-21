@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
-import 'package:angel_broking_demo/extra_demo_screens/ImageCropperExample.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -12,8 +11,6 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
@@ -181,13 +178,17 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
     super.dispose();
   }
 
+  Future<bool> _onWillPop() {
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(onWillPop: _onWillPop ,child:Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
         backgroundColor: Color(0xffF0ECFF),
         elevation: 0,
       ),
@@ -370,7 +371,7 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
             ),
           ),
         ),
-      ),
+      ),)
     );
   }
 

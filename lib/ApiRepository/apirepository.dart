@@ -28,6 +28,7 @@ class ApiRepo {
 
   SharedPreferences? preferences;
 
+  //NEW APIS
   //Send Mobile Number to Database
   Future<bool> SendMobileNumber(String phoneNumber) async {
     var headers = {
@@ -195,7 +196,6 @@ class ApiRepo {
     }
   }
 
-
   Future<String> GetCurrentJWTToken() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String JWT_TOKEN= prefs.getString('API_TOKEN');
@@ -203,8 +203,57 @@ class ApiRepo {
     return JWT_TOKEN;
   }
 
-  Future<void> leadLocation(String phoneNumber,String ipAddress,String city,String country,String state,String latitude,String longitude) async{
+  Future<Map<dynamic,dynamic>> searchIFSCCodes(String branchName , String branchLocation) async{
+    Map valueMap = Map();
+    String JWT_TOKEN= await GetCurrentJWTToken();
 
+    print("Calling IFSC Search Using API"+JWT_TOKEN);
+
+    var headers = {
+      'Authorization': 'Bearer $JWT_TOKEN',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/ifscmaster/IFSC_Master_Search'));
+    request.body = json.encode({
+      "bank": branchName,
+      "ifsc": "string",
+      "branch": branchLocation
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+
+      return valueMap;
+
+    }
+    else {
+      print(response.reasonPhrase);
+      return valueMap;
+    }
+  }
+
+  Future<String> isValidIFSC(String ifscCode) async{
+    var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/$ifscCode'));
+    //var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/BARB0DBGHTW'));
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      return result;
+    }
+    else {
+      print(response.reasonPhrase);
+      return "Not Found";
+    }
+  }
+
+  Future<void> leadLocation(String phoneNumber,String ipAddress,String city,String country,String state,String latitude,String longitude) async{
     String JWT_TOKEN= await GetCurrentJWTToken();
 
     print("Posting LOCATION Details Using API TOKEN :"+JWT_TOKEN);
@@ -337,6 +386,149 @@ class ApiRepo {
     }
   }
 
+
+  //////////LOCAL BACKENDS
+  Future<bool> PostPersonalDetailsLOCAL(String phoneNumber , String fatherName, String motherName , String income,String gender,String maritial_Status,
+      String politicalExposed , String occupation , String tradingExperience , String education) async{
+
+    var headers = {
+      'Content-Type': 'application/json',
+    };
+
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/personal/Personal_Details'));
+    request.body = json.encode({
+      "mobile_No": phoneNumber,
+      "father_Name": fatherName,
+      "mother_Name": motherName,
+      "income": income,
+      "gender": gender,
+      "marital_Status": maritial_Status,
+      "politically_Exposed": politicalExposed,
+      "occupation": occupation,
+      "trading_Experience": tradingExperience,
+      "education": education
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      if(result_Id == 1){
+        return true;
+      }
+      return false;
+    }
+    else {
+      print(response.reasonPhrase);
+      return false;
+    }
+  }
+
+
+  Future<void> KRALOCAL(String panNumber,String phoneNumber) async{
+    print("Calling KRA LOCAL USING");
+    print(panNumber);
+    print(phoneNumber);
+
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Verify PAN Using API"+JWT_TOKEN);
+    var headers = {
+      'Authorization': 'Bearer $JWT_TOKEN',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/api/cvlkra/Get_PanStatus'));
+    request.body = json.encode({
+      "pan_No": panNumber,
+      "mobile_No": phoneNumber
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("KRA LOCAL");
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+  Future<void> SolicitLocal(String panNumber,String dOB) async{
+    print("Calling Solicit LOCAL USING");
+    print(panNumber);
+    print(dOB);
+
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Verify SOLICIT Using API"+JWT_TOKEN);
+    var headers = {
+      'Authorization': 'Bearer $JWT_TOKEN',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/api/cvlkra/SolicitPANDetailsFetchALLKRA'));
+    request.body = json.encode({
+      "apP_PAN_NO": "HCAPK4259Q",
+      "apP_DOB_INCORP": "31-03-2000"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print("SOLICIT LOCAL");
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+
+  }
+
+  Future<void> postStageIDLocal() async{
+
+    String JWT_TOKEN= await GetCurrentJWTToken();
+    print("Calling Stage ID Using API"+JWT_TOKEN);
+
+    var headers = {
+      'Authorization': 'Bearer $JWT_TOKEN',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Update_StageId'));
+    request.body = json.encode({
+      "stageId": 1,
+      "mobile_No": "8268405887"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+    print(response.reasonPhrase);
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
   ///Bank Validation API - NEW
   Future<bool> fetchIsBankValid(String bankAccountNumber,String ifscCode) async {
     var request = http.Request('POST', Uri.parse('$BASE_API_URL/VerifyBankAccount?beneficiary_account_no=$bankAccountNumber&beneficiary_ifsc=$ifscCode'));
@@ -438,56 +630,6 @@ class ApiRepo {
     else {
       print(response.reasonPhrase);
       return false;
-    }
-  }
-
-  Future<Map<dynamic,dynamic>> searchIFSCCodes(String bankName , String branchName) async{
-    Map valueMap = Map();
-    String JWT_TOKEN= await GetCurrentJWTToken();
-
-    print("Calling IFSC Search Using API"+JWT_TOKEN);
-
-    var headers = {
-      'Authorization': 'Bearer $JWT_TOKEN',
-      'Content-Type': 'application/json'
-    };
-    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/ifscmaster/IFSC_Master_Search'));
-    request.body = json.encode({
-      "bank": "icici",
-      "ifsc": "string",
-      "branch": "andheri"
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      String result = await response.stream.bytesToString();
-      valueMap = jsonDecode(result);
-      print(valueMap);
-      print(result);
-
-      return valueMap;
-
-    }
-    else {
-      print(response.reasonPhrase);
-      return valueMap;
-    }
-  }
-
-  Future<String> isValidIFSC(String ifscCode) async{
-    var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/$ifscCode'));
-    //var request = http.Request('GET', Uri.parse('https://ifsc.razorpay.com/BARB0DBGHTW'));
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      String result = await response.stream.bytesToString();
-      return result;
-    }
-    else {
-      print(response.reasonPhrase);
-      return "Not Found";
     }
   }
 

@@ -36,6 +36,15 @@ class WidgetHelper extends StatefulWidget {
     );
   }
 
+  Widget NuniyoAppBar(){
+    return AppBar(
+      leading: Icon(Icons.ac_unit,color: Colors.black,),
+      title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+      backgroundColor: Color(0xffF0ECFF),
+      elevation: 0,
+    );
+  }
+
   Widget NuniyoUINavigatorBtn(BuildContext context , String screenName ,String btnText){
     return Padding(
       padding: const EdgeInsets.all(10.0),

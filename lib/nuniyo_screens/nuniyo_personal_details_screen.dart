@@ -17,7 +17,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
-  late FocusNode _fatherNameTextFieldFocusNode,_annualIncomeDropDownFocusNode,_motherNameTextFieldFocusNode,_occupationDropDownFocusNode,_maritialStatusIncomeDropDownFocusNode,_genderDropDownFocusNode,_tradingExperienceDropDownFocusNode,_politicallyExposedDropDownFocusNode;
+  late FocusNode _fatherNameTextFieldFocusNode,_annualIncomeDropDownFocusNode,_motherNameTextFieldFocusNode,_occupationDropDownFocusNode,_maritialStatusDropDownFocusNode,_genderDropDownFocusNode,_tradingExperienceDropDownFocusNode,_politicallyExposedDropDownFocusNode,_educationDropDownFocusNode,_incomeDropDownFocusNode;
 
   String annualIncome = '1-5 Lac';
   String gender = 'Male';
@@ -25,6 +25,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String tradingExperience = '0 Years';
   String politicallyExposed = 'Yes';
   String occupation = 'PRIVATE SECTOR';
+  String education = 'Graduate';
+
+  TextEditingController fatherNameTextEditingController = TextEditingController();
+  TextEditingController motherNameTextEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -34,10 +38,31 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     _tradingExperienceDropDownFocusNode = FocusNode();
     _motherNameTextFieldFocusNode = FocusNode();
     _occupationDropDownFocusNode = FocusNode();
-    _maritialStatusIncomeDropDownFocusNode = FocusNode();
+    _maritialStatusDropDownFocusNode = FocusNode();
     _annualIncomeDropDownFocusNode = FocusNode();
     _genderDropDownFocusNode = FocusNode();
     _politicallyExposedDropDownFocusNode = FocusNode();
+    _educationDropDownFocusNode = FocusNode();
+    _incomeDropDownFocusNode = FocusNode();
+  }
+
+
+  void _requestIncomeDropDownFocusNode(){
+    setState(() {
+      FocusScope.of(context).requestFocus(_incomeDropDownFocusNode);
+    });
+  }
+
+  void _requestEducationDropDownFocusNode(){
+    setState(() {
+      FocusScope.of(context).requestFocus(_educationDropDownFocusNode);
+    });
+  }
+
+  void _requestMaritialStatusDropDownFocusNode(){
+    setState(() {
+      FocusScope.of(context).requestFocus(_maritialStatusDropDownFocusNode);
+    });
   }
 
   void _requestFatherNameTextFieldFocusNode(){
@@ -81,21 +106,29 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     _fatherNameTextFieldFocusNode.dispose();
     _motherNameTextFieldFocusNode.dispose();
     _occupationDropDownFocusNode.dispose();
-    _maritialStatusIncomeDropDownFocusNode.dispose();
+    _maritialStatusDropDownFocusNode.dispose();
     _annualIncomeDropDownFocusNode.dispose();
     _genderDropDownFocusNode.dispose();
     _tradingExperienceDropDownFocusNode.dispose();
     _politicallyExposedDropDownFocusNode.dispose();
+    _educationDropDownFocusNode.dispose();
+    _incomeDropDownFocusNode.dispose();
     super.dispose();
+  }
+
+  Future<bool> _onWillPop() {
+    return Future.value(false);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(
+        onWillPop: _onWillPop,
+        child:Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black),
-        title: Text('Nuniyo',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
+        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
         backgroundColor: Color(0xffF0ECFF),
         elevation: 0,
       ),
@@ -117,6 +150,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _fatherNameTextFieldFocusNode,
                         onTap: _requestFatherNameTextFieldFocusNode,
+                        controller: fatherNameTextEditingController,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.fromLTRB(25.0,40.0,0.0,40.0),
                             counter: Offstage(),
@@ -136,6 +170,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: 0.5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _motherNameTextFieldFocusNode,
+                        controller: motherNameTextEditingController,
                         onTap: _requestMotherNameTextFieldFocusNode,
                         decoration: InputDecoration(
                             contentPadding: EdgeInsets.fromLTRB(25.0,40.0,0.0,40.0),
@@ -153,18 +188,18 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   height: 75.0,
                   child: InputDecorator(
                     decoration: InputDecoration(
-                        labelText: _maritialStatusIncomeDropDownFocusNode.hasFocus ? 'Maritial Status' : 'Maritial Status',
+                        labelText: _maritialStatusDropDownFocusNode.hasFocus ? 'Maritial Status' : 'Maritial Status',
                         labelStyle: GoogleFonts.openSans(textStyle:TextStyle(fontSize: 14,letterSpacing: 0.5,
-                          color: _maritialStatusIncomeDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                          color: _maritialStatusDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
                         )),
                         border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(5.0))),
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color:  _maritialStatusDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: maritialStatus,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color:  _maritialStatusDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -173,7 +208,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             maritialStatus = newValue!;
                           });
                         },
-
+                        onTap: _requestMaritialStatusDropDownFocusNode,
                         items: <String>['Single','Married','Unmarried','Divorced']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
@@ -199,9 +234,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        onTap: _requestGenderDropDownFocusNode,
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color:  _genderDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: gender,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color: _genderDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -236,9 +272,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        onTap: _requestIncomeDropDownFocusNode,
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: _incomeDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: annualIncome,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color: _incomeDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -247,7 +284,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             annualIncome = newValue!;
                           });
                         },
-
                         items: <String>['1-5 Lac','5-10 Lac','10-25 Lac','>25 Lac' ,'25 Lac-1 Cr','> 1 Cr']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
@@ -273,9 +309,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        onTap: _requestOccupationDropDownFocusNode,
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: _occupationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: occupation,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color: _occupationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -284,8 +321,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             occupation = newValue!;
                           });
                         },
-
-                        items: <String>['PRIVATE SECTOR','PUBLIC SECTOR','etc']
+                        items: <String>['PRIVATE SECTOR','PUBLIC SECTOR','GOVERNMENT SECTOR']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -310,9 +346,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: _tradingExperienceDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: tradingExperience,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color: _tradingExperienceDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -347,9 +383,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     //isEmpty: _currentSelectedValue == '',
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        onTap: _requestPoliticallyExposedDropDownFocusNode,
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: _politicallyExposedDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
                         value: politicallyExposed,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color:_politicallyExposedDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         underline: Container(
                           color: Colors.black,
                         ),
@@ -359,6 +396,44 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                           });
                         },
                         items: <String>['Yes','No','Maybe']
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(value),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
+                Container(
+                  height: 75.0,
+                  child: InputDecorator(
+                    decoration: InputDecoration(
+                        labelText: _educationDropDownFocusNode.hasFocus ? 'Education' : 'Education',
+                        labelStyle: GoogleFonts.openSans(textStyle:TextStyle(fontSize: 14,letterSpacing: 0.5,
+                          color: _educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
+                        )),
+                        border: OutlineInputBorder(
+                            borderSide: BorderSide(color: _educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey),
+                            borderRadius: BorderRadius.circular(5.0))),
+                    //isEmpty: _currentSelectedValue == '',
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        onTap: _requestEducationDropDownFocusNode,
+                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
+                        value: education,
+                        style: GoogleFonts.openSans(textStyle: TextStyle(color:_educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
+                        underline: Container(
+                          color: Colors.black,
+                        ),
+                        onChanged: (String? newValue) {
+                          setState(() {
+                            education = newValue!;
+                          });
+                        },
+                        items: <String>['Graduate','P.G','P.hd']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -396,7 +471,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
             ),
           ),
         ),
-      ),
+      ),)
     );
   }
 

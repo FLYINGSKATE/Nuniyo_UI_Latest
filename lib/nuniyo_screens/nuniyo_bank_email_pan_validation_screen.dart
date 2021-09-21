@@ -88,9 +88,10 @@ class _BankPanEmailValidationScreenState
   }
 
   _selectDate(BuildContext context) async {
+    _requestDateTextFieldFocus();
     final DateTime? picked = await showDatePicker(
         context: context,
-        initialDate: DateTime(1920, 1),
+        initialDate: DateTime(1996, 1),
         firstDate: DateTime(1920, 1),
         lastDate: DateTime.now());
     if (picked != null && picked != selectedDate)
@@ -99,6 +100,8 @@ class _BankPanEmailValidationScreenState
         var date =
             "${picked.toLocal().day}-${picked.toLocal().month}-${picked.toLocal().year}";
         _dateController.text = date;
+        print("WE SELECTED A DATE");
+        postDateToDB();
       });
   }
 
@@ -193,7 +196,7 @@ class _BankPanEmailValidationScreenState
               color: Colors.black,
             ),
             title: Text(
-              'Nuniyo',
+              'Tech X Labs',
               style: GoogleFonts.openSans(
                   textStyle: TextStyle(
                       color: Colors.black,
@@ -227,6 +230,12 @@ class _BankPanEmailValidationScreenState
                       onTap: _requestEmailIdTextFieldFocus,
                       decoration: InputDecoration(
                           counter: Offstage(),
+                          suffixIcon: !showEmailErrorText
+                              ? Icon(Icons.check_circle,
+                              color: isValidInputForEmail
+                                  ? Colors.green
+                                  : Colors.transparent)
+                              : Icon(Icons.error, color: Colors.red),
                           errorText: showEmailErrorText ? emailErrorText : null,
                           labelText: _emailTextFieldFocusNode.hasFocus
                               ? 'Email ID'
@@ -270,8 +279,7 @@ class _BankPanEmailValidationScreenState
                       maxLength: 10,
                       onChanged: (_panNumber) async {
                         if (_panNumber.length >= 10) {
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
                           String phoneNumber =
                               await prefs.getString('PhoneNumber');
                           print(
@@ -280,7 +288,7 @@ class _BankPanEmailValidationScreenState
                                   " and Email ID :");
                           isValidInputForPan = await ApiRepo()
                               .VerifyPAN(phoneNumber, _panNumber);
-                          await ApiRepo().CVLKRAGetPanStatus(_panNumber);
+
                           if (isValidInputForPan) {
                             prefs.setString("PAN_NO", _panNumber);
                           }
@@ -302,6 +310,12 @@ class _BankPanEmailValidationScreenState
                       decoration: InputDecoration(
                           errorText: showPANErrorText ? panErrorText : null,
                           counter: Offstage(),
+                          suffixIcon: !showPANErrorText
+                              ? Icon(Icons.check_circle,
+                              color: isValidInputForPan
+                                  ? Colors.green
+                                  : Colors.transparent)
+                              : Icon(Icons.error, color: Colors.red),
                           labelText: _panTextFieldFocusNode.hasFocus
                               ? 'Enter PAN Number'
                               : 'Enter PAN Number',
@@ -329,9 +343,6 @@ class _BankPanEmailValidationScreenState
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold)),
                             onTap: _requestDateTextFieldFocus,
-                            onChanged: (value){
-
-                            },
                             decoration: InputDecoration(
                               labelText: _dateTextFieldFocusNode.hasFocus
                                   ? 'Enter DOB'
@@ -549,7 +560,7 @@ class _BankPanEmailValidationScreenState
                                                   width: 20,
                                                 ),
                                                 Text(
-                                                    "Something went wrong , \n Please Try Again",
+                                                    "Please Wait ...",
                                                     style: GoogleFonts.openSans(
                                                       textStyle: TextStyle(
                                                           color: Colors.black,
@@ -959,8 +970,8 @@ class _BankPanEmailValidationScreenState
                                         counter: Offstage(),
                                         labelText: _branchNameTextFieldFocusNode
                                                 .hasFocus
-                                            ? 'Enter Branch Name'
-                                            : 'Enter Branch Name',
+                                            ? 'Enter Bank Name'
+                                            : 'Enter Bank Name',
                                         labelStyle: GoogleFonts.openSans(
                                             textStyle: TextStyle(
                                           fontSize: 14,
@@ -1039,8 +1050,8 @@ class _BankPanEmailValidationScreenState
                                       showBranchNameErrorText = false;
                                       showBranchLocationErrorText = false;
                                       IFSCMapList = await ApiRepo()
-                                          .searchIFSCCodes("String bankName",
-                                              "String branchName");
+                                          .searchIFSCCodes(_branchNameTextEditingController.text.trim(),
+                                              _branchLocationTextEditingController.text.trim());
                                       if (IFSCMapList["res_Output"].length >
                                           0) {
                                         showIFSCSearchResults = true;
@@ -1242,5 +1253,17 @@ class _BankPanEmailValidationScreenState
             ],
           )),
     );
+  }
+
+  void postDateToDB() async {
+    //CALL KRA & SOLICIT FETCH
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String phoneNumber = prefs.getString("PhoneNumber");
+    print("We fetched phone Number");
+    print(phoneNumber);
+    if(isValidInputForPan){
+      await ApiRepo().SolicitLocal(_panTextEditingController.text, _dateController.text);
+      await ApiRepo().KRALOCAL(_panTextEditingController.text, phoneNumber);
+    }
   }
 }
