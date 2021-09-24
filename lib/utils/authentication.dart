@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:local_auth/local_auth.dart';
 
 
-
 class Authentication {
   static SnackBar customSnackBar({required String content}) {
     return SnackBar(

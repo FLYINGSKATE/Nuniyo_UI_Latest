@@ -14,15 +14,16 @@ import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
 import 'package:flutter/material.dart';
 
 /*
-1)contact
-2)email
-3)market segment
-4)digiloc
-5)personal
-6) docupload
-7) esign
-8) application status
- */
+0) contact
+1) email
+2) market segment / Options / market segment
+4) digiloc/aadhar kyc
+5) personal info /
+6) IPV / Webcam screen
+7) docupload /
+8) esign /
+9) application status /
+*/
 
 class ScreenRouter {
   static Route<dynamic> generateRoute(RouteSettings settings) {
@@ -30,33 +31,33 @@ class ScreenRouter {
       //0
       case '/':
         return MaterialPageRoute(builder: (_) => SplashScreen());
-      //1
+      //0
       case '/mobilevalidationscreen':
         return MaterialPageRoute(builder: (_) => MobileValidationLoginScreen());
-      //2
+      //1
       case '/bankemailpanvalidationscreen':
         return MaterialPageRoute(builder: (_) => BankPanEmailValidationScreen());
-      //3
+      //2
       case '/optionsscreen':
         return MaterialPageRoute(builder: (_) => OptionsScreen());
       case '/optionsscreen2':
         return MaterialPageRoute(builder: (_) => OptionsScreenTwo());
-      //4
+      //3
       case '/aadharkycscreen':
         return MaterialPageRoute(builder: (_) => AadharKYCScreen());
-      //5
+      //4
       case '/personaldetailsscreen':
         return MaterialPageRoute(builder: (_) => PersonalDetailsScreen());
-      //6
+      //5
       case '/webcamscreen':
         return MaterialPageRoute(builder: (_) => WebCamScreen());
-      //7
+      //6
       case '/uploaddocumentscreen':
         return MaterialPageRoute(builder: (_) => UploadDocumentScreen());
-      //8
+      //7
       case '/esignscreen':
         return MaterialPageRoute(builder: (_) => EsignScreen());
-      //9
+      //8
       case '/congratsscreen':
         return MaterialPageRoute(builder: (_) => CongratsScreen());
       //EXTRA

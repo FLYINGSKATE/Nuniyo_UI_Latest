@@ -49,9 +49,6 @@ class _BrowserViewXState extends State<BrowserViewX> {
     )) ?? false;
   }
 
-
-
-
   @override
   Widget build(BuildContext context) {
     return WillPopScope(child: Scaffold(
@@ -111,5 +108,4 @@ class _BrowserViewXState extends State<BrowserViewX> {
       SourceType.url,
     );
   }
-
 }

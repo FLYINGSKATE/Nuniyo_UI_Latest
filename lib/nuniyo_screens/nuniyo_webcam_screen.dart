@@ -2,6 +2,7 @@
 import 'dart:io';
 
 import 'package:angel_broking_demo/extra_demo_screens/FlutCam.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
@@ -44,6 +45,10 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   String RecordingStatus = "Start Recording";
 
   bool showRecordingButton = false;
+
+  bool enableProceedBtn = false;
+
+  bool enableRetryBtn = false;
 
   @override
   void initState() {
@@ -191,17 +196,18 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                     ],
                   ),
                 ),
-                Container(
-
+                GestureDetector(child:Container(
                   decoration: BoxDecoration(
                       border: Border.all(
-                        color: primaryColorOfApp,
+                        color: showRecordingButton?primaryColorOfApp:Colors.white,
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(8))
                   ),
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   child: FlatButton(
+                    disabledTextColor: Colors.grey,
+                    disabledColor: Color(0xffD2D0E1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
@@ -210,10 +216,10 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                     child: Text(
                         "$RecordingStatus",
                         style: GoogleFonts.openSans(
-                          textStyle: TextStyle(color: primaryColorOfApp, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
+                          textStyle: TextStyle(color:showRecordingButton? primaryColorOfApp:Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
                     ),
                   ),
-                ),
+                )),
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: Row(
@@ -228,10 +234,13 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                   width: MediaQuery.of(context).size.width,
                   height: 60,
                   child: FlatButton(
+                    disabledTextColor: Colors.blue,
+                    disabledColor: Color(0xffD2D0E1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {Navigator.pushNamed(context, '/uploaddocumentscreen');},
+                    onPressed:enableProceedBtn?() {
+                      Navigator.pushNamed(context, '/uploaddocumentscreen');}:null,
                     color: primaryColorOfApp,
                     child: Text(
                         "Proceed",
@@ -244,12 +253,13 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                 Align(
                   alignment: Alignment.center,
                   child: TextButton(
-                    child: Text("Retry",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
-                    onPressed: (){
+                    child: Text("Retry",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableRetryBtn?primaryColorOfApp:Colors.transparent, letterSpacing: .5),),),
+                    onPressed: enableRetryBtn?(){
                       _onWillPop();
+                      enableProceedBtn = false;
                       onVideoRecordButtonPressed();
                       _onWillPop();
-                    },),
+                    }:null),
                 ),
                 SizedBox(height: 10,),
                 Text("type and scrambled it to make a type specimen book.",textAlign: TextAlign.center,style: GoogleFonts.openSans(
@@ -281,7 +291,6 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   /// Display the preview from the camera (or a message if the preview is not available).
   Widget _cameraPreviewWidget() {
     CameraController? cameraController = controller;
-
     if (cameraController == null || !cameraController.value.isInitialized) {
       return Container(
               height: 200,
@@ -289,6 +298,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
           onPressed: (){
             initializeRecorder();
             showRecordingButton = true;
+            enableRetryBtn = true;
             setState(() {
 
             });
@@ -409,6 +419,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
           onStopButtonPressed();
           print("DONE WAITING");
           RecordingStatus = "DONE RECORDING";
+          enableProceedBtn = true;
           setState(() {
 
           });
@@ -502,25 +513,10 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
-    ///SET STEP ID HERE
-    String ThisStepId = '/webcamscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID',ThisStepId);
-
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :"+StepId);
+    String currentRouteName = '/webcamscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
   }
 
 

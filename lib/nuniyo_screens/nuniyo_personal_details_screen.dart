@@ -1,5 +1,6 @@
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -476,25 +477,11 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
     ///SET STEP ID HERE
-    String ThisStepId = '/personaldetailsscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID',ThisStepId);
-
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :"+StepId);
+    String currentRouteName = '/personaldetailsscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
   }
 
 }

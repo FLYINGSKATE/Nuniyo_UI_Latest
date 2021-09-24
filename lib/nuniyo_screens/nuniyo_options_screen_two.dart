@@ -213,18 +213,6 @@ class _OptionsScreenTwoState extends State<OptionsScreenTwo> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
     ///SET STEP ID HERE
     String ThisStepId = '/optionsscreen2';
     SharedPreferences prefs = await SharedPreferences.getInstance();

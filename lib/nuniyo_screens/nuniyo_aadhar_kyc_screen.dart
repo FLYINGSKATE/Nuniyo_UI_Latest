@@ -2,6 +2,7 @@
 
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_digilocker_web_view.dart';
 import 'package:angel_broking_demo/extra_demo_screens/web_view.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -95,24 +96,16 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
     ///SET STEP ID HERE
-    String ThisStepId = '/aadharkycscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID',ThisStepId);
+    String currentRouteName = '/aadharkycscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
 
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :"+StepId);
+    //SharedPreferences prefs = await SharedPreferences.getInstance();
+    //prefs.setString('ROUTE_NAME',currentRouteName);
+
+    //String routeName = prefs.getString('ROUTE_NAME');
+    //print("You are on Route  :"+routeName);
   }
 }

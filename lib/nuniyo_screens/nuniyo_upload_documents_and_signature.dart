@@ -3,8 +3,10 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flushbar/flushbar.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -68,6 +70,28 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
         print(pdfPanImagefile.size);
         print(pdfPanImagefile.extension);
         print(pdfPanImagefile.path);
+        ///FILE SIZE
+        File theNewPickedFile = File(pdfPanImagefile.path.toString());
+        int sizeInBytes = theNewPickedFile.lengthSync();
+        double sizeInMb = sizeInBytes / (1024 * 1024);
+        print("Your File Size is : "+sizeInMb.toString());
+        if(sizeInMb > 2){
+          // This file is Longer the
+          print("Your file is greater than 2MB");
+          ///
+          Navigator.pop(context);
+          Flushbar(
+            flushbarPosition: FlushbarPosition.BOTTOM,
+            icon: Icon(Icons.error,color: Colors.red,),
+            title:  "Error",
+            duration:  Duration(seconds: 3),
+            messageText: Text(
+              "File Size Cannot Be Greater than 2MB",
+              style: TextStyle(color: Colors.red, letterSpacing: 0.5),
+            ),
+          )..show(context);
+          return;
+        }
         if(pdfPanImagefile.extension != 'pdf'){
           imageFilePan = File(pdfPanImagefile.path.toString());
           if (imageFilePan != null) {
@@ -118,6 +142,27 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
         print(pdfPanDigitalSignaturefile.size);
         print(pdfPanDigitalSignaturefile.extension);
         print(pdfPanDigitalSignaturefile.path);
+        ///FILE SIZE
+        File theNewPickedFile = File(pdfPanDigitalSignaturefile.path.toString());
+        int sizeInBytes = theNewPickedFile.lengthSync();
+        double sizeInMb = sizeInBytes / (1024 * 1024);
+        print("Your File Size is : "+sizeInMb.toString());
+        if(sizeInMb > 2){
+          // This file is Longer the
+          print("Your file is greater than 2MB");
+          Navigator.pop(context);
+          Flushbar(
+            flushbarPosition: FlushbarPosition.BOTTOM,
+            icon: Icon(Icons.error,color: Colors.red,),
+            title:  "Error",
+            duration:  Duration(seconds: 3),
+            messageText: Text(
+              "File Size Cannot Be Greater than 2MB",
+              style: TextStyle(color: Colors.red, letterSpacing: 0.5),
+            ),
+          )..show(context);
+          return;
+        }
         if(pdfPanDigitalSignaturefile.extension != 'pdf'){
           imageFileDigitalSignature = File(pdfPanDigitalSignaturefile.path.toString());
           if (imageFileDigitalSignature != null) {
@@ -758,6 +803,26 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           title: 'Cropper',
         ));
     if (croppedFile != null) {
+      ///FILE SIZE
+      int sizeInBytes = croppedFile.lengthSync();
+      double sizeInMb = sizeInBytes / (1024 * 1024);
+      print("Your File Size is : "+sizeInMb.toString());
+      if(sizeInMb > 2){
+        // This file is Longer the
+        print("Your file is greater than 2MB");
+        Navigator.pop(context);
+        Flushbar(
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          icon: Icon(Icons.error,color: Colors.red,),
+          title:  "Error",
+          duration:  Duration(seconds: 3),
+          messageText: Text(
+            "File Size Cannot Be Greater than 2MB",
+            style: TextStyle(color: Colors.red, letterSpacing: 0.5),
+          ),
+        )..show(context);
+        return;
+      }
       imageFilePan = croppedFile;
       tempPanUploaded = true;
       setState(() {
@@ -779,6 +844,28 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
           title: 'Cropper',
         ));
     if (croppedFile != null) {
+
+      ///FILE SIZE
+      int sizeInBytes = croppedFile.lengthSync();
+      double sizeInMb = sizeInBytes / (1024 * 1024);
+      print("Your File Size is : "+sizeInMb.toString());
+      if(sizeInMb > 2){
+        // This file is Longer the
+        print("Your file is greater than 2MB");
+        Navigator.pop(context);
+        Flushbar(
+          flushbarPosition: FlushbarPosition.BOTTOM,
+          icon: Icon(Icons.error,color: Colors.red,),
+          title:  "Error",
+          duration:  Duration(seconds: 3),
+          messageText: Text(
+            "File Size Cannot Be Greater than 2MB",
+            style: TextStyle(color: Colors.red, letterSpacing: 0.5),
+          ),
+        )..show(context);
+        return;
+      }
+      /////
       imageFileDigitalSignature = croppedFile;
       showDrawnDigitalSignatureImage = false;
       tempDigitalPadUploaded  = true;
@@ -788,24 +875,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
-    ///SET STEP ID HERE
-    String ThisStepId = '/uploaddocumentscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID',ThisStepId);
-
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :"+StepId);
+    String currentRouteName = '/uploaddocumentscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
   }
 }

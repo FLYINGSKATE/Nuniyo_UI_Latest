@@ -1,4 +1,5 @@
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -210,25 +211,11 @@ class _OptionsScreenState extends State<OptionsScreen> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
     ///SET STEP ID HERE
-    String ThisStepId = '/optionsscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID',ThisStepId);
-
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :"+StepId);
+    String currentRouteName = '/optionsscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
   }
 
 }

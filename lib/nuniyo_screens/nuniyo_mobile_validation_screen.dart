@@ -48,7 +48,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
 
-
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
   late FocusNode _phoneNumberFocusNode,_otpFocusNode,_referralCodeNode;
@@ -318,10 +317,15 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     ),
                     onPressed: !isValidOTP ? null : () async{
                       if(!tncChecked){
+                        SnackBar(
+                          backgroundColor: Colors.black,
+                          content: Text(
+                            "Please Check the Terms & Conditions",
+                            style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
+                          ),
+                        );
                         showTNCError = true;
-                        setState(() {
-
-                        });
+                        setState(() {});
                         return;
                       }
                       if(this.preferences!.containsKey('COUNTRY')){
@@ -398,8 +402,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   Future<void> ContinueToStep() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey('STEP_ID')){
-      String ThisStepId = prefs.getString("STEP_ID");
+    if(prefs.containsKey('ROUTE_NAME')){
+      String ThisStepId = prefs.getString("ROUTE_NAME");
       print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
       Navigator.pushNamed(context,ThisStepId);
     }

@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -258,8 +259,7 @@ class _BankPanEmailValidationScreenState
                           isValidInputForEmail = false;
                         } else {
                           print("Noice Email");
-                          SharedPreferences prefs =
-                              await SharedPreferences.getInstance();
+                          SharedPreferences prefs = await SharedPreferences.getInstance();
                           isValidInputForEmail = await ApiRepo().VerifyEmail(
                               prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
@@ -276,12 +276,11 @@ class _BankPanEmailValidationScreenState
                     ),
                     Flexible(
                         child: TextField(
-                      maxLength: 10,
-                      onChanged: (_panNumber) async {
+                        maxLength: 10,
+                        onChanged: (_panNumber) async {
                         if (_panNumber.length >= 10) {
                           SharedPreferences prefs = await SharedPreferences.getInstance();
-                          String phoneNumber =
-                              await prefs.getString('PhoneNumber');
+                          String phoneNumber = await prefs.getString('PhoneNumber');
                           print(
                               "We are Fetching PAN Details For the Phone Number :" +
                                   phoneNumber +
@@ -407,24 +406,37 @@ class _BankPanEmailValidationScreenState
                       onChanged: (value) async {
                         setState(() {});
                         if (value.length == 11) {
-                          isValidInputForIFSC = true;
-                          String response = await ApiRepo().isValidIFSC(value);
-                          if (response == "Not Found") {
-                            print("IFSC CODE WRONG");
+                          String Ifsc_pattern = "^[A-Z]{4}0[A-Z0-9]{6}\$";
+                          RegExp regex = new RegExp(Ifsc_pattern);
+                          if (!regex.hasMatch(value) || value == null) {
+                            print('Enter a valid IFSC CODE ');
+                            isValidInputForEmail = false;
                             showIFSCErrorText = true;
-                            isValidIFSCCode = false;
-                            setState(() {});
+                            setState(() {
+
+                            });
                           } else {
                             showIFSCErrorText = false;
-                            isValidIFSCCode = true;
-                            print(response);
+                            isValidInputForIFSC = true;
                             setState(() {});
-                            Map valueMap = jsonDecode(response);
-                            String _ifscCodeR = valueMap["IFSC"];
-                            String _bankNameR = valueMap["BANK"];
-                            String _addressR = valueMap["ADDRESS"];
-                            openIFSCConfirmDialogBox(
-                                _ifscCodeR, _bankNameR, _addressR);
+                            String response = await ApiRepo().isValidIFSC(value);
+                            if (response == "Not Found") {
+                              print("IFSC CODE WRONG");
+                              showIFSCErrorText = true;
+                              isValidIFSCCode = false;
+                              setState(() {});
+                            } else {
+                              showIFSCErrorText = false;
+                              isValidIFSCCode = true;
+                              print(response);
+                              setState(() {});
+                              Map valueMap = jsonDecode(response);
+                              String _ifscCodeR = valueMap["IFSC"];
+                              String _bankNameR = valueMap["BANK"];
+                              String _addressR = valueMap["ADDRESS"];
+                              openIFSCConfirmDialogBox(
+                                  _ifscCodeR, _bankNameR, _addressR);
+                            }
                           }
                         }
                       },
@@ -601,34 +613,6 @@ class _BankPanEmailValidationScreenState
                             )),
                       ),
                     ),
-                    //Real Button
-                    /*Container(
-                  color: Colors.transparent,
-                  width: MediaQuery.of(context).size.width,
-                  height: 60,
-                  child: FlatButton(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    onPressed: () async {
-                      isBankValidatedSuccessfully = await ApiRepo().fetchIsBankValid(_bankTextEditingController.text.trim(), _ifscCodeTextEditingController.text.trim());
-                      if(isBankValidatedSuccessfully){
-                        isBankValidatedSuccessfully = true;
-                        setState(() {});
-                      }
-                      isPanValidatedSuccessfully = await ApiRepo().fetchIsPanValid(fullName, _dateController.text, _panTextEditingController.text);
-                      if(isPanValidatedSuccessfully && isBankValidatedSuccessfully){
-                        Navigator.pushNamed(context, '/UploadDocumentScreen');
-                      }
-                    },
-                    color: primaryColorOfApp,
-                    child: Text(
-                      "Proceed",
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(color: Colors.white, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),)
-                    ),
-                  ),
-                ),*/
                   ],
                 ),
               ),
@@ -1094,25 +1078,10 @@ class _BankPanEmailValidationScreenState
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
-    ///SET STEP ID HERE
-    String ThisStepId = '/bankemailpanvalidationscreen';
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('STEP_ID', ThisStepId);
-
-    String StepId = prefs.getString('STEP_ID');
-    print("You are on STEP  :" + StepId);
+    String currentRouteName = '/bankemailpanvalidationscreen';
+    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String routeName = await StoreLocal().getRouteNameFromLocalStorage();
+    print("YOU ARE ON THIS STEP : "+routeName);
   }
 
   Widget ListViewOfIFSCCode() {

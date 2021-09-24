@@ -3,16 +3,11 @@
 
 import 'dart:io';
 
-import 'package:angel_broking_demo/extra_demo_screens/FlutCam.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_mobile_validation_screen.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_personal_details_screen.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_splash_screen.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_upload_documents_and_signature.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
+import 'package:angel_broking_demo/utils/Router.dart';
 import 'package:flutter/material.dart';
-import 'extra_demo_screens/pdfuploadandview.dart';
-import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
-import 'utils/Router.dart';
 
 void main() {
   ///TO hide Red Screen of Death!
@@ -68,8 +63,9 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      initialRoute: '/',
-      onGenerateRoute: ScreenRouter.generateRoute,
+      home: UploadDocumentScreen(),
+      //initialRoute: '/',
+      //onGenerateRoute: ScreenRouter.generateRoute,
     );
   }
 }
