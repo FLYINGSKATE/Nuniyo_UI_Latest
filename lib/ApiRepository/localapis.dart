@@ -240,9 +240,7 @@ class LocalApiRepo {
     }
   }
 
-  Future<void> ConfirmIFSCDetailsLocal() async{
-
-  }
+  Future<void> ConfirmIFSCDetailsLocal() async{}
 
   Future<bool> GetPanStatusLocal(String panCardNumber) async{
     String lead_id = await StoreLocal().getLeadIdFromLocalStorage();

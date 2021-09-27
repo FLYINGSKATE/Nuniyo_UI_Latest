@@ -238,10 +238,7 @@ class _BankPanEmailValidationScreenState
                       decoration: InputDecoration(
                           counter: Offstage(),
                           suffixIcon: !showEmailErrorText
-                              ? Icon(Icons.check_circle,
-                              color: isValidInputForEmail
-                                  ? Colors.green
-                                  : Colors.transparent)
+                              ? isValidInputForEmail? Icon(Icons.check_circle,color:Colors.green) : CircularProgressIndicator(color: !isValidInputForEmail?Colors.transparent:primaryColorOfApp,)
                               : Icon(Icons.error, color: Colors.red),
                           errorText: showEmailErrorText ? emailErrorText : null,
                           labelText: _emailTextFieldFocusNode.hasFocus
@@ -255,6 +252,8 @@ class _BankPanEmailValidationScreenState
                           )),
                       onChanged: (_emailID) async {
                         print(_emailID.length);
+                        print("Show Progress Inddicator 1 "+isValidInputForEmail.toString());
+                        print("Show Email Error 1 "+isEmailValidatedSuccessfully.toString());
                         String pattern =
                             r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
                             r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
@@ -263,14 +262,22 @@ class _BankPanEmailValidationScreenState
                         if (!regex.hasMatch(_emailID) || _emailID == null) {
                           print('Enter a valid email address');
                           isValidInputForEmail = false;
+                          setState(() {
+
+                          });
                         } else {
                           print("Noice Email");
                           SharedPreferences prefs = await SharedPreferences.getInstance();
+                          isValidInputForEmail = true;
+                          setState(() {
+
+                          });
+
                           //isValidInputForEmail = await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
-                          isValidInputForEmail = await LocalApiRepo().Email_StatusLocal(_emailID);
-                          showEmailErrorText = !isValidInputForEmail;
-                          if (isValidInputForEmail) {
+                          isEmailValidatedSuccessfully = await LocalApiRepo().Email_StatusLocal(_emailID);
+                          showEmailErrorText = !isEmailValidatedSuccessfully;
+                          if (isEmailValidatedSuccessfully) {
                             prefs.setString('EMAIL_ID', _emailID);
                             await LocalApiRepo().UpdateEmailLocal(_emailID);
                           }
