@@ -402,6 +402,9 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () {
+
+
+
                       Navigator.pushNamed(context, '/esignscreen');
                     },
                     color: primaryColorOfApp,

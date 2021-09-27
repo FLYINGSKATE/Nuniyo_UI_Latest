@@ -175,7 +175,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
     var options = {
       'key': 'rzp_test_dojmbldJSpz91g',
       'amount': 20000,
-      'name': 'Nuniyo.',
+      'name': 'TechXLabs.',
       'description': 'Stock Trading',
       'prefill': {'contact': '$phoneNumber', 'email': '$emailID'},
       'external': {

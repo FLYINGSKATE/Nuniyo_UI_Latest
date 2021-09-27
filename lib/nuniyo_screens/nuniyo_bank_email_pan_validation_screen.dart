@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/cupertino.dart';
@@ -69,6 +70,11 @@ class _BankPanEmailValidationScreenState
 
   String branchNameErrorText = "Please Enter a Valid Branch Name";
   String branchLocationErrorText = "Please Enter a Valid Branch Location";
+
+  String BankAccountNumberErrorText = "Please Enter a Valid Bank Account Number";
+  bool showBankAccountNumberErrorText = false;
+
+  bool isValidBankAccount = false;
 
   void _requestBankNameTextFieldFocusNode() {
     setState(() {
@@ -260,12 +266,13 @@ class _BankPanEmailValidationScreenState
                         } else {
                           print("Noice Email");
                           SharedPreferences prefs = await SharedPreferences.getInstance();
-                          isValidInputForEmail = await ApiRepo().VerifyEmail(
-                              prefs.getString('PhoneNumber'), _emailID);
+                          //isValidInputForEmail = await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
+                          isValidInputForEmail = await LocalApiRepo().Email_StatusLocal(_emailID);
                           showEmailErrorText = !isValidInputForEmail;
                           if (isValidInputForEmail) {
                             prefs.setString('EMAIL_ID', _emailID);
+                            await LocalApiRepo().UpdateEmailLocal(_emailID);
                           }
                           setState(() {});
                         }
@@ -285,8 +292,8 @@ class _BankPanEmailValidationScreenState
                               "We are Fetching PAN Details For the Phone Number :" +
                                   phoneNumber +
                                   " and Email ID :");
-                          isValidInputForPan = await ApiRepo()
-                              .VerifyPAN(phoneNumber, _panNumber);
+                          //isValidInputForPan = await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
+                          isValidInputForPan = await LocalApiRepo().GetPanStatusLocal(_panNumber);
 
                           if (isValidInputForPan) {
                             prefs.setString("PAN_NO", _panNumber);
@@ -365,6 +372,14 @@ class _BankPanEmailValidationScreenState
                         child: TextField(
                       textCapitalization: TextCapitalization.characters,
                       controller: _bankTextEditingController,
+                      onChanged: (value) async {
+                        if(value.length>18 || value.length>9){
+                          print("Verifying Bank Account");
+                          isValidBankAccount = await LocalApiRepo().verifyBankAccountLocal(value, _ifscCodeTextEditingController.text.trim());
+                          showBankAccountNumberErrorText = !isValidBankAccount;
+                          setState((){});
+                        }
+                      },
                       cursorColor: primaryColorOfApp,
                       style: GoogleFonts.openSans(
                           textStyle: TextStyle(
@@ -376,6 +391,13 @@ class _BankPanEmailValidationScreenState
                       onTap: _requestBankTextFieldFocus,
                       decoration: InputDecoration(
                           counter: Offstage(),
+                          errorText: showBankAccountNumberErrorText ? "Enter a valid Bank A/C No." : null,
+                          suffixIcon: !showBankAccountNumberErrorText
+                              ? Icon(Icons.check_circle,
+                              color: isValidBankAccount
+                                  ? Colors.green
+                                  : Colors.transparent)
+                              : Icon(Icons.error, color: Colors.red),
                           labelText: _bankTextFieldFocusNode.hasFocus
                               ? 'Enter Bank A/C Number'
                               : 'Enter Bank A/C Number',
@@ -419,7 +441,8 @@ class _BankPanEmailValidationScreenState
                             showIFSCErrorText = false;
                             isValidInputForIFSC = true;
                             setState(() {});
-                            String response = await ApiRepo().isValidIFSC(value);
+                            //String response = await ApiRepo().isValidIFSC(value);
+                            String response = await LocalApiRepo().getIFSCDetailsLocal(value);
                             if (response == "Not Found") {
                               print("IFSC CODE WRONG");
                               showIFSCErrorText = true;
@@ -442,8 +465,7 @@ class _BankPanEmailValidationScreenState
                       },
                       decoration: InputDecoration(
                           counter: Offstage(),
-                          errorText:
-                              showIFSCErrorText ? "Enter a valid IFSC" : null,
+                          errorText: showIFSCErrorText ? "Enter a valid IFSC" : null,
                           suffixIcon: !showIFSCErrorText
                               ? Icon(Icons.check_circle,
                                   color: isValidIFSCCode
@@ -1033,9 +1055,8 @@ class _BankPanEmailValidationScreenState
                                             "") {
                                       showBranchNameErrorText = false;
                                       showBranchLocationErrorText = false;
-                                      IFSCMapList = await ApiRepo()
-                                          .searchIFSCCodes(_branchNameTextEditingController.text.trim(),
-                                              _branchLocationTextEditingController.text.trim());
+                                      //IFSCMapList = await ApiRepo().searchIFSCCodes(_branchNameTextEditingController.text.trim(), _branchLocationTextEditingController.text.trim());
+                                      IFSCMapList = await LocalApiRepo().IFSCMasterSearchLocal(_branchNameTextEditingController.text.trim(), _branchLocationTextEditingController.text.trim());
                                       if (IFSCMapList["res_Output"].length >
                                           0) {
                                         showIFSCSearchResults = true;
@@ -1231,8 +1252,8 @@ class _BankPanEmailValidationScreenState
     print("We fetched phone Number");
     print(phoneNumber);
     if(isValidInputForPan){
-      await ApiRepo().SolicitLocal(_panTextEditingController.text, _dateController.text);
-      await ApiRepo().KRALOCAL(_panTextEditingController.text, phoneNumber);
+      await LocalApiRepo().SolicitLocal(_panTextEditingController.text, _dateController.text);
+      await LocalApiRepo().KRALOCAL(_panTextEditingController.text, phoneNumber);
     }
   }
 }

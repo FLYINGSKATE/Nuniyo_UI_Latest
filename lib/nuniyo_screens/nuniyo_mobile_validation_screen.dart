@@ -1,6 +1,7 @@
 //Mobile Validation
 import 'dart:async';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_terms_and_conditions_webview.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
@@ -153,7 +154,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         this.preferences?.setString("PhoneNumber", phoneNumberString);
                         print("Below Given is the Value From Shared Prefereneces");
                         print(this.preferences?.getString("PhoneNumber"));
-                        isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
+                        //isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
+                        isPhoneNumberValid = await LocalApiRepo().ReadLeadLocal(_phoneNumber);
                         //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
                         howManyTimesResendOTPPressed ++;
                         setState((){});
@@ -168,7 +170,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     child: TextField(
                       onChanged: (value) async {
                         if(value.length==6){
-                          isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
+                          //isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
+                          isValidOTP = await LocalApiRepo().VerifyOTPLocal(phoneNumberString, value);
                           showOTPErrorText= !isValidOTP;
                           setState(() {});
                           // if(value==OTPFromApi){
@@ -317,13 +320,13 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     ),
                     onPressed: !isValidOTP ? null : () async{
                       if(!tncChecked){
-                        SnackBar(
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           backgroundColor: Colors.black,
                           content: Text(
                             "Please Check the Terms & Conditions",
                             style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
                           ),
-                        );
+                        ));
                         showTNCError = true;
                         setState(() {});
                         return;

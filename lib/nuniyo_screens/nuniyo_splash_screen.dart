@@ -160,7 +160,10 @@ class SplashScreenState extends State<SplashScreen> {
     else{
       _askForPermissions();
       _getCurrentLocation();
-      Navigator.pushNamed(context,'/mobilevalidationscreen');
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Navigator.pushNamed(context,'/mobilevalidationscreen');
+      });
+
     }
   }
 
@@ -201,7 +204,9 @@ class SplashScreenState extends State<SplashScreen> {
   void _getBioMetricsAuthentication() async {
     bool isAuthenticated = await Authentication.authenticateWithBiometrics();
     if (isAuthenticated) {
-      Navigator.pushNamed(context,'/mobilevalidationscreen');
+      WidgetsBinding.instance!.addPostFrameCallback((_){
+        Navigator.pushNamed(context,'/mobilevalidationscreen');
+      });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         Authentication.customSnackBar(

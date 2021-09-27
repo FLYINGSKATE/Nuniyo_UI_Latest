@@ -9,6 +9,7 @@ class StoreLocal{
   final String fatherNameKey  = "FATHER_NAME";
   final String motherNameKey  = "MOTHER_NAME";
   final String routeNameKey = "ROUTE_NAME";
+  final String leadIDKey = "LEAD_ID";
 
   /////PHONE NUMBER
   Future<void> StorePhoneNumberToLocalStorage(String mobileNumber) async {
@@ -22,9 +23,17 @@ class StoreLocal{
     return phoneNumber;
   }
 
+  ////LEAD IF
+  Future<void> StoreLeadIdToLocalStorage(String value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(leadIDKey,value);
+  }
 
-
-
+  Future<String> getLeadIdFromLocalStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String value = prefs.getString(leadIDKey);
+    return value;
+  }
 
   /////EMAIL ID
   Future<void> StoreEmailIdToLocalStorage(String value) async {

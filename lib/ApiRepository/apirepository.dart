@@ -1,6 +1,6 @@
 /*This class file consists of calls to API Endpoints*/
 import 'dart:io';
-
+import 'package:angel_broking_demo/globals.dart' as globals;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -56,15 +56,21 @@ class ApiRepo {
   }
 
   Future<bool> VerifyOTP(String phoneNumber,String userEnteredOTP) async{
+
     var headers = {
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Verify_OTP'));
+
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Verify_OTP'));
     request.body = json.encode({
-      "mobile_No": phoneNumber,
-      "otp": userEnteredOTP,
-      "method_Name": "Check_OTP"
+      "mobile_No": "$phoneNumber",
+      "otp": "$userEnteredOTP",
+      "method_Name": "Check_OTP",
+      "org_Id": "S001",
+      "flow_Id": "M001001",
+      "current_Stage_Id": "715439"
     });
+
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
@@ -552,21 +558,7 @@ class ApiRepo {
     }
   }
 
-  Future<void> getIFSCDetailsLocal() async{
 
-  }
-
-  Future<void> ConfirmIFSCDetailsLocal() async{
-
-  }
-
-  Future<void> GetPanStatusLocal() async{}
-  Future<void> SolicitPANDetailsFetchALLKRALocal() async{}
-  Future<void> InsertUpdateKYCRecordLocal() async{}
-  Future<void> GenerateCodeChallengeLocal() async{}
-  Future<void> VerifyDigiLockerAccountLocal() async{}
-  Future<void> GetAuthorizationCodeLocal() async{}
-  Future<void> DocumentUploadLocal() async{}
 
   Future<void> DocumentUploadPANLocal(String phoneNumber,File panCardImage) async{
     var request = http.MultipartRequest('POST', Uri.parse('http://localhost:44330/v1/api/documentupload/Document_Upload_PAN'));
@@ -593,7 +585,34 @@ class ApiRepo {
   Future<void> IPVOTPLocal() async{}
   Future<void> VerifyIPVOTPLocal() async{}
   Future<void> SaveIPVVideoLocal() async{}
-  Future<void> ReadLeadLocal() async{}
+
+
+
+  Future<void> ReadLeadLocal(String mobileNo,String currentStageId) async{
+    var headers = {
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Read_Lead'));
+    request.body = json.encode({
+      "mobile_No": "$mobileNo",
+      "method_Name": "Check_Mobile_No",
+      "org_Id": "S001",
+      "flow_Id": "M001001",
+      "current_Stage_Id": "C002001"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+  }
+
+
   Future<void> VerifyOTPLocal() async{}
   Future<void> LeadLocationLocal() async{}
   Future<void> UpdateStageIdLocal() async{}
