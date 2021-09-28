@@ -117,6 +117,7 @@ class _BankPanEmailValidationScreenState
   bool isPanValidatedSuccessfully = false;
   bool isBankValidatedSuccessfully = false;
   bool isEmailValidatedSuccessfully = false;
+  bool isIFSCValidatedSuccessfully = false;
 
   bool isValidInputForPan = false;
   bool isValidInputForBank = false;
@@ -237,9 +238,15 @@ class _BankPanEmailValidationScreenState
                       onTap: _requestEmailIdTextFieldFocus,
                       decoration: InputDecoration(
                           counter: Offstage(),
-                          suffixIcon: !showEmailErrorText
-                              ? isValidInputForEmail? Icon(Icons.check_circle,color:Colors.green) : CircularProgressIndicator(color: !isValidInputForEmail?Colors.transparent:primaryColorOfApp,)
-                              : Icon(Icons.error, color: Colors.red),
+                          suffixIcon:!isValidInputForEmail?Padding(
+                          padding: EdgeInsets.all(5)
+                          ,child:SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    color: !_emailTextFieldFocusNode.hasFocus && !isValidInputForEmail?Colors.transparent:primaryColorOfApp,
+                                  ))
+                          ):isEmailValidatedSuccessfully?Icon(Icons.check_circle,color:Colors.green):Icon(Icons.error,color:Colors.red),
                           errorText: showEmailErrorText ? emailErrorText : null,
                           labelText: _emailTextFieldFocusNode.hasFocus
                               ? 'Email ID'
@@ -252,8 +259,6 @@ class _BankPanEmailValidationScreenState
                           )),
                       onChanged: (_emailID) async {
                         print(_emailID.length);
-                        print("Show Progress Inddicator 1 "+isValidInputForEmail.toString());
-                        print("Show Email Error 1 "+isEmailValidatedSuccessfully.toString());
                         String pattern =
                             r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]"
                             r"{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]"
@@ -272,11 +277,11 @@ class _BankPanEmailValidationScreenState
                           setState(() {
 
                           });
-
                           //isValidInputForEmail = await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
                           isEmailValidatedSuccessfully = await LocalApiRepo().Email_StatusLocal(_emailID);
                           showEmailErrorText = !isEmailValidatedSuccessfully;
+
                           if (isEmailValidatedSuccessfully) {
                             prefs.setString('EMAIL_ID', _emailID);
                             await LocalApiRepo().UpdateEmailLocal(_emailID);
@@ -293,6 +298,7 @@ class _BankPanEmailValidationScreenState
                         maxLength: 10,
                         onChanged: (_panNumber) async {
                         if (_panNumber.length >= 10) {
+                          isValidInputForPan = true;
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           String phoneNumber = await prefs.getString('PhoneNumber');
                           print(
@@ -300,12 +306,11 @@ class _BankPanEmailValidationScreenState
                                   phoneNumber +
                                   " and Email ID :");
                           //isValidInputForPan = await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
-                          isValidInputForPan = await LocalApiRepo().GetPanStatusLocal(_panNumber);
-
-                          if (isValidInputForPan) {
+                          isPanValidatedSuccessfully = await LocalApiRepo().GetPanStatusLocal(_panNumber);
+                          if (isPanValidatedSuccessfully) {
                             prefs.setString("PAN_NO", _panNumber);
                           }
-                          showPANErrorText = !isValidInputForPan;
+                          showPANErrorText = !isPanValidatedSuccessfully;
                           setState(() {});
                         }
                       },
@@ -320,12 +325,13 @@ class _BankPanEmailValidationScreenState
                               fontWeight: FontWeight.bold)),
                       focusNode: _panTextFieldFocusNode,
                       onTap: _requestPanTextFieldFocus,
+                      enabled: isEmailValidatedSuccessfully,
                       decoration: InputDecoration(
                           errorText: showPANErrorText ? panErrorText : null,
                           counter: Offstage(),
                           suffixIcon: !showPANErrorText
                               ? Icon(Icons.check_circle,
-                              color: isValidInputForPan
+                              color: isPanValidatedSuccessfully
                                   ? Colors.green
                                   : Colors.transparent)
                               : Icon(Icons.error, color: Colors.red),
@@ -345,9 +351,10 @@ class _BankPanEmailValidationScreenState
                     Padding(
                       padding: const EdgeInsets.all(0.0),
                       child: GestureDetector(
-                        onTap: () => _selectDate(context),
+                        onTap: () => isValidInputForPan?null:_selectDate(context),
                         child: AbsorbPointer(
                           child: TextField(
+                            enabled: isValidInputForPan,
                             cursorColor: primaryColorOfApp,
                             style: GoogleFonts.openSans(
                                 textStyle: TextStyle(
@@ -365,6 +372,7 @@ class _BankPanEmailValidationScreenState
                                     ? primaryColorOfApp
                                     : Colors.grey,
                               ),
+                              contentPadding: EdgeInsets.only(top:20,bottom: 20,left: 25),
                               hintText: 'DD/MM/YYYY',
                             ),
                             controller: _dateController,
@@ -372,51 +380,7 @@ class _BankPanEmailValidationScreenState
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: 10,
-                    ),
-                    Flexible(
-                        child: TextField(
-                      textCapitalization: TextCapitalization.characters,
-                      controller: _bankTextEditingController,
-                      onChanged: (value) async {
-                        if(value.length>18 || value.length>9){
-                          print("Verifying Bank Account");
-                          isValidBankAccount = await LocalApiRepo().verifyBankAccountLocal(value, _ifscCodeTextEditingController.text.trim());
-                          showBankAccountNumberErrorText = !isValidBankAccount;
-                          setState((){});
-                        }
-                      },
-                      cursorColor: primaryColorOfApp,
-                      style: GoogleFonts.openSans(
-                          textStyle: TextStyle(
-                              color: Colors.black,
-                              letterSpacing: .5,
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold)),
-                      focusNode: _bankTextFieldFocusNode,
-                      onTap: _requestBankTextFieldFocus,
-                      decoration: InputDecoration(
-                          counter: Offstage(),
-                          errorText: showBankAccountNumberErrorText ? "Enter a valid Bank A/C No." : null,
-                          suffixIcon: !showBankAccountNumberErrorText
-                              ? Icon(Icons.check_circle,
-                              color: isValidBankAccount
-                                  ? Colors.green
-                                  : Colors.transparent)
-                              : Icon(Icons.error, color: Colors.red),
-                          labelText: _bankTextFieldFocusNode.hasFocus
-                              ? 'Enter Bank A/C Number'
-                              : 'Enter Bank A/C Number',
-                          labelStyle: TextStyle(
-                            color: _bankTextFieldFocusNode.hasFocus
-                                ? primaryColorOfApp
-                                : Colors.grey,
-                          )),
-                    )),
-                    SizedBox(
-                      height: 10,
-                    ),
+                    SizedBox(height: 20,),
                     Flexible(
                         child: TextField(
                       maxLength: 11,
@@ -439,7 +403,7 @@ class _BankPanEmailValidationScreenState
                           RegExp regex = new RegExp(Ifsc_pattern);
                           if (!regex.hasMatch(value) || value == null) {
                             print('Enter a valid IFSC CODE ');
-                            isValidInputForEmail = false;
+                            isValidInputForIFSC = false;
                             showIFSCErrorText = true;
                             setState(() {
 
@@ -458,6 +422,7 @@ class _BankPanEmailValidationScreenState
                             } else {
                               showIFSCErrorText = false;
                               isValidIFSCCode = true;
+                              isIFSCValidatedSuccessfully = true;
                               print(response);
                               setState(() {});
                               Map valueMap = jsonDecode(response);
@@ -475,7 +440,7 @@ class _BankPanEmailValidationScreenState
                           errorText: showIFSCErrorText ? "Enter a valid IFSC" : null,
                           suffixIcon: !showIFSCErrorText
                               ? Icon(Icons.check_circle,
-                                  color: isValidIFSCCode
+                                  color: isIFSCValidatedSuccessfully
                                       ? Colors.green
                                       : Colors.transparent)
                               : Icon(Icons.error, color: Colors.red),
@@ -519,6 +484,45 @@ class _BankPanEmailValidationScreenState
                         ],
                       ),
                     ),
+                    SizedBox(height: 10,),
+                    Flexible(child: TextField(
+                      textCapitalization: TextCapitalization.characters,
+                      controller: _bankTextEditingController,
+                      onChanged: (value) async {
+                        if(value.length>18 || value.length>9){
+                          print("Verifying Bank Account");
+                          isValidBankAccount = await LocalApiRepo().verifyBankAccountLocal(value, _ifscCodeTextEditingController.text.trim());
+                          showBankAccountNumberErrorText = !isValidBankAccount;
+                          setState((){});
+                        }
+                      },
+                      cursorColor: primaryColorOfApp,
+                      style: GoogleFonts.openSans(
+                          textStyle: TextStyle(
+                              color: Colors.black,
+                              letterSpacing: .5,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold)),
+                      focusNode: _bankTextFieldFocusNode,
+                      onTap: _requestBankTextFieldFocus,
+                      decoration: InputDecoration(
+                          counter: Offstage(),
+                          errorText: showBankAccountNumberErrorText ? "Enter a valid Bank A/C No." : null,
+                          suffixIcon: !showBankAccountNumberErrorText
+                              ? Icon(Icons.check_circle,
+                              color: isValidBankAccount
+                                  ? Colors.green
+                                  : Colors.transparent)
+                              : Icon(Icons.error, color: Colors.red),
+                          labelText: _bankTextFieldFocusNode.hasFocus
+                              ? 'Enter Bank A/C Number'
+                              : 'Enter Bank A/C Number',
+                          labelStyle: TextStyle(
+                            color: _bankTextFieldFocusNode.hasFocus
+                                ? primaryColorOfApp
+                                : Colors.grey,
+                          )),
+                    )),
                     SizedBox(
                       height: 20,
                     ),
@@ -532,9 +536,14 @@ class _BankPanEmailValidationScreenState
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        onPressed: !isValidIFSCCode
+                        onPressed: !(isIFSCValidatedSuccessfully && isEmailValidatedSuccessfully && isPanValidatedSuccessfully)
                             ? null
                             : () async {
+                                print(isValidIFSCCode);
+                                print(isBankValidatedSuccessfully);
+                                print(isValidInputForEmail);
+                                print(isValidInputForPan);
+
                                 isValidInputForBank = true;
                                 isValidInputForPan = true;
                                 isValidInputForEmail = true;
@@ -1153,6 +1162,7 @@ class _BankPanEmailValidationScreenState
   }
 
   IFSCCard(String BranchName, String Address, String IfscCode) {
+    var val;
     return GestureDetector(
       onTap: () async {
         Navigator.pop(context);
@@ -1259,6 +1269,7 @@ class _BankPanEmailValidationScreenState
     print("We fetched phone Number");
     print(phoneNumber);
     if(isValidInputForPan){
+      ///If only 18
       await LocalApiRepo().SolicitLocal(_panTextEditingController.text, _dateController.text);
       await LocalApiRepo().KRALOCAL(_panTextEditingController.text, phoneNumber);
     }

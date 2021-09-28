@@ -19,15 +19,13 @@ class LocalApiRepo {
   //final String BASE_API_URL = 'https://10.0.2.2:5001';
 
   //BASE URL : When Run In Web
-  final String BASE_API_URL = 'https://localhost:5001';
-
   String API_TOKEN = "";
 
-  final String BASE_API_URL_2 = 'http://localhost:44333';
-
-  final String BASE_API_URL_3 = 'http://localhost:44330';
+  final String BASE_WEB_URL = 'http://localhost:44330';
 
   final String BASE_API_LINK_URL = 'https://api.nuniyo.tech';
+
+  final String BASE_ANDROID_EMULATOR_URL = "https://10.0.2.2:44330";
 
   SharedPreferences? preferences;
 
@@ -147,10 +145,8 @@ class LocalApiRepo {
   }
 
   Future<void> postStageIDLocal() async{
-
     String JWT_TOKEN= await GetCurrentJWTToken();
     print("Calling Stage ID Using API"+JWT_TOKEN);
-
     var headers = {
       'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
@@ -312,7 +308,7 @@ class LocalApiRepo {
     List<int> _selectedFile = await imageP.readAsBytes();
     var request;
     if(kIsWeb){
-      request = http.MultipartRequest('POST', Uri.parse(BASE_API_URL+'/api/DocumentOCR/OCR'));
+      request = http.MultipartRequest('POST', Uri.parse(BASE_API_LINK_URL+'/api/DocumentOCR/OCR'));
       request.files.add(await http.MultipartFile.fromBytes('front_part', _selectedFile,
           contentType: new MediaType('application', 'octet-stream'),
           filename: "file_up"));
@@ -511,12 +507,12 @@ class LocalApiRepo {
       print(valueMap);
       print(result);
       int result_Id = valueMap["res_Output"][0]["result_Id"];
-      String result_Description = valueMap["res_Output"][0]["result_Description"];
+      //String result_Description = valueMap["res_Output"][0]["result_Description"];
       print("Your OTP IS VERIFIED OR NOT DEPENDS ON "+result_Id.toString());
-      API_TOKEN = result_Description;
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString("API_TOKEN", API_TOKEN);
-      print("YOUR JWT TOKEN :"+API_TOKEN);
+      //API_TOKEN = result_Description;
+      //SharedPreferences prefs = await SharedPreferences.getInstance();
+      //await prefs.setString("API_TOKEN", API_TOKEN);
+      //print("YOUR JWT TOKEN :"+API_TOKEN);
       if(result_Id==1){
         return true;
       }
@@ -576,8 +572,5 @@ class LocalApiRepo {
     else {
       print(response.reasonPhrase);
     }
-
   }
-
-
 }
