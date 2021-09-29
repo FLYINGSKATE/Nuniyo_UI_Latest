@@ -65,6 +65,7 @@ dependencies:
   get: ^4.3.8
   syncfusion_flutter_pdfviewer: ^19.2.62-beta
   flushbar: ^1.10.4
+  email_validator: ^2.0.1
 
 
 

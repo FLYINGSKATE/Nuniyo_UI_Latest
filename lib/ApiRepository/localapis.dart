@@ -85,36 +85,8 @@ class LocalApiRepo {
   }
 
 
-  Future<void> KRALOCAL(String panNumber,String phoneNumber) async{
-    print("Calling KRA LOCAL USING");
-    print(panNumber);
-    print(phoneNumber);
 
-    String JWT_TOKEN= await GetCurrentJWTToken();
-    print("Calling Verify PAN Using API"+JWT_TOKEN);
-    var headers = {
-      'Authorization': 'Bearer $JWT_TOKEN',
-      'Content-Type': 'application/json'
-    };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/api/cvlkra/Get_PanStatus'));
-    request.body = json.encode({
-      "pan_No": panNumber,
-      "mobile_No": phoneNumber
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print("KRA LOCAL");
-      print(await response.stream.bytesToString());
-    }
-    else {
-      print(response.reasonPhrase);
-    }
-  }
-
-  Future<void> SolicitLocal(String panNumber,String dOB) async{
+  /*Future<void> SolicitLocal(String panNumber,String dOB) async{
     print("Calling Solicit LOCAL USING");
     print(panNumber);
     print(dOB);
@@ -142,7 +114,7 @@ class LocalApiRepo {
       print(response.reasonPhrase);
     }
 
-  }
+  }*/
 
   Future<void> postStageIDLocal() async{
     String JWT_TOKEN= await GetCurrentJWTToken();
@@ -174,7 +146,9 @@ class LocalApiRepo {
     print("IFSC CODE"+ifscNo);
     print("Account No"+accountNo);
 
-    String lead_id = await StoreLocal().getLeadIdFromLocalStorage();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
+
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -239,7 +213,8 @@ class LocalApiRepo {
   Future<void> ConfirmIFSCDetailsLocal() async{}
 
   Future<bool> GetPanStatusLocal(String panCardNumber) async{
-    String lead_id = await StoreLocal().getLeadIdFromLocalStorage();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -274,8 +249,10 @@ class LocalApiRepo {
     }
   }
 
-  Future<void> SolicitPANDetailsFetchALLKRALocal(String panCard) async{
-    String lead_id = await StoreLocal().getLeadIdFromLocalStorage();
+  Future<void> SolicitPANDetailsFetchALLKRALocal(String panCard,String dOB) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
+    print("YOUR LEAD ID : "+lead_id);
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -284,7 +261,7 @@ class LocalApiRepo {
       "lead_Id": "$lead_id",
       "paN_NO": "$panCard",
       "org_Id": "S001",
-      "date_Of_birth": "31-03-2000"
+      "date_Of_birth": "$dOB"
     });
     request.headers.addAll(headers);
 
@@ -334,7 +311,9 @@ class LocalApiRepo {
   Future<void> DocumentUploadSignatureLocal() async{}
 
   Future<bool>Email_StatusLocal(String emailID) async{
-    String lead_id = await StoreLocal().getLeadIdFromLocalStorage().toString();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
+    print("Email Status for Lead ID : "+lead_id.toString());
     var headers = {
       'Content-Type': 'application/json'
     };
@@ -371,13 +350,19 @@ class LocalApiRepo {
   }
 
   Future<bool> UpdateEmailLocal(String emailId) async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
+    print("Update Email Status for Lead ID : "+lead_id);
+
+
     var headers = {
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/email/Update_Email'));
     request.body = json.encode({
       "org_Id": "S001",
-      "lead_Id": "T001211000006",
+      "lead_Id": "$lead_id",
       "email": "$emailId",
       "method_Name": "Update_Email"
     });
@@ -413,9 +398,9 @@ class LocalApiRepo {
     };
     var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/ifscmaster/IFSC_Master_Search'));
     request.body = json.encode({
-      "bank": "icici",
+      "bank": "$branchName",
       "ifsc": "string",
-      "branch": "andheri"
+      "branch": "$branchLocation"
     });
     request.headers.addAll(headers);
 
@@ -531,14 +516,16 @@ class LocalApiRepo {
   Future<void> UpdateStageIdLocal() async{}
 
   Future<void> NSDLeKYCPanAuthenticationLocal() async{
-    String lead_id = await StoreLocal().getLeadIdFromLocalStorage();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id = prefs.getString("LEAD_ID");
+    print("Lead id PAN :"+lead_id);
     var headers = {
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/PanAuthenticationController/PanAuthentication'));
     request.body = json.encode({
       "pan_No": "HCAPk4259Q",
-      "lead_Id": "T001211000006",
+      "lead_Id": "$lead_id",
       "org_Id": "S001",
       "method_Name": "NSDLeKYCPanAuthentication"
     });

@@ -386,7 +386,6 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       IconButton(onPressed:(){
                         tempDigitalPadUploaded = false;
                         showDigitalPadBox = false;
-
                         setState(() {});
                       }, icon: Icon(Icons.delete,size: 36.0,color: Colors.red,)),
                     ],
@@ -398,15 +397,14 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                   width: MediaQuery.of(context).size.width,
                   height: 75,
                   child: FlatButton(
+                    disabledTextColor: Colors.blue,
+                    disabledColor: Color(0xffD2D0E1),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {
-
-
-
-                      Navigator.pushNamed(context, '/esignscreen');
-                    },
+                    onPressed:(tempDigitalPadUploaded&&tempPanUploaded)?() {
+                        Navigator.pushNamed(context, '/esignscreen');
+                    }:null,
                     color: primaryColorOfApp,
                     child: Text(
                         "Proceed",

@@ -1,5 +1,7 @@
 import 'dart:convert' show utf8, base64;
 
+import 'package:flutter/services.dart';
+
 EncodingDecodingDemo() {
   final StringToEncode = 'https://dartpad.dartlang.org/';
 
@@ -23,4 +25,15 @@ String Decode(String StringToDecode){
   final DecodedString = utf8.decode(base64.decode(StringToDecode));
   print(DecodedString);
   return DecodedString;
+}
+
+
+class UpperCaseTextFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(TextEditingValue oldValue, TextEditingValue newValue) {
+    return TextEditingValue(
+      text: newValue.text.toUpperCase(),
+      selection: newValue.selection,
+    );
+  }
 }
