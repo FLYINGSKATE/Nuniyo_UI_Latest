@@ -1,6 +1,9 @@
 ///Sign Up Page 1
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/scheduler.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:intl/intl.dart';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
 import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/utils/encode_decode.dart';
@@ -11,6 +14,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
+
+import '../globals.dart';
 
 extension DateTimeX on DateTime {
   bool isUnderage() =>
@@ -83,6 +89,11 @@ class _BankPanEmailValidationScreenState
 
   bool showSearchYourIFSCFields = true;
 
+  String? _selectedDate;
+
+  bool enableBankAccountTextField = false;
+  bool enableDatePicker = false;
+
 
   void _requestBankNameTextFieldFocusNode() {
     setState(() {
@@ -101,6 +112,7 @@ class _BankPanEmailValidationScreenState
       FocusScope.of(context).requestFocus(_IFSCCode2TextFieldFocusNode);
     });
   }
+
 
   _selectDate(BuildContext context) async {
     _requestDateTextFieldFocus();
@@ -123,6 +135,8 @@ class _BankPanEmailValidationScreenState
           );
         },
         context: context,
+        initialDatePickerMode: DatePickerMode.year,
+        initialEntryMode: DatePickerEntryMode.calendar,
         initialDate: DateTime(DateTime.now().year-25, DateTime.now().month, DateTime.now().day),
         firstDate: DateTime(DateTime.now().year-200, DateTime.now().month, DateTime.now().day),
         lastDate: DateTime(DateTime.now().year-18, DateTime.now().month, DateTime.now().day));
@@ -141,7 +155,6 @@ class _BankPanEmailValidationScreenState
               "${picked.toLocal().day}-${picked.toLocal().month}-${picked.toLocal().year}";
           _dateController.text = date;
           print("WE SELECTED A DATE");
-          enableIFSCCodeTextField = true;
           postDateToDB();
         }
       });
@@ -153,6 +166,7 @@ class _BankPanEmailValidationScreenState
   bool isBankValidatedSuccessfully = false;
   bool isEmailValidatedSuccessfully = false;
   bool isIFSCValidatedSuccessfully = false;
+  bool isDOBValidatedSuccessfully = false;
 
   bool isValidInputForPan = false;
   bool isValidInputForBank = false;
@@ -231,6 +245,7 @@ class _BankPanEmailValidationScreenState
 
   @override
   Widget build(BuildContext context) {
+    _requestEmailIdTextFieldFocus();
     return WillPopScope(
         child: Scaffold(
           resizeToAvoidBottomInset: true,
@@ -309,12 +324,12 @@ class _BankPanEmailValidationScreenState
                           setState(() {});
                           //isValidInputForEmail = await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
-                          isEmailValidatedSuccessfully = await LocalApiRepo().Email_StatusLocal(_emailID);
+                          isEmailValidatedSuccessfully = await LocalApiRepo().Email_Status(_emailID);
+                          await LocalApiRepo().UpdateEmail(_emailID);
                           showEmailErrorText = !isEmailValidatedSuccessfully;
-
                           if (isEmailValidatedSuccessfully) {
-                            prefs.setString('EMAIL_ID', _emailID);
-                            await LocalApiRepo().UpdateEmailLocal(_emailID);
+                            _requestPanTextFieldFocus();
+                            prefs.setString(EMAIL_ID_KEY, _emailID);
                           }
                           setState(() {});
                         }
@@ -332,12 +347,15 @@ class _BankPanEmailValidationScreenState
                         if (_panNumber.length >= 10) {
                           isValidInputForPan = true;
                           SharedPreferences prefs = await SharedPreferences.getInstance();
-                          String phoneNumber = await prefs.getString('PhoneNumber');
-                          print("We are Fetching PAN Details For the Phone Number :" + phoneNumber + " and Email ID :");
                           //isValidInputForPan = await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
+                          isPanValidatedSuccessfully = await LocalApiRepo().NSDLeKYCPanAuthenticationLocal(_panNumber);
                           isPanValidatedSuccessfully = await LocalApiRepo().GetPanStatusLocal(_panNumber);
+                          String panOwnerName = prefs.getString("PAN_OWNER_NAME");
+                          Fluttertoast.showToast(msg: "PAN OWNER NAME :"+panOwnerName, toastLength: Toast.LENGTH_SHORT);
                           if (isPanValidatedSuccessfully) {
-                            prefs.setString("PAN_NO", _panNumber);
+                            prefs.setString(PAN_NO_KEY, _panNumber);
+                            enableDatePicker = true;
+                            _requestDateTextFieldFocus();
                           }
                           showPANErrorText = !isPanValidatedSuccessfully;
                           setState(() {});
@@ -374,6 +392,7 @@ class _BankPanEmailValidationScreenState
                                 ? primaryColorOfApp
                                 : Colors.grey,
                           )),
+
                     )),
                     SizedBox(
                       height: 10,
@@ -382,19 +401,40 @@ class _BankPanEmailValidationScreenState
                     Padding(
                       padding: const EdgeInsets.all(0.0),
                       child: GestureDetector(
-                        onTap: () => !isPanValidatedSuccessfully?null:_selectDate(context),
+                        onTap:enableDatePicker?(){
+                          showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                    title: Text('Select Date Of Birth'),
+                                    content: Container(
+                                      height: 400,
+                                      child: Column(
+                                        children: <Widget>[
+                                          Container(
+                                            height: 400,
+                                            width: 400,
+                                            child: getDateRangePicker(),
+                                          ),
+                                        ],
+                                      ),
+                                    ));
+                              });
+                        }:null,
                         child: AbsorbPointer(
                           child: TextField(
-                            enabled: isPanValidatedSuccessfully,
+                            enabled: enableDatePicker,
                             cursorColor: primaryColorOfApp,
                             style: GoogleFonts.openSans(
                                 textStyle: TextStyle(
-                                    color: Colors.grey,
+                                    color: _dateTextFieldFocusNode.hasFocus?Colors.grey:Colors.black,
                                     letterSpacing: .5,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold)),
                             onTap: _requestDateTextFieldFocus,
                             decoration: InputDecoration(
+                              suffixIcon: IconButton(icon:Icon(Icons.date_range, color:_dateTextFieldFocusNode.hasFocus?primaryColorOfApp:Colors.grey),onPressed:enableDatePicker? (){getDateRangePicker();}:null),
+                              errorText: showDOBError?"Enter a valid DOB":null,
                               labelText: _dateTextFieldFocusNode.hasFocus
                                   ? 'Enter DOB'
                                   : 'Enter DOB',
@@ -413,14 +453,16 @@ class _BankPanEmailValidationScreenState
                     ),
                     SizedBox(height: 20,),
                     Flexible(child: TextField(
-                      enabled: isPanValidatedSuccessfully ,
+                      enabled: enableBankAccountTextField ,
                       textCapitalization: TextCapitalization.characters,
                       controller: _bankTextEditingController,
                       onChanged: (value) async {
                         if(value.length>18 || value.length>9){
                           print("Verifying Bank Account");
-                          isValidBankAccount = await LocalApiRepo().verifyBankAccountLocal(value, _ifscCodeTextEditingController.text.trim());
+                          isValidBankAccount = true;
                           showBankAccountNumberErrorText = !isValidBankAccount;
+                          enableIFSCCodeTextField = true;
+                          _requestIfscTextFieldFocus();
                           setState((){});
                         }
                       },
@@ -474,6 +516,10 @@ class _BankPanEmailValidationScreenState
                       inputFormatters: [UpperCaseTextFormatter(),],
                       decoration: InputDecoration(
                           counter: Offstage(),
+                          disabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            borderSide: BorderSide(color: Colors.grey,width: 0),
+                          ),
                           errorText: showIFSCErrorText ? "Enter a valid IFSC" : null,
                           suffixIcon: !showIFSCErrorText
                               ? Icon(Icons.check_circle,
@@ -486,25 +532,25 @@ class _BankPanEmailValidationScreenState
                               : 'Enter IFSC Number',
                           labelStyle: TextStyle(
                             color: _ifscTextFieldFocusNode.hasFocus
-                                ? primaryColorOfApp
+                                ? isIFSCValidatedSuccessfully?Colors.grey:primaryColorOfApp
                                 : Colors.grey,
                           )),
                     )),
                     Visibility(visible:true,child:Align(
                       alignment: Alignment.centerRight,
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           Icon(
                             Icons.search,
                             color: enableIFSCCodeTextField?primaryColorOfApp:Color(0xffD2D0E1),
-                            size: 18,
+                            size: 26,
                           ),
                           SizedBox(
                             width: 5,
                           ),
                           TextButton(
-                              onPressed: !enableIFSCCodeTextField?() {
+                              onPressed: enableIFSCCodeTextField?() {
                                 openIFSCSearchDialogBox();
                               }:null,
                               child: Text(
@@ -539,102 +585,14 @@ class _BankPanEmailValidationScreenState
                                 print(isBankValidatedSuccessfully);
                                 print(isValidInputForEmail);
                                 print(isValidInputForPan);
-
-                                isValidInputForBank = true;
-                                isValidInputForPan = true;
-                                isValidInputForEmail = true;
-                                isValidInputForIFSC = true;
-
-                                if (isValidInputForBank &&
-                                    isValidInputForPan &&
-                                    isValidInputForEmail &&
-                                    isValidInputForIFSC) {
-                                  //Show Success and Move to next screen in some seconds
-                                  showDialog(
-                                    context: context, // <-----
-                                    barrierDismissible: false,
-                                    builder: (BuildContext context) {
-                                      return Dialog(
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(20.0),
-                                          child: new Row(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              CircularProgressIndicator(),
-                                              SizedBox(
-                                                width: 20,
-                                              ),
-                                              Text("Please Wait",
-                                                  style: GoogleFonts.openSans(
-                                                    textStyle: TextStyle(
-                                                        color: Colors.black,
-                                                        letterSpacing: .5,
-                                                        fontSize: 16,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  )),
-                                            ],
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                  );
-                                  //isBankValidatedSuccessfully = await ApiRepo().fetchIsBankValid(bankAccountNumber, ifscCode);
-                                  //isPanValidatedSuccessfully = await ApiRepo().fetchIsPanValid(fullName, dOB, panNumber);
-                                  //isEmailValidatedSuccessfully = await ApiRepo().fetchEmailOTP(emailID);
-                                  await Future.delayed(Duration(seconds: 1));
-                                  if (isBankValidatedSuccessfully &&
-                                      isPanValidatedSuccessfully &&
-                                      isEmailValidatedSuccessfully) {
-                                    Navigator.pushNamed(
-                                        context, '/optionsscreen');
-                                  } else {
-                                    Navigator.pop(context);
-                                    //Show error in a dialog box and then wait for 1 seconds and let user try again
-                                    showDialog(
-                                      context: context, // <-----
-                                      barrierDismissible: false,
-                                      builder: (BuildContext context) {
-                                        return Dialog(
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(20.0),
-                                            child: new Row(
-                                              mainAxisSize: MainAxisSize.min,
-                                              children: [
-                                                Icon(Icons.error),
-                                                SizedBox(
-                                                  width: 20,
-                                                ),
-                                                Text(
-                                                    "Please Wait ...",
-                                                    style: GoogleFonts.openSans(
-                                                      textStyle: TextStyle(
-                                                          color: Colors.black,
-                                                          letterSpacing: .5,
-                                                          fontSize: 16,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    )),
-                                              ],
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                    await Future.delayed(Duration(seconds: 1));
-                                    Navigator.pop(context);
-                                    ////////////////////////////FOR DEMO////////////////////
-                                    SharedPreferences prefs =
-                                        await SharedPreferences.getInstance();
-                                    prefs.setString(
-                                        "DOB", _dateController.text);
-                                    prefs.setString("BANK_AC_NO",
-                                        _bankTextEditingController.text);
-                                    Navigator.pushNamed(
-                                        context, '/optionsscreen');
-                                    ////////////
-                                  }
-                                }
+                                ////////////////////////////FOR DEMO////////////////////
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                prefs.setString("DOB", _dateController.text);
+                                prefs.setString("BANK_AC_NO", _bankTextEditingController.text);
+                                await LocalApiRepo().UpdateStage_Id();
+                                String stage_id = prefs.getString(STAGE_KEY);
+                                print("On Proceed Let's go to :"+stage_id);
+                                Navigator.pushNamed(context, stage_id);
                               },
                         color: primaryColorOfApp,
                         child: Text("Proceed",
@@ -670,9 +628,10 @@ class _BankPanEmailValidationScreenState
   }
 
   void openIFSCConfirmDialogBox(String _ifscCodeR, String _bankNameR, String _addressR) {
+    String confirmBtnText = "Confirm";
     showGeneralDialog(
       barrierLabel: "Barrier",
-      barrierDismissible: true,
+      barrierDismissible: false,
       barrierColor: Colors.black.withOpacity(0.5),
       transitionDuration: Duration(milliseconds: 700),
       context: context,
@@ -709,7 +668,13 @@ class _BankPanEmailValidationScreenState
                                   child: IconButton(
                                     icon: Icon(Icons.close),
                                     onPressed: () {
+                                      _ifscCodeTextEditingController.text = "";
+                                      isIFSCValidatedSuccessfully = false;
+                                      isValidIFSCCode = false;
+                                      isValidInputForIFSC = false;
+                                      enableIFSCCodeTextField = true;
                                       Navigator.pop(context);
+                                      setState(() {});
                                     },
                                   ),
                                 ),
@@ -726,13 +691,13 @@ class _BankPanEmailValidationScreenState
                                         fontSize: 18,
                                         fontWeight: FontWeight.bold),
                                   )),
-                              Text(_ifscCodeR,
+                              Padding(padding:EdgeInsets.only(left: 18),child:Text(_ifscCodeR,
                                   style: GoogleFonts.openSans(
                                     textStyle: TextStyle(
                                         color: Colors.black,
                                         letterSpacing: .5,
                                         fontSize: 18),
-                                  )),
+                                  )),)
                             ],
                           ),
                           SizedBox(
@@ -773,51 +738,18 @@ class _BankPanEmailValidationScreenState
                                         fontWeight: FontWeight.bold),
                                   )),
                               Flexible(
-                                child: Text(_addressR,
+                                child: Align(alignment: Alignment.centerRight,child:Padding(padding:EdgeInsets.only(right: 20,left:34),child:Text(_addressR,
                                     style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
                                           color: Colors.black,
                                           letterSpacing: .5,
-                                          fontSize: 18),
+                                          fontSize: 16)),
                                     )),
-                              ),
+                              ),)
                             ],
                           ),
                           SizedBox(height: 20.0),
-                          Container(
-                            color: Colors.transparent,
-                            width: MediaQuery.of(context).size.width / 1.5,
-                            height: 60,
-                            child: FlatButton(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              onPressed: () {
-                                //Penny Drop Api Will Come here till then suppose it is valid
-                                isValidIFSCCode = true;
-                                isValidInputForIFSC = true;
-                                isIFSCValidatedSuccessfully = true;
-                                enableIFSCCodeTextField = false;
-                                //validateIFSC(_ifscCodeTextEditingController.text);
-                                Navigator.pop(context);
-                                setState(() {
-
-                                });
-                                //validateIFSC(_ifscCodeTextEditingController.text);
-                              },
-                              color: primaryColorOfApp,
-                              child: Text("Confirm",
-                                  style: GoogleFonts.openSans(
-                                    textStyle: TextStyle(
-                                        color: Colors.white,
-                                        letterSpacing: .5,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.bold),
-                                  )),
-                            ),
-                          ),
-                          SizedBox(height: 20.0),
-                          Container(
+                          Padding(padding:EdgeInsets.only(right: 25),child:Container(
                             color: Colors.transparent,
                             width: MediaQuery.of(context).size.width / 1.5,
                             height: 60,
@@ -826,8 +758,53 @@ class _BankPanEmailValidationScreenState
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               onPressed: () async {
+                                confirmBtnText = "Please Wait ";
+                                setState(() {
+
+                                });
+                                //Penny Drop Api Will Come here till then suppose it is valid
+                                isBankValidatedSuccessfully = await LocalApiRepo().verifyBankAccountLocal(_bankTextEditingController.text.trim(), _ifscCodeTextEditingController.text.trim());
+                                if(isBankValidatedSuccessfully){
+                                  isValidIFSCCode = true;
+                                  isValidInputForIFSC = true;
+                                  isIFSCValidatedSuccessfully = true;
+                                  enableIFSCCodeTextField = false;
+                                  enableBankAccountTextField = false;
+                                }
+                                //validateIFSC(_ifscCodeTextEditingController.text);
                                 Navigator.pop(context);
+                                setState(() {
+
+                                });
+                                //validateIFSC(_ifscCodeTextEditingController.text);
+                              },
+                              color: primaryColorOfApp,
+                              child: Text("$confirmBtnText",
+                                  style: GoogleFonts.openSans(
+                                    textStyle: TextStyle(
+                                        color: Colors.white,
+                                        letterSpacing: .5,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold),
+                                  )),
+                            ),
+                          )),
+                          SizedBox(height: 20.0),
+                          Padding(padding:EdgeInsets.only(right: 25),child:Container(
+                            color: Colors.transparent,
+                            width: MediaQuery.of(context).size.width / 1.5,
+                            height: 60,
+                            child: FlatButton(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              onPressed: () async {
+                                _ifscCodeTextEditingController.text = "";
+                                isIFSCValidatedSuccessfully = false;
+                                isValidIFSCCode = false;
+                                isValidInputForIFSC = false;
                                 enableIFSCCodeTextField = true;
+                                Navigator.pop(context);
                                 setState(() {});
                               },
                               color: Colors.black12,
@@ -840,7 +817,7 @@ class _BankPanEmailValidationScreenState
                                         fontWeight: FontWeight.bold),
                                   )),
                             ),
-                          ),
+                          )),
                           SizedBox(height: 20.0),
                         ],
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -869,7 +846,7 @@ class _BankPanEmailValidationScreenState
   void openIFSCSearchDialogBox() {
     showDialog(
         barrierLabel: "Barrier",
-        barrierDismissible: true,
+        barrierDismissible: false,
         barrierColor: Colors.black.withOpacity(0.5),
         context: context,
         builder: (BuildContext context) {
@@ -894,7 +871,7 @@ class _BankPanEmailValidationScreenState
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Find Your IFSC Code",
+                                    Text("Tap On Your IFSC Code",
                                         style: GoogleFonts.openSans(
                                           textStyle: TextStyle(
                                               color: Colors.black,
@@ -902,16 +879,22 @@ class _BankPanEmailValidationScreenState
                                               fontSize: 20,
                                               fontWeight: FontWeight.bold),
                                         )),
-                                    Padding(
+                                    Visibility(visible:false,child:Padding(
                                       padding: const EdgeInsets.fromLTRB(
                                           0.0, 0.0, 10.0, 0.0),
                                       child: IconButton(
                                         icon: Icon(Icons.close),
                                         onPressed: () {
+                                          _ifscCodeTextEditingController.text = "";
+                                          isIFSCValidatedSuccessfully = false;
+                                          isValidIFSCCode = false;
+                                          isValidInputForIFSC = false;
+                                          enableIFSCCodeTextField = true;
                                           Navigator.pop(context);
+                                          setState(() {});
                                         },
                                       ),
-                                    ),
+                                    ),)
                                   ],
                                 ),
                               ),
@@ -1363,7 +1346,15 @@ class _BankPanEmailValidationScreenState
     print(phoneNumber);
     if(isPanValidatedSuccessfully){
       ///If only 18
+      enableDatePicker = false;
+      enableBankAccountTextField = true;
       await LocalApiRepo().SolicitPANDetailsFetchALLKRALocal(_panTextEditingController.text, _dateController.text);
+      enableDatePicker = false;
+      enableBankAccountTextField = true;
+      _requestBankTextFieldFocus();
+      setState(() {
+
+      });
     }
   }
 
@@ -1384,7 +1375,7 @@ class _BankPanEmailValidationScreenState
         isValidInputForIFSC = true;
         setState(() {});
         //String response = await ApiRepo().isValidIFSC(value);
-        String response = await LocalApiRepo().getIFSCDetailsLocal(value);
+        String response = await LocalApiRepo().getIFSCDetails(value);
         if (response == "Not Found") {
           print("IFSC CODE WRONG");
           showIFSCErrorText = true;
@@ -1405,5 +1396,39 @@ class _BankPanEmailValidationScreenState
         }
       }
     }
+  }
+
+  void selectionChanged(DateRangePickerSelectionChangedArgs args) {
+
+
+    //DateTime newDate = DateTime.parse(DateFormat('dd-MM-yyyy').format(args.value));
+
+
+    _dateController.text = DateFormat('dd-MM-yyyy').format(args.value);
+    SchedulerBinding.instance!.addPostFrameCallback((duration) {
+      setState(() {});
+      postDateToDB();
+    });
+  }
+
+  Widget getDateRangePicker() {
+    return SfDateRangePicker(
+      showNavigationArrow: true,
+      view: DateRangePickerView.decade,
+      showActionButtons: true,
+      maxDate: DateTime(DateTime.now().year-18, DateTime.now().month, DateTime.now().day),
+      minDate:DateTime(DateTime.now().year-150, DateTime.now().month, DateTime.now().day),
+      initialSelectedDate:DateTime(DateTime.now().year-25, DateTime.now().month, DateTime.now().day) ,
+      selectionTextStyle: TextStyle(color: Colors.white),
+      selectionRadius: 15,
+      selectionMode: DateRangePickerSelectionMode.single,
+      onSelectionChanged: selectionChanged,
+      onCancel:(){Navigator.pop(context);} ,
+
+      onSubmit: (Object p1){Navigator.pop(context);},
+      selectionColor: primaryColorOfApp,
+
+      todayHighlightColor: primaryColorOfApp,
+    );
   }
 }

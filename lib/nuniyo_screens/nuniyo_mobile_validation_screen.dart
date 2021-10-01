@@ -11,6 +11,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../globals.dart';
+
 class MobileValidationLoginScreen extends StatefulWidget {
   const MobileValidationLoginScreen({Key? key}) : super(key: key);
 
@@ -27,7 +29,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   bool isValidOTP = false;
   bool isPhoneNumberValid = false;
-  bool enableOTPButton = true;
+  bool enableResendOTPButtonm = true;
+  
 
   String OTPErrorText = "Wrong OTP";
   bool showOTPErrorText = false;
@@ -45,6 +48,15 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   bool tncChecked = false;
 
   bool showTNCError = false;
+
+  TextEditingController _otpTextEditingController = TextEditingController();
+  TextEditingController _phoneNumberTextEditingController = TextEditingController();
+
+  bool enableOTPTextField = true;
+
+  bool ShowOTP=false;
+
+  bool enablePhoneNumberTextField = true;
 
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
@@ -87,6 +99,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
     _phoneNumberFocusNode.dispose();
     _otpFocusNode.dispose();
     _referralCodeNode.dispose();
+    _phoneNumberTextEditingController.dispose();
+    _otpTextEditingController.dispose();
     super.dispose();
   }
 
@@ -115,7 +129,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     ),),
                     TextButton(
                       onPressed: (){
-                        Navigator.pushNamed(context, '/personaldetailsscreen');
+                        Navigator.pushNamed(context, 'Personal');
                       },
                       child:Text("Log In",style: GoogleFonts.openSans(
                         textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color: primaryColorOfApp, letterSpacing: .5),
@@ -126,6 +140,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                 Flexible(
                   child: TextField(
                     maxLength: 10,
+                    controller: _phoneNumberTextEditingController,
                     keyboardType: TextInputType.number,
                     cursorColor: primaryColorOfApp,
                     style :GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
@@ -133,9 +148,17 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     onTap: _requestPhoneFocus,
                     decoration: InputDecoration(
                         counter: Offstage(),
+                        isDense: true,
+                        enabled: enablePhoneNumberTextField,
+                        prefixIcon:Padding(
+                          padding: EdgeInsets.fromLTRB(16.0,_phoneNumberFocusNode.hasFocus ?4.5:1.0,_phoneNumberFocusNode.hasFocus ?0.0:10,0.0),
+                          child:Text("+91 | ",style:GoogleFonts.openSans(textStyle: TextStyle(letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold,
+                          color: _phoneNumberFocusNode.hasFocus ?Colors.black : Colors.grey,)
+                        ),),),
+                        prefixIconConstraints: BoxConstraints(minWidth: 0, minHeight: 0),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.fromLTRB(0.0,0.0,20.0,0.0),
-                          child: Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
+                          child: !isValidOTP?Icon(NuniyoCustomIcons.mobile_number_black,size: 26.0,color: _phoneNumberFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,):Padding(padding:EdgeInsets.only(right:2.5),child:Icon(Icons.check_circle,color:Colors.green,size: 30,)),
                         ),
                         labelText: _phoneNumberFocusNode.hasFocus ? 'Mobile Number' : 'Enter Mobile Number',
                         labelStyle: TextStyle(fontWeight: FontWeight.bold,
@@ -149,13 +172,27 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         print(_phoneNumber);
                         phoneNumberString = _phoneNumber;
                         //Store Mobile Number in Shared Preferences
-                        this.preferences?.setString("PhoneNumber", phoneNumberString);
-                        //Store Mobile Number in Shared Preferences
-                        this.preferences?.setString("PhoneNumber", phoneNumberString);
+                        this.preferences?.setString(MOBILE_NUMBER_KEY, phoneNumberString);
                         print("Below Given is the Value From Shared Prefereneces");
-                        print(this.preferences?.getString("PhoneNumber"));
+                        print(this.preferences?.getString(MOBILE_NUMBER_KEY));
                         //isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
-                        isPhoneNumberValid = await LocalApiRepo().ReadLeadLocal(_phoneNumber);
+                        isPhoneNumberValid = await LocalApiRepo().ReadLead(_phoneNumber);
+
+                        SharedPreferences prefs = await SharedPreferences.getInstance();
+                        String otp= prefs.getString("MOBILE_OTP");
+                        print("OTP INSIDE SHARED PREFERENCES :" + otp);
+                        _otpTextEditingController.text = otp;
+                        isValidOTP = await LocalApiRepo().VerifyOTP(phoneNumberString, _otpTextEditingController.text);
+                        showOTPErrorText= !isValidOTP;
+                        if(isValidOTP){
+                          enableResendOTPButtonm = false;
+                          enableOTPTextField = false;
+                          enablePhoneNumberTextField= false;
+
+
+                        }
+                        setState(() {});
+
                         //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
                         howManyTimesResendOTPPressed ++;
                         setState((){});
@@ -171,7 +208,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                       onChanged: (value) async {
                         if(value.length==6){
                           //isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
-                          isValidOTP = await LocalApiRepo().VerifyOTPLocal(phoneNumberString, value);
+                          isValidOTP = await LocalApiRepo().VerifyOTP(phoneNumberString, value);
                           showOTPErrorText= !isValidOTP;
                           setState(() {});
                           // if(value==OTPFromApi){
@@ -181,18 +218,21 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         }
                       },
                       maxLength: 6,
+                      controller: _otpTextEditingController,
                       keyboardType: TextInputType.number,
-                      obscureText: true,
+                      obscureText: !ShowOTP,
                       cursorColor: primaryColorOfApp,
                       style: TextStyle(fontSize: 14,fontWeight: FontWeight.bold),
                       focusNode: _otpFocusNode,
                       onTap: _requestOtpFocus,
                       decoration: InputDecoration(
+                        enabled: enableOTPTextField,
                           counter: Offstage(),
                           errorText: showOTPErrorText?"$OTPErrorText":null,
                           suffixIcon: Padding(
-                            padding: const EdgeInsets.fromLTRB(0.0,0.0,40.0,0.0),
-                            child: Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,),
+                            padding: EdgeInsets.fromLTRB(0.0,0.0,!ShowOTP?15.0:26.0,0.0),
+                            child: !ShowOTP?IconButton(icon:Icon(Icons.remove_red_eye,size: 26.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey),onPressed: (){ShowOTP=!ShowOTP;setState(() {
+                            });},):IconButton(onPressed: (){ShowOTP=!ShowOTP;setState(() {});},icon:Icon(NuniyoCustomIcons.mobile_otp_black,size: 12.0,color: _otpFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,)),
                           ),
                           labelText: _otpFocusNode.hasFocus ? 'OTP' : 'Enter OTP',
                           labelStyle: TextStyle(
@@ -206,9 +246,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                   child: Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
-                        child: Text("Resend OTP",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
-                        onPressed: enableOTPButton ? () async {
-                          enableOTPButton = false;
+                        child: Text("Resend OTP",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableResendOTPButtonm?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                        onPressed: enableResendOTPButtonm ? () async {
+                          enableResendOTPButtonm = false;
                           howManyTimesResendOTPPressed ++;
                           setState((){});
                           startTimer();
@@ -263,7 +303,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     children: [
                       Text("Do you have a ",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 16.0,letterSpacing: .5,fontWeight: FontWeight.normal)),),
                       TextButton(
-                          child: Text("Referral Code ?",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                          child: Text("Referral Code ?",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 16,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
                           onPressed: (){
                             showReferralTextField = true;
                             setState(() {
@@ -296,13 +336,14 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         },
                       ),
                     ),
-                    TextButton(child: Text("Terms & Conditions",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 12,fontWeight: FontWeight.bold,color:enableOTPButton?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
+                    TextButton(child: Text("Terms & Conditions",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 12,fontWeight: FontWeight.bold,color:primaryColorOfApp, letterSpacing: .5),),),
                         onPressed: (){
                             Navigator.push(context, MaterialPageRoute(builder: (context) => TermsAndConditions() ));
                         }
                     ),
                   ],
                 ),
+                Visibility(visible:showTNCError,child: Text("Please Check the Terms & Condition!",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(fontSize: 12,fontWeight: FontWeight.bold,color:Colors.red, letterSpacing: .5),),),),
                 SizedBox(height: 20,),
                 //Real Button
                 Container(
@@ -320,13 +361,6 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     ),
                     onPressed: !isValidOTP ? null : () async{
                       if(!tncChecked){
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          backgroundColor: Colors.black,
-                          content: Text(
-                            "Please Check the Terms & Conditions",
-                            style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
-                          ),
-                        ));
                         showTNCError = true;
                         setState(() {});
                         return;
@@ -347,6 +381,8 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         print(latitude);
                         await ApiRepo().leadLocation(phoneNumberString, ip_address, city, country, state, latitude, longitude);
                       }
+                      _phoneNumberTextEditingController.clear();
+                      _otpTextEditingController.clear();
                       ContinueToStep();
                     },
                     color: primaryColorOfApp,
@@ -372,7 +408,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
         print(timer.tick);
         currentSeconds = timer.tick;
         if (timer.tick >= _resendOTPIntervalTime){
-          enableOTPButton = true;
+          enableResendOTPButtonm = true;
           timer.cancel();
         }
       });
@@ -380,7 +416,10 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
   }
 
   bool _shouldResendOTPBTNbeVisible() {
-    if(howManyTimesResendOTPPressed>0 && howManyTimesResendOTPPressed < 4 ){
+    if(isValidOTP){
+      return false;
+    }
+    else if(howManyTimesResendOTPPressed>0 && howManyTimesResendOTPPressed < 4 ){
       return true;
     }
     else if(howManyTimesResendOTPPressed>=4){
@@ -405,14 +444,14 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   Future<void> ContinueToStep() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    if(prefs.containsKey('ROUTE_NAME')){
-      String ThisStepId = prefs.getString("ROUTE_NAME");
+    if(prefs.containsKey(STAGE_KEY)){
+      String ThisStepId = prefs.getString(STAGE_KEY);
       print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
       Navigator.pushNamed(context,ThisStepId);
     }
     else{
       print("WELCOME NEW USER");
-      Navigator.pushNamed(context,'/bankemailpanvalidationscreen');
+      Navigator.pushNamed(context,'Email');
     }
   }
 

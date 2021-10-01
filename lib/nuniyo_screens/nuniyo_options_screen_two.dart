@@ -149,7 +149,7 @@ class _OptionsScreenTwoState extends State<OptionsScreenTwo> {
                     ),
                     onPressed: () {
                       openCheckout();
-                      Navigator.pushNamed(context, '/aadharkycscreen');
+                      Navigator.pushNamed(context, 'Digilocker');
                     },
                     color: primaryColorOfApp,
                     child: Text(

@@ -1,4 +1,6 @@
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
+import 'package:angel_broking_demo/globals.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +45,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
       appBar: AppBar(
         leading: Icon(Icons.ac_unit,color: Colors.black,),
@@ -66,50 +68,50 @@ class _OptionsScreenState extends State<OptionsScreen> {
                       children: [
                         SizedBox(width: 10.0,),
                         Text("Account Opening FEE !",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
-                  ],
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
-                  child: Container(height: 5, width: 35,
-                    decoration: BoxDecoration(
-                        color: Color(0xff6A4EEE),
-                        borderRadius: BorderRadius.all(Radius.circular(20))
+                      ],
                     ),
-                  ),
-                ),
-                SizedBox(height: 20.0,),
-              ],
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0,10,0,0),
+                      child: Container(height: 5, width: 35,
+                        decoration: BoxDecoration(
+                            color: Color(0xff6A4EEE),
+                            borderRadius: BorderRadius.all(Radius.circular(20))
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20.0,),
+                  ],
                 ),
                 Container(
                   height: 140,
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: primaryColorOfApp,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(15))
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text("Equity",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
-                                ),
-                              ),
-                              Text("200₹",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),)
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.fromLTRB(8.0,0.0,0.0,0.0),
-                            child: Text("Buy and sell shares , mutual funds and derivatives on NSE and BSE",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5)),),
-                          ),
-                        ],
+                  decoration: BoxDecoration(
+                      border: Border.all(
+                        color: primaryColorOfApp,
                       ),
+                      borderRadius: BorderRadius.all(Radius.circular(15))
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text("Equity",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),),
+                              ),
+                            ),
+                            Text("200₹",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 22.0,letterSpacing: .5,fontWeight: FontWeight.bold)),)
+                          ],
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(8.0,0.0,0.0,0.0),
+                          child: Text("Buy and sell shares , mutual funds and derivatives on NSE and BSE",textAlign:TextAlign.left, style:GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black,fontSize: 12.0,letterSpacing: .5)),),
+                        ),
+                      ],
                     ),
+                  ),
                 ),
                 SizedBox(height: 24.0,),
                 Divider(
@@ -142,7 +144,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
                     ),
                     onPressed: () {
                       openCheckout();
-                      Navigator.pushNamed(context, '/aadharkycscreen');
+                      Navigator.pushNamed(context, 'Digilocker');
                     },
                     color: primaryColorOfApp,
                     child: Text(
@@ -161,7 +163,7 @@ class _OptionsScreenState extends State<OptionsScreen> {
           ),
         ),
       ),
-    );
+    ), onWillPop: _onWillPop);
   }
 
 
@@ -193,11 +195,12 @@ class _OptionsScreenState extends State<OptionsScreen> {
   void _handlePaymentSuccess(PaymentSuccessResponse response) {
     Fluttertoast.showToast(msg: "SUCCESS: " + response.paymentId!, toastLength: Toast.LENGTH_SHORT);
     PostPayment(response.paymentId.toString());
-    Navigator.pushNamed(context, '/aadharkycscreen');
+    Navigator.pushNamed(context, 'Digilocker');
   }
 
   void _handlePaymentError(PaymentFailureResponse response) {
     Fluttertoast.showToast(msg: "ERROR: " + response.code.toString() + " - " + response.message!, toastLength: Toast.LENGTH_SHORT);
+    Navigator.pushNamed(context, 'Digilocker');
   }
 
   void _handleExternalWallet(ExternalWalletResponse response) {
@@ -206,16 +209,21 @@ class _OptionsScreenState extends State<OptionsScreen> {
 
   Future<void> PostPayment(String paymentID) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String phoneNumber = await prefs.getString('PhoneNumber');
-    ApiRepo().OnPaymentSuccessPostToDatabase(200, phoneNumber,paymentID);
+    String phoneNumber = await prefs.getString(MOBILE_NUMBER_KEY);
+    ///ApiRepo().OnPaymentSuccessPostToDatabase(200, phoneNumber,paymentID);
+    LocalApiRepo().RazorPayStatusLocal(200, 'INR', phoneNumber, paymentID);
   }
 
   Future<void> manageSteps() async {
     ///SET STEP ID HERE
-    String currentRouteName = '/optionsscreen';
-    await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
+    String currentRouteName = 'Account';
+    await StoreLocal().StoreStageIdToLocalStorage(currentRouteName);
     String routeName = await StoreLocal().getRouteNameFromLocalStorage();
     print("YOU ARE ON THIS STEP : "+routeName);
   }
 
+
+  Future<bool> _onWillPop() {
+    return Future.value(false);
+  }
 }

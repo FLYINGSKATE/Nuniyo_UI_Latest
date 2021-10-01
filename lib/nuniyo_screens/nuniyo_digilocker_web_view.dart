@@ -1,5 +1,9 @@
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webviewx/webviewx.dart';
+
+import '../globals.dart';
 
 class BrowserViewX extends StatefulWidget {
   const BrowserViewX({Key? key}) : super(key: key);
@@ -35,12 +39,16 @@ class _BrowserViewXState extends State<BrowserViewX> {
         content: new Text('Do you want to exit DigiLocker'),
         actions: <Widget>[
           TextButton(
-            onPressed:(){Navigator.pushNamed(context, '/personaldetailsscreen');},
+            onPressed:(){Navigator.pushNamed(context, 'Document');},
             //onPressed: () => Navigator.of(context).pop(false),
             child: new Text('No'),
           ),
           TextButton(
-            onPressed:(){Navigator.pushNamed(context, '/personaldetailsscreen');},
+            onPressed:() {
+              Navigator.pushNamed(context, 'Document');
+              //await LocalApiRepo().UpdateStage_Id();
+              //await ContinueToStep();
+              },
             //onPressed: () => Navigator.of(context).pop(true),
             child: new Text('Yes'),
           ),
@@ -57,7 +65,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, '/personaldetailsscreen');
+            Navigator.pushNamed(context, 'Document');
           },
           icon: Icon(Icons.arrow_back_rounded),
         ),
@@ -105,9 +113,18 @@ class _BrowserViewXState extends State<BrowserViewX> {
   }
 
   Future<void> initializeWebView() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id= prefs.getString(LEAD_ID_KEY);
     await webviewController.loadContent(
-      'https://accounts.digilocker.gov.in/',
+      'https://api.digitallocker.gov.in/public/oauth2/1/authorize?response_type=code&client_id=140FF210&state=$lead_id&redirect_uri=https://nuniyo.tech/digilocker/index.html',
       SourceType.url,
     );
+  }
+
+  Future<void> ContinueToStep() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String ThisStepId = prefs.getString(STAGE_KEY);
+    print("YOU LEFT ON THIS PAGE LAST TIME"+ThisStepId);
+    Navigator.pushNamed(context,ThisStepId);
   }
 }

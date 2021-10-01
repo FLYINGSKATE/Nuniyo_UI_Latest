@@ -10,6 +10,7 @@ class StoreLocal{
   final String motherNameKey  = "MOTHER_NAME";
   final String routeNameKey = "ROUTE_NAME";
   final String leadIDKey = "LEAD_ID";
+  final String stageKey = "STAGE_ID";
 
   /////PHONE NUMBER
   Future<void> StorePhoneNumberToLocalStorage(String mobileNumber) async {
@@ -23,7 +24,7 @@ class StoreLocal{
     return phoneNumber;
   }
 
-  ////LEAD IF
+  ////LEAD ID
   Future<void> StoreLeadIdToLocalStorage(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setString(leadIDKey,value);
@@ -47,10 +48,6 @@ class StoreLocal{
     return value;
   }
 
-
-
-
-
   /////PAN Number
   Future<void> StorePANNumberToLocalStorage(String value) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -62,8 +59,6 @@ class StoreLocal{
     String value = prefs.getString(panNumberKey);
     return value;
   }
-
-
 
 
   ///FATHER NAME
@@ -107,6 +102,18 @@ class StoreLocal{
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String value = prefs.getString(routeNameKey);
     return value;
+  }
+
+
+  Future<void> StoreStageIdToLocalStorage(String stageId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(stageKey,stageId);
+  }
+
+  Future<String> getStageIdFromLocalStorage() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String phoneNumber = prefs.getString(stageKey);
+    return phoneNumber;
   }
 
 }

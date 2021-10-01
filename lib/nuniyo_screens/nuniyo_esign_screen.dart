@@ -202,7 +202,7 @@ class _EsignScreenState extends State<EsignScreen> {
     //'/congratsscreen'
 
     ///SET STEP ID HERE
-    String currentRouteName = '/esignscreen';
+    String currentRouteName = 'Esign';
     await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
     String routeName = await StoreLocal().getRouteNameFromLocalStorage();
     print("YOU ARE ON THIS STEP : "+routeName);

@@ -32,30 +32,30 @@ class ScreenRouter {
       case '/':
         return MaterialPageRoute(builder: (_) => SplashScreen());
       //0
-      case '/mobilevalidationscreen':
+      case 'Mobile':
         return MaterialPageRoute(builder: (_) => MobileValidationLoginScreen());
       //1
-      case '/bankemailpanvalidationscreen':
+      case 'Email':
         return MaterialPageRoute(builder: (_) => BankPanEmailValidationScreen());
       //2
-      case '/optionsscreen':
+      case 'Account':
         return MaterialPageRoute(builder: (_) => OptionsScreen());
       case '/optionsscreen2':
         return MaterialPageRoute(builder: (_) => OptionsScreenTwo());
       //3
-      case '/aadharkycscreen':
+      case 'Digilocker':
         return MaterialPageRoute(builder: (_) => AadharKYCScreen());
       //4
-      case '/personaldetailsscreen':
+      case 'Personal':
         return MaterialPageRoute(builder: (_) => PersonalDetailsScreen());
       //5
-      case '/webcamscreen':
+      case 'IPV':
         return MaterialPageRoute(builder: (_) => WebCamScreen());
       //6
-      case '/uploaddocumentscreen':
+      case 'Document':
         return MaterialPageRoute(builder: (_) => UploadDocumentScreen());
       //7
-      case '/esignscreen':
+      case 'Esign':
         return MaterialPageRoute(builder: (_) => EsignScreen());
       //8
       case '/congratsscreen':

@@ -124,8 +124,8 @@ class SplashScreenState extends State<SplashScreen> {
 
 
     final coordinates = Coordinates(_currentPosition.latitude, _currentPosition.longitude);
-    showToastNotification(_currentPosition.latitude.toString());
-    showToastNotification("CURRENT POSITION :LATITUDE "+_currentPosition.latitude.toString() + "LONGITUDE : "+_currentPosition.longitude.toString());
+    //showToastNotification(_currentPosition.latitude.toString());
+    //showToastNotification("CURRENT POSITION :LATITUDE "+_currentPosition.latitude.toString() + "LONGITUDE : "+_currentPosition.longitude.toString());
 
     // this fetches multiple address, but you need to get the first address by doing the following two codes
     var addresses = await Geocoder.local.findAddressesFromCoordinates(coordinates);
@@ -137,7 +137,7 @@ class SplashScreenState extends State<SplashScreen> {
     prefs.setString("CITY",first.locality);
     prefs.setString("LONGITUDE", _currentPosition.longitude.toString());
     prefs.setString("LATITUDE", _currentPosition.latitude.toString());
-    showToastNotification("Current Location : "+first.countryName+"-SUBADMIN AREA -"+first.subAdminArea+"-locality"+first.locality+"|"+first.subLocality+","+first.postalCode+"AADMIN AREA"+first.adminArea);
+    //showToastNotification("Current Location : "+first.countryName+"-SUBADMIN AREA -"+first.subAdminArea+"-locality"+first.locality+"|"+first.subLocality+","+first.postalCode+"AADMIN AREA"+first.adminArea);
   }
 
   @override
@@ -154,14 +154,14 @@ class SplashScreenState extends State<SplashScreen> {
       //EMULATOR
       _getBioMetricsAuthentication();
       WidgetsBinding.instance!.addPostFrameCallback((_){
-        Navigator.pushNamed(context,'/mobilevalidationscreen');
+        Navigator.pushNamed(context,'Mobile');
       });
     }
     else{
       _askForPermissions();
       _getCurrentLocation();
       WidgetsBinding.instance!.addPostFrameCallback((_) {
-        Navigator.pushNamed(context,'/mobilevalidationscreen');
+        Navigator.pushNamed(context,'Mobile');
       });
 
     }
@@ -187,7 +187,7 @@ class SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  showToastNotification(String currentLocation) {
+  /*showToastNotification(String currentLocation) {
     Fluttertoast.showToast(
         msg: currentLocation,
         toastLength: Toast.LENGTH_SHORT,
@@ -197,7 +197,7 @@ class SplashScreenState extends State<SplashScreen> {
         textColor: Colors.white,
         fontSize: 16.0
     );
-  }
+  }*/
 
 
 
@@ -205,7 +205,7 @@ class SplashScreenState extends State<SplashScreen> {
     bool isAuthenticated = await Authentication.authenticateWithBiometrics();
     if (isAuthenticated) {
       WidgetsBinding.instance!.addPostFrameCallback((_){
-        Navigator.pushNamed(context,'/mobilevalidationscreen');
+        Navigator.pushNamed(context,'Mobile');
       });
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

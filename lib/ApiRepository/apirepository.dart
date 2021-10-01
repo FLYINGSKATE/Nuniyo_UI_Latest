@@ -262,12 +262,7 @@ class ApiRepo {
   }
 
   Future<void> leadLocation(String phoneNumber,String ipAddress,String city,String country,String state,String latitude,String longitude) async{
-    String JWT_TOKEN= await GetCurrentJWTToken();
-
-    print("Posting LOCATION Details Using API TOKEN :"+JWT_TOKEN);
-
     var headers = {
-      'Authorization': 'Bearer $JWT_TOKEN',
       'Content-Type': 'application/json'
     };
     var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Lead_Location'));

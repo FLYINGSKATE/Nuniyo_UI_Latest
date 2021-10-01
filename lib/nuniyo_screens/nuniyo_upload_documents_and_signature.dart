@@ -403,7 +403,28 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed:(tempDigitalPadUploaded&&tempPanUploaded)?() {
-                        Navigator.pushNamed(context, '/esignscreen');
+                        if(imageFilePan!=null){
+                          //CALL APIS TO UPLOAD
+                        }
+                        else if(imageFileDigitalSignature!=null){
+
+                        }
+                        else if(pdfPanImagefile!=null){
+
+                        }
+                        else if(pdfPanDigitalSignaturefile!=null){
+
+                        }
+                        else{
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                            backgroundColor: Colors.black,
+                            content: Text(
+                              "Please Upload Proper Documents!",
+                              style: TextStyle(color: Colors.redAccent, letterSpacing: 0.5),
+                            ),
+                          ));
+                        }
+                        Navigator.pushNamed(context, 'Esign');
                     }:null,
                     color: primaryColorOfApp,
                     child: Text(

@@ -9,6 +9,8 @@ import 'dart:convert';
 import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../globals.dart';
+
 class LocalApiRepo {
 
   var headers = {
@@ -30,11 +32,36 @@ class LocalApiRepo {
   SharedPreferences? preferences;
 
 
+  Future<void> SetMobileOTP(String otp) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString("MOBILE_OTP",otp);
+    print("Your OTP is :"+prefs.getString("MOBILE_OTP"));
+  }
+
+  Future<void> SetStageId(String stage_id) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(STAGE_KEY,stage_id);
+    print("Your Stage id :"+prefs.getString(STAGE_KEY));
+  }
+
+  Future<void> SetJwtToken(String token) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString(JWT_TOKEN_KEY,token);
+    print("Your JWT is :"+prefs.getString(JWT_TOKEN_KEY));
+  }
+
   Future<String> GetCurrentJWTToken() async{
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String JWT_TOKEN= prefs.getString('API_TOKEN');
-    print("AWT STORED INSIDE SHARED PREFERENCES :" + JWT_TOKEN);
-    return JWT_TOKEN;
+    String jwt_token= prefs.getString(JWT_TOKEN_KEY);
+    print("JWT STORED INSIDE SHARED PREFERENCES :" + jwt_token);
+    return jwt_token;
+  }
+
+  Future<String> GetLeadId() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String lead_id= prefs.getString(LEAD_ID_KEY);
+    print("LEAD ID STORED INSIDE SHARED PREFERENCES :" + lead_id);
+    return lead_id;
   }
 
 
@@ -64,7 +91,6 @@ class LocalApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
       String result = await response.stream.bytesToString();
       Map valueMap = jsonDecode(result);
       print(valueMap);
@@ -84,77 +110,68 @@ class LocalApiRepo {
     }
   }
 
+  Future<void> UpdateStage_Id() async{
 
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling UpdateStage_Id Using API"+jwt_token);
 
-  /*Future<void> SolicitLocal(String panNumber,String dOB) async{
-    print("Calling Solicit LOCAL USING");
-    print(panNumber);
-    print(dOB);
+    String lead_id = await GetLeadId();
+    print("Get UpdateStage_Id for Lead ID : "+lead_id);
 
-    String JWT_TOKEN= await GetCurrentJWTToken();
-    print("Calling Verify SOLICIT Using API"+JWT_TOKEN);
     var headers = {
-      'Authorization': 'Bearer $JWT_TOKEN',
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/api/cvlkra/SolicitPANDetailsFetchALLKRA'));
+
+    var request = http.Request('POST', Uri.parse('https://api.nuniyo.tech/api/lead/Update_StageId'));
     request.body = json.encode({
-      "apP_PAN_NO": "HCAPK4259Q",
-      "apP_DOB_INCORP": "31-03-2000"
+      "method_Name": "Update_Stage_Id",
+      "org_Id": ORG_ID,
+      "lead_Id": "$lead_id"
     });
     request.headers.addAll(headers);
 
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print("SOLICIT LOCAL");
-      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      print(result);
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      print("RESULT ID : "+result_Id.toString());
+      String stage_id = valueMap["res_Output"][0]["stage_Id"];
+      await SetStageId(stage_id);
     }
     else {
       print(response.reasonPhrase);
     }
 
-  }*/
-
-  Future<void> postStageIDLocal() async{
-    String JWT_TOKEN= await GetCurrentJWTToken();
-    print("Calling Stage ID Using API"+JWT_TOKEN);
-    var headers = {
-      'Authorization': 'Bearer $JWT_TOKEN',
-      'Content-Type': 'application/json'
-    };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Update_StageId'));
-    request.body = json.encode({
-      "stageId": 1,
-      "mobile_No": "8268405887"
-    });
-    request.headers.addAll(headers);
-
-    http.StreamedResponse response = await request.send();
-
-    if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
-    }
-    else {
-      print(response.reasonPhrase);
-    }
   }
 
   ///Verify Bank Details
 
   Future<bool> verifyBankAccountLocal(String accountNo,String ifscNo) async{
-    print("IFSC CODE"+ifscNo);
-    print("Account No"+accountNo);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Get Pan Status Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("Get Pan Status for Lead ID : "+lead_id);
 
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/bank/VerifyBankAccount'));
+
+    print("IFSC CODE"+ifscNo);
+    print("Account No"+accountNo);
+    print("Calling Penny Drop Using");
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/bank/VerifyBankAccount'));
     request.body = json.encode({
-      "org_Id": "S001",
+      "org_Id": ORG_ID,
       "lead_Id": "$lead_id",
       "beneficiary_account_no": "$accountNo",
       "beneficiary_ifsc": "$ifscNo"
@@ -186,11 +203,19 @@ class LocalApiRepo {
 
   }
 
-  Future<String> getIFSCDetailsLocal(String ifscCode) async{
+  Future<String> getIFSCDetails(String ifscCode) async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling IFSC DETAILS LOCAL Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("Get IFSC DETAILS LOCAL for Lead ID : "+lead_id);
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/bank/GetIfscDetails'));
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/bank/GetIfscDetails'));
     request.body = json.encode({
       "ifsc": "$ifscCode"
     });
@@ -213,16 +238,21 @@ class LocalApiRepo {
   Future<void> ConfirmIFSCDetailsLocal() async{}
 
   Future<bool> GetPanStatusLocal(String panCardNumber) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Get Pan Status Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("Get Pan Status for Lead ID : "+lead_id);
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/cvlkra/Get_PanStatus'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/cvlkra/Get_PanStatus'));
     request.body = json.encode({
       "pan_No": "$panCardNumber",
       "lead_Id": "$lead_id",
-      "org_Id": "S001"
+      "org_Id": ORG_ID
     });
     request.headers.addAll(headers);
 
@@ -235,6 +265,14 @@ class LocalApiRepo {
       print(valueMap);
       print(result);
       int result_Id = valueMap["res_Output"][0]["result_Id"];
+
+      ///Save Pan Owner Name
+      String result_description = valueMap["res_Output"][0]["result_Description"];
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      print("PAN OWNER NAME :"+result_description);
+      prefs.setString("PAN_OWNER_NAME",result_description);
+
+
       print("STATUS : "+result_Id.toString());
       if(result_Id==1){
         return true;
@@ -250,17 +288,22 @@ class LocalApiRepo {
   }
 
   Future<void> SolicitPANDetailsFetchALLKRALocal(String panCard,String dOB) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
-    print("YOUR LEAD ID : "+lead_id);
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Solicit Pan Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("Solicit Pan for Lead ID : "+lead_id);
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/cvlkra/SolicitPANDetailsFetchALLKRA'));
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/cvlkra/SolicitPANDetailsFetchALLKRA'));
     request.body = json.encode({
       "lead_Id": "$lead_id",
       "paN_NO": "$panCard",
-      "org_Id": "S001",
+      "org_Id": ORG_ID,
       "date_Of_birth": "$dOB"
     });
     request.headers.addAll(headers);
@@ -281,11 +324,11 @@ class LocalApiRepo {
   Future<void> GetAuthorizationCodeLocal() async{}
   Future<void> DocumentUploadLocal() async{}
 
-  Future<bool> DocumentUploadPANLocal(String imagePath,var imageP) async{
+  Future<bool> DocumentUploadPANLocal(var imageP) async{
     List<int> _selectedFile = await imageP.readAsBytes();
     var request;
     if(kIsWeb){
-      request = http.MultipartRequest('POST', Uri.parse(BASE_API_LINK_URL+'/api/DocumentOCR/OCR'));
+      request = http.MultipartRequest('POST', Uri.parse('http://localhost:44330/v1/api/documentupload/Document_Upload_PAN'));
       request.files.add(await http.MultipartFile.fromBytes('front_part', _selectedFile,
           contentType: new MediaType('application', 'octet-stream'),
           filename: "file_up"));
@@ -310,16 +353,22 @@ class LocalApiRepo {
 
   Future<void> DocumentUploadSignatureLocal() async{}
 
-  Future<bool>Email_StatusLocal(String emailID) async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
+  Future<bool>Email_Status(String emailID) async{
+
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Email Status Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
     print("Email Status for Lead ID : "+lead_id.toString());
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/email/Email_Status'));
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/email/Email_Status'));
     request.body = json.encode({
-      "org_Id": "S001",
+      "org_Id": ORG_ID,
       "lead_Id": "$lead_id",
       "email": "$emailID",
       "method_Name": "Email_Status"
@@ -349,19 +398,21 @@ class LocalApiRepo {
     }
   }
 
-  Future<bool> UpdateEmailLocal(String emailId) async{
+  Future<bool> UpdateEmail(String emailId) async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Update Email Using API"+jwt_token);
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
+    String lead_id = await GetLeadId();
     print("Update Email Status for Lead ID : "+lead_id);
 
-
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/email/Update_Email'));
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/email/Update_Email'));
     request.body = json.encode({
-      "org_Id": "S001",
+      "org_Id": ORG_ID,
       "lead_Id": "$lead_id",
       "email": "$emailId",
       "method_Name": "Update_Email"
@@ -393,10 +444,17 @@ class LocalApiRepo {
 
   Future<Map<dynamic,dynamic>> IFSCMasterSearchLocal(String branchName , String branchLocation) async{
     Map valueMap = Map();
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Update IFSC SEARCH Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("IFSC Search for Lead ID : "+lead_id);
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/ifscmaster/IFSC_Master_Search'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/ifscmaster/IFSC_Master_Search'));
     request.body = json.encode({
       "bank": "$branchName",
       "ifsc": "string",
@@ -423,20 +481,20 @@ class LocalApiRepo {
   Future<void> VerifyIPVOTPLocal() async{}
   Future<void> SaveIPVVideoLocal() async{}
 
-  Future<bool> ReadLeadLocal(String mobileNo) async{
+  Future<bool> ReadLead(String mobileNo) async{
     var headers = {
       "Access-Control-Allow-Origin": "*", // Required for CORS support to work
         // Required for cookies, authorization headers with HTTPS
       //"Access-Control-Allow-Headers": "Origin,Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,locale",
       'Content-Type': 'application/json',
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Read_Lead'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Read_Lead'));
     request.body = json.encode({
       "mobile_No": "$mobileNo",
       "method_Name": "Check_Mobile_No",
-      "org_Id": "S001",
-      "flow_Id": "M001001",
-      "current_Stage_Id": "C002001"
+      "org_Id": ORG_ID,
+      "flow_Id": FLOW_ID,
+      "current_Stage_Id": CURRENT_STAGE_ID
     });
     request.headers.addAll(headers);
 
@@ -455,6 +513,9 @@ class LocalApiRepo {
       String savedLead = await StoreLocal().getLeadIdFromLocalStorage();
       print("LEAD ID SAVED LOCALLY IS :"+savedLead);
 
+      String otp = valueMap["res_Output"][0]["stage_Id"];
+      await SetMobileOTP(otp);
+
       if(result_Id == 1){
         return true;
       }
@@ -466,20 +527,19 @@ class LocalApiRepo {
     }
   }
 
-
-  Future<bool> VerifyOTPLocal(String mobileNumber,String userEnteredOTP) async{
+  Future<bool> VerifyOTP(String mobileNumber,String userEnteredOTP) async{
     var headers = {
       'Content-Type': 'application/json'
     };
 
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/lead/Verify_OTP'));
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/lead/Verify_OTP'));
     request.body = json.encode({
       "mobile_No": "$mobileNumber",
       "otp": "$userEnteredOTP",
       "method_Name": "Check_OTP",
-      "org_Id": "S001",
-      "flow_Id": "M001001",
-      "current_Stage_Id": "715439"
+      "org_Id": ORG_ID,
+      "flow_Id": FLOW_ID,
+      "current_Stage_Id": CURRENT_STAGE_ID
     });
 
     request.headers.addAll(headers);
@@ -492,12 +552,16 @@ class LocalApiRepo {
       print(valueMap);
       print(result);
       int result_Id = valueMap["res_Output"][0]["result_Id"];
-      //String result_Description = valueMap["res_Output"][0]["result_Description"];
-      print("Your OTP IS VERIFIED OR NOT DEPENDS ON "+result_Id.toString());
-      //API_TOKEN = result_Description;
-      //SharedPreferences prefs = await SharedPreferences.getInstance();
-      //await prefs.setString("API_TOKEN", API_TOKEN);
-      //print("YOUR JWT TOKEN :"+API_TOKEN);
+      //print("Your OTP IS VERIFIED OR NOT DEPENDS ON "+result_Id.toString());
+      String stage_id = valueMap["res_Output"][0]["stage_Id"];
+      String jwt_token = valueMap["res_Output"][0]["result_Description"];
+
+      await SetStageId(stage_id);
+
+      await SetJwtToken(jwt_token);
+
+
+
       if(result_Id==1){
         return true;
       }
@@ -513,20 +577,23 @@ class LocalApiRepo {
 
   Future<void> LeadLocationLocal() async{}
 
-  Future<void> UpdateStageIdLocal() async{}
+  Future<bool> NSDLeKYCPanAuthenticationLocal(String panCardNumber) async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling NSDL EKYC PAN Using API"+jwt_token);
 
-  Future<void> NSDLeKYCPanAuthenticationLocal() async{
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String lead_id = prefs.getString("LEAD_ID");
-    print("Lead id PAN :"+lead_id);
+    String lead_id = await GetLeadId();
+    print("NSDL EKYC PAN for Lead ID : "+lead_id);
+
     var headers = {
+      'Authorization': 'Bearer $jwt_token',
       'Content-Type': 'application/json'
     };
-    var request = http.Request('POST', Uri.parse('http://localhost:44330/v1/api/PanAuthenticationController/PanAuthentication'));
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/nsdlpan/NSDLeKYCPanAuthentication'));
     request.body = json.encode({
-      "pan_No": "HCAPk4259Q",
+      "pan_No": "$panCardNumber",
       "lead_Id": "$lead_id",
-      "org_Id": "S001",
+      "org_Id": ORG_ID,
       "method_Name": "NSDLeKYCPanAuthentication"
     });
     request.headers.addAll(headers);
@@ -534,20 +601,32 @@ class LocalApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      return true;
     }
     else {
       print(response.reasonPhrase);
+      return false;
     }
   }
+
   Future<void> PanAuthenticationLocal() async{}
   Future<void> PersonalDetailsLocal() async{}
 
   Future<void> RazorPayStatusLocal(int amountPayed,String currency , String mobileNumber, String merchantTransactionID) async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling RAZOR PAY STATUS Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("RAZOR PAY STATUS for Lead ID : "+lead_id);
+
     var headers = {
-      'Content-Type': 'text/plain'
+      'Authorization': 'Bearer $jwt_token',
+      'Content-Type': 'application/json'
     };
-    var request = http.Request('GET', Uri.parse('http://localhost:44330/v1/api/razorpay/RazorPayStatus'));
+    var request = http.Request('GET', Uri.parse('$BASE_API_LINK_URL/api/razorpay/RazorPayStatus'));
     request.body = '''{\r\n  "inr": 0,\r\n  "currency": "string",\r\n  "mobile_No": "string",\r\n  "merchantTransactionId": "string"\r\n}''';
     request.headers.addAll(headers);
 

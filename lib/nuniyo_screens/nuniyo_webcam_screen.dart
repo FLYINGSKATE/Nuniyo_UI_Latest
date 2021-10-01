@@ -240,7 +240,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed:enableProceedBtn?() {
-                      Navigator.pushNamed(context, '/uploaddocumentscreen');}:null,
+                      Navigator.pushNamed(context, 'Document');}:null,
                     color: primaryColorOfApp,
                     child: Text(
                         "Proceed",

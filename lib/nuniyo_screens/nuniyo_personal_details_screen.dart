@@ -1,4 +1,5 @@
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/globals.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
@@ -26,7 +27,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String tradingExperience = '0 Years';
   String politicallyExposed = 'Yes';
   String occupation = 'PRIVATE SECTOR';
-  String education = 'Graduate';
+  //String education = 'Graduate';
 
   TextEditingController fatherNameTextEditingController = TextEditingController();
   TextEditingController motherNameTextEditingController = TextEditingController();
@@ -34,7 +35,8 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   @override
   void initState() {
     super.initState();
-    manageSteps();
+    //manageSteps();
+    //prefilTexts();
     _fatherNameTextFieldFocusNode = FocusNode();
     _tradingExperienceDropDownFocusNode = FocusNode();
     _motherNameTextFieldFocusNode = FocusNode();
@@ -123,6 +125,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    fatherNameTextEditingController.text = "";
     return WillPopScope(
         onWillPop: _onWillPop,
         child:Scaffold(
@@ -409,44 +412,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                 ),
                 SizedBox(height: 20,),
                 Container(
-                  height: 75.0,
-                  child: InputDecorator(
-                    decoration: InputDecoration(
-                        labelText: _educationDropDownFocusNode.hasFocus ? 'Education' : 'Education',
-                        labelStyle: GoogleFonts.openSans(textStyle:TextStyle(fontSize: 14,letterSpacing: 0.5,
-                          color: _educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey,
-                        )),
-                        border: OutlineInputBorder(
-                            borderSide: BorderSide(color: _educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey),
-                            borderRadius: BorderRadius.circular(5.0))),
-                    //isEmpty: _currentSelectedValue == '',
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        onTap: _requestEducationDropDownFocusNode,
-                        icon: Icon(NuniyoCustomIcons.down_open,size: 24.0,color: Colors.grey,),
-                        value: education,
-                        style: GoogleFonts.openSans(textStyle: TextStyle(color:_educationDropDownFocusNode.hasFocus ?primaryColorOfApp : Colors.grey, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
-                        underline: Container(
-                          color: Colors.black,
-                        ),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            education = newValue!;
-                          });
-                        },
-                        items: <String>['Graduate','P.G','P.hd']
-                            .map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                  ),
-                ),
-                SizedBox(height: 20,),
-                Container(
                   color: Colors.transparent,
                   width: MediaQuery.of(context).size.width,
                   height: 75,
@@ -458,7 +423,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       ApiRepo().PostPersonalDetails("phoneNumber", "Salim", "Shamim", "income", gender, "Single", "politicalExposed", occupation, tradingExperience, "Bsc CS");
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
-                      Navigator.pushNamed(context, '/webcamscreen');
+                      Navigator.pushNamed(context, 'IPV');
                     },
                     color: primaryColorOfApp,
                     child: Text(
@@ -478,10 +443,19 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   Future<void> manageSteps() async {
     ///SET STEP ID HERE
-    String currentRouteName = '/personaldetailsscreen';
+    String currentRouteName = 'Personal';
     await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
     String routeName = await StoreLocal().getRouteNameFromLocalStorage();
     print("YOU ARE ON THIS STEP : "+routeName);
+  }
+
+  Future<void> prefilTexts() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String father_name = prefs.getString(FATHER_NAME_KEY);
+    print(father_name+"I'm Your Father");
+
+    fatherNameTextEditingController.text = father_name;
+
   }
 
 }
