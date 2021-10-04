@@ -407,23 +407,26 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   }
 
   void onVideoRecordButtonPressed() {
-    startVideoRecording().then((_) {
+    startVideoRecording().then((_) async {
       if (mounted) {
         setState(() {});
-        print("WAIT 12 Seconds");
-        RecordingStatus = "RECORDING .....";
+        print("Recording Started");
+        RecordingStatus = "Recording Started";
         setState(() {
 
         });
-        Future.delayed(Duration(seconds: 12), () {
-          onStopButtonPressed();
-          print("DONE WAITING");
-          RecordingStatus = "DONE RECORDING";
-          enableProceedBtn = true;
-          setState(() {
-
+        for(int i=12;i>=0;i--){
+          await Future.delayed(Duration(seconds: 1), () {
+            RecordingStatus = "$i Seconds Remaining";
+            setState(() {});
           });
-        });
+        }
+        onStopButtonPressed();
+        print("DONE WAITING");
+        showRecordingButton = false;
+        RecordingStatus = "RECORDING COMPLETED";
+        enableProceedBtn = true;
+        setState(() {});
       }
     });
   }

@@ -137,6 +137,7 @@ class SplashScreenState extends State<SplashScreen> {
     prefs.setString("CITY",first.locality);
     prefs.setString("LONGITUDE", _currentPosition.longitude.toString());
     prefs.setString("LATITUDE", _currentPosition.latitude.toString());
+    await Future.delayed(const Duration(seconds: 2), (){});
     //showToastNotification("Current Location : "+first.countryName+"-SUBADMIN AREA -"+first.subAdminArea+"-locality"+first.locality+"|"+first.subLocality+","+first.postalCode+"AADMIN AREA"+first.adminArea);
   }
 
@@ -152,7 +153,7 @@ class SplashScreenState extends State<SplashScreen> {
       _getIPAddress();
       _getCurrentLocation();
       //EMULATOR
-      _getBioMetricsAuthentication();
+      //_getBioMetricsAuthentication();
       WidgetsBinding.instance!.addPostFrameCallback((_){
         Navigator.pushNamed(context,'Mobile');
       });
@@ -201,7 +202,7 @@ class SplashScreenState extends State<SplashScreen> {
 
 
 
-  void _getBioMetricsAuthentication() async {
+  /*void _getBioMetricsAuthentication() async {
     bool isAuthenticated = await Authentication.authenticateWithBiometrics();
     if (isAuthenticated) {
       WidgetsBinding.instance!.addPostFrameCallback((_){
@@ -214,7 +215,7 @@ class SplashScreenState extends State<SplashScreen> {
         ),
       );
     }
-  }
+  }*/
 
   Future<void> _askForPermissions() async {
     print("asking for permissions");
@@ -229,6 +230,18 @@ class SplashScreenState extends State<SplashScreen> {
     }
     else{
       print("Don't Deny Locations");
+    }
+    if (await Permission.camera.request().isGranted) {
+      print("Permitted to use Camera");
+    }
+    else{
+      print("Don't Deny Camera");
+    }
+    if (await Permission.microphone.request().isGranted) {
+      print("Permitted to use Microphone");
+    }
+    else{
+      print("Don't Deny Microphone");
     }
     
     /*if (await Permission.location.isDenied) {

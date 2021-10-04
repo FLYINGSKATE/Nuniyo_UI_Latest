@@ -4,7 +4,9 @@
 import 'dart:io';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_mobile_validation_screen.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_personal_details_screen.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_splash_screen.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_upload_documents_and_signature.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
 import 'package:angel_broking_demo/utils/Router.dart';
 import 'package:flutter/material.dart';
 
@@ -43,7 +45,6 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         inputDecorationTheme: InputDecorationTheme(
           focusColor: Color(0xff6A4EEE),
-
           focusedBorder:OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: const BorderSide(color: Color(0xff6A4EEE), width: 2.0),
@@ -67,8 +68,7 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      home: MobileValidationLoginScreen(),
-      //initialRoute: '/',
+      initialRoute: '/',
       onGenerateRoute: ScreenRouter.generateRoute,
     );
   }

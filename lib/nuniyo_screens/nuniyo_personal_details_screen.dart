@@ -1,4 +1,5 @@
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/globals.dart';
 import 'package:angel_broking_demo/nuniyo_custom_icons.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
@@ -24,7 +25,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String annualIncome = '1-5 Lac';
   String gender = 'Male';
   String maritialStatus = 'Single';
-  String tradingExperience = '0 Years';
+  String tradingExperience = 'Beginner';
   String politicallyExposed = 'Yes';
   String occupation = 'PRIVATE SECTOR';
   //String education = 'Graduate';
@@ -125,7 +126,6 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    fatherNameTextEditingController.text = "";
     return WillPopScope(
         onWillPop: _onWillPop,
         child:Scaffold(
@@ -150,6 +150,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     child: Container(
                       height: 80,
                       child: TextField(
+                        enabled: false,
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _fatherNameTextFieldFocusNode,
@@ -171,6 +172,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     child: Container(
                       height: 80,
                       child: TextField(
+                        enabled: false,
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: 0.5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _motherNameTextFieldFocusNode,
@@ -362,7 +364,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                             tradingExperience = newValue!;
                           });
                         },
-                        items: <String>['0 Years','1 Years','2 Years','3 Years']
+                        items: <String>['Beginner','Intermediate','Professional']
                             .map<DropdownMenuItem<String>>((String value) {
                           return DropdownMenuItem<String>(
                             value: value,
@@ -420,7 +422,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       borderRadius: BorderRadius.circular(8.0),
                     ),
                     onPressed: () async {
-                      ApiRepo().PostPersonalDetails("phoneNumber", "Salim", "Shamim", "income", gender, "Single", "politicalExposed", occupation, tradingExperience, "Bsc CS");
+                      LocalApiRepo().PersonalDetailsLocal(fatherNameTextEditingController.text.trim(),motherNameTextEditingController.text.trim(),annualIncome,gender,maritialStatus,politicallyExposed,occupation,tradingExperience);
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
                       Navigator.pushNamed(context, 'IPV');

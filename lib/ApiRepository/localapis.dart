@@ -613,7 +613,45 @@ class LocalApiRepo {
   }
 
   Future<void> PanAuthenticationLocal() async{}
-  Future<void> PersonalDetailsLocal() async{}
+
+  Future<void> PersonalDetailsLocal(String fatherName,String motherName,String income,String gender,String maritalStatus,String politicallyExposed,String occupation,String tradingExperience) async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling RAZOR PAY STATUS Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("RAZOR PAY STATUS for Lead ID : "+lead_id);
+
+    var headers = {
+      'Authorization': 'Bearer $jwt_token',
+      'Content-Type': 'application/json'
+    };
+
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/personal/Personal_Details'));
+    request.body = json.encode({
+      "lead_Id": "$lead_id",
+      "org_Id": globals.ORG_ID,
+      "father_Name": "$fatherName",
+      "mother_Name": "$motherName",
+      "income": "$income",
+      "gender": "$gender",
+      "marital_Status": "$maritalStatus",
+      "politically_Exposed": "$politicallyExposed",
+      "occupation": "$occupation",
+      "trading_Experience": "$tradingExperience",
+      "education": "string"
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      print(await response.stream.bytesToString());
+    }
+    else {
+      print(response.reasonPhrase);
+    }
+
+  }
 
   Future<void> RazorPayStatusLocal(int amountPayed,String currency , String mobileNumber, String merchantTransactionID) async{
     String jwt_token= await GetCurrentJWTToken();

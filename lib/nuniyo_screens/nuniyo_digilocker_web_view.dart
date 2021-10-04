@@ -39,13 +39,13 @@ class _BrowserViewXState extends State<BrowserViewX> {
         content: new Text('Do you want to exit DigiLocker'),
         actions: <Widget>[
           TextButton(
-            onPressed:(){Navigator.pushNamed(context, 'Document');},
+            onPressed:(){Navigator.pushNamed(context, 'Personal');},
             //onPressed: () => Navigator.of(context).pop(false),
             child: new Text('No'),
           ),
           TextButton(
             onPressed:() {
-              Navigator.pushNamed(context, 'Document');
+              Navigator.pushNamed(context, 'Personal');
               //await LocalApiRepo().UpdateStage_Id();
               //await ContinueToStep();
               },
@@ -65,7 +65,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
         // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
         leading: IconButton(
           onPressed: () {
-            Navigator.pushNamed(context, 'Document');
+            Navigator.pushNamed(context, 'Personal');
           },
           icon: Icon(Icons.arrow_back_rounded),
         ),
@@ -95,7 +95,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
         dartCallBacks: {
           DartCallback(
             name: 'TestDartCallback',
-            callBack: (msg) => print(msg.toString()),
+            callBack: (msg) => print("Waht is this ? "+msg.toString()),
           )
         },
         webSpecificParams: const WebSpecificParams(

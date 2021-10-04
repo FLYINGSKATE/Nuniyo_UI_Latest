@@ -2,6 +2,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
@@ -245,7 +246,6 @@ class _BankPanEmailValidationScreenState
 
   @override
   Widget build(BuildContext context) {
-    _requestEmailIdTextFieldFocus();
     return WillPopScope(
         child: Scaffold(
           resizeToAvoidBottomInset: true,
@@ -279,6 +279,7 @@ class _BankPanEmailValidationScreenState
                         child: TextField(
                           enabled: !isEmailValidatedSuccessfully,
                       cursorColor: primaryColorOfApp,
+                      keyboardType: TextInputType.emailAddress,
                       style: GoogleFonts.openSans(
                           textStyle: TextStyle(
                               color: Colors.black,
@@ -325,8 +326,10 @@ class _BankPanEmailValidationScreenState
                           //isValidInputForEmail = await ApiRepo().VerifyEmail(prefs.getString('PhoneNumber'), _emailID);
                           //Send Email ID to APi
                           isEmailValidatedSuccessfully = await LocalApiRepo().Email_Status(_emailID);
-                          await LocalApiRepo().UpdateEmail(_emailID);
                           showEmailErrorText = !isEmailValidatedSuccessfully;
+                          if(isEmailValidatedSuccessfully){
+                            await LocalApiRepo().UpdateEmail(_emailID);
+                          }
                           if (isEmailValidatedSuccessfully) {
                             _requestPanTextFieldFocus();
                             prefs.setString(EMAIL_ID_KEY, _emailID);
@@ -759,9 +762,7 @@ class _BankPanEmailValidationScreenState
                               ),
                               onPressed: () async {
                                 confirmBtnText = "Please Wait ";
-                                setState(() {
-
-                                });
+                                setState(() {});
                                 //Penny Drop Api Will Come here till then suppose it is valid
                                 isBankValidatedSuccessfully = await LocalApiRepo().verifyBankAccountLocal(_bankTextEditingController.text.trim(), _ifscCodeTextEditingController.text.trim());
                                 if(isBankValidatedSuccessfully){
@@ -844,6 +845,7 @@ class _BankPanEmailValidationScreenState
   }
 
   void openIFSCSearchDialogBox() {
+    String headerTitle = "Find Your IFSC";
     showDialog(
         barrierLabel: "Barrier",
         barrierDismissible: false,
@@ -854,7 +856,18 @@ class _BankPanEmailValidationScreenState
             return Align(
               alignment: Alignment.center,
               child: Container(
-                height: 650,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                  ), height: 550,child:Material(
+                borderRadius: BorderRadius.circular(40),
+                color: Colors.transparent,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(40),
+                  ),
+                height: 550,
                 child: SingleChildScrollView(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(0.0, 10.0, 0.0, 0.0),
@@ -865,13 +878,10 @@ class _BankPanEmailValidationScreenState
                                 const EdgeInsets.fromLTRB(22.0, 0.0, 0.0, 10.0),
                             child: Align(
                               alignment: Alignment.centerLeft,
-                              child: Material(
-                                color: Colors.transparent,
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                              child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text("Tap On Your IFSC Code",
+                                    Text("$headerTitle",
                                         style: GoogleFonts.openSans(
                                           textStyle: TextStyle(
                                               color: Colors.black,
@@ -896,65 +906,55 @@ class _BankPanEmailValidationScreenState
                                       ),
                                     ),)
                                   ],
-                                ),
-                              ),
-                            ),
-                          ),
+                                ))),
+
                           SizedBox(height: 10),
                           Visibility(visible:IFSCMapList.isEmpty,
                             child:Column(children: <Widget>[
-                    Material(
-                      color: Colors.white,
-                      child: Padding(
-                        padding: const EdgeInsets.all(15.0),
-                        child: Container(
-                          height: 80,
-                          child: TextField(
-                            textCapitalization: TextCapitalization.characters,
-                            inputFormatters: [UpperCaseTextFormatter(),],
-                            cursorColor: primaryColorOfApp,
-                            style: GoogleFonts.openSans(
-                                textStyle: TextStyle(
-                                    color: Colors.black,
-                                    letterSpacing: 0.5,
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold)),
-                            focusNode: _IFSCCode2TextFieldFocusNode,
-                            onTap: _requestIFSCCode2TextFieldFocusNode,
-                            decoration: InputDecoration(
-                                contentPadding: EdgeInsets.fromLTRB(
-                                    25.0, 40.0, 0.0, 40.0),
-                                counter: Offstage(),
-                                labelText: _IFSCCode2TextFieldFocusNode
-                                    .hasFocus
-                                    ? 'Enter IFSC Code'
-                                    : 'Enter IFSC Code',
-                                labelStyle: GoogleFonts.openSans(
+                            Padding(
+                            padding: const EdgeInsets.all(15.0),
+                            child: Container(
+                              height: 80,
+                              child: TextField(
+                                textCapitalization: TextCapitalization.characters,
+                                inputFormatters: [UpperCaseTextFormatter(),],
+                                cursorColor: primaryColorOfApp,
+                                style: GoogleFonts.openSans(
                                     textStyle: TextStyle(
-                                      fontSize: 14,
-                                      letterSpacing: 0.5,
-                                      color: _IFSCCode2TextFieldFocusNode
-                                          .hasFocus
-                                          ? primaryColorOfApp
-                                          : Colors.grey,
-                                    ))),
+                                        color: Colors.black,
+                                        letterSpacing: 0.5,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold)),
+                                focusNode: _IFSCCode2TextFieldFocusNode,
+                                onTap: _requestIFSCCode2TextFieldFocusNode,
+                                decoration: InputDecoration(
+                                    contentPadding: EdgeInsets.fromLTRB(
+                                        25.0, 40.0, 0.0, 40.0),
+                                    counter: Offstage(),
+                                    labelText: _IFSCCode2TextFieldFocusNode
+                                        .hasFocus
+                                        ? 'Enter IFSC Code'
+                                        : 'Enter IFSC Code',
+                                    labelStyle: GoogleFonts.openSans(
+                                        textStyle: TextStyle(
+                                          fontSize: 14,
+                                          letterSpacing: 0.5,
+                                          color: _IFSCCode2TextFieldFocusNode
+                                              .hasFocus
+                                              ? primaryColorOfApp
+                                              : Colors.grey,
+                                        ))),
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
-                    Material(
-                      color: Colors.white,
-                      child: Text("Or",
+                    Text("Or",
                           style: GoogleFonts.openSans(
                             textStyle: TextStyle(
                                 color: Colors.black,
                                 letterSpacing: .5,
                                 fontSize: 20),
                           )),
-                    ),
-                    Material(
-                      color: Colors.white,
-                      child: Padding(
+                    Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Container(
                           height: 80,
@@ -992,11 +992,8 @@ class _BankPanEmailValidationScreenState
                                     ))),
                           ),
                         ),
-                      ),
                     ),
-                    Material(
-                      color: Colors.white,
-                      child: Padding(
+                    Padding(
                         padding: const EdgeInsets.all(15.0),
                         child: Container(
                           height: 80,
@@ -1040,7 +1037,6 @@ class _BankPanEmailValidationScreenState
                           ),
                         ),
                       ),
-                    ),
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Container(
@@ -1062,6 +1058,7 @@ class _BankPanEmailValidationScreenState
                               IFSCMapList = await LocalApiRepo().IFSCMasterSearchLocal(_branchNameTextEditingController.text.trim(), _branchLocationTextEditingController.text.trim());
                               if (IFSCMapList["res_Output"].length > 0) {
                                 showIFSCSearchResults = true;
+                                headerTitle = "Tap On Your IFSC Code";
                                 setState(() {});
                               }
                             } else {
@@ -1090,12 +1087,9 @@ class _BankPanEmailValidationScreenState
                         crossAxisAlignment: CrossAxisAlignment.center),
                   ),
                 ),
-                margin: EdgeInsets.only(bottom: 20, left: 12, right: 12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(40),
-                ),
-              ),
+                margin: EdgeInsets.only(bottom: 20, left: 12, right: 12,top: 40),
+              )
+              )),
             );
           });
         });
@@ -1157,6 +1151,24 @@ class _BankPanEmailValidationScreenState
             children: [
               Row(
                 children: [
+                  Text("IFSC Code :",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            color: Colors.black,
+                            letterSpacing: .5,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      )),
+                  Text("$IfscCode",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            color: Colors.black, letterSpacing: .5, fontSize: 18),
+                      )),
+                ],
+              ),
+              SizedBox(height: 10,),
+              Row(
+                children: [
                   Expanded(
                     child: Text("$BranchName",
                         style: GoogleFonts.openSans(
@@ -1169,9 +1181,7 @@ class _BankPanEmailValidationScreenState
                   )
                 ],
               ),
-              SizedBox(
-                height: 10,
-              ),
+              SizedBox(height: 10,),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1193,26 +1203,6 @@ class _BankPanEmailValidationScreenState
                               fontSize: 18),
                         )),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Text("IFSC Code :",
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: .5,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      )),
-                  Text("$IfscCode",
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            color: Colors.black, letterSpacing: .5, fontSize: 18),
-                      )),
                 ],
               ),
               SizedBox(
@@ -1268,13 +1258,33 @@ class _BankPanEmailValidationScreenState
             children: [
               Row(
                 children: [
+                  Text("IFSC Code :",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            color: Colors.black,
+                            letterSpacing: .5,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold),
+                      )),
+                  Text("$IfscCode",
+                      style: GoogleFonts.openSans(
+                        textStyle: TextStyle(
+                            color: Colors.black, letterSpacing: .5, fontSize: 18),
+                      )),
+                ],
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
                   Expanded(
                     child: Text("$BranchName",
                         style: GoogleFonts.openSans(
                           textStyle: TextStyle(
                               color: Colors.black,
                               letterSpacing: .5,
-                              fontSize: 18,
+                              fontSize: 16,
                               fontWeight: FontWeight.bold),
                         )),
                   )
@@ -1292,7 +1302,7 @@ class _BankPanEmailValidationScreenState
                         textStyle: TextStyle(
                             color: Colors.black,
                             letterSpacing: .5,
-                            fontSize: 18,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold),
                       )),
                   Flexible(
@@ -1301,29 +1311,9 @@ class _BankPanEmailValidationScreenState
                           textStyle: TextStyle(
                               color: Colors.black,
                               letterSpacing: .5,
-                              fontSize: 18),
+                              fontSize: 14),
                         )),
                   ),
-                ],
-              ),
-              SizedBox(
-                height: 10,
-              ),
-              Row(
-                children: [
-                  Text("IFSC Code :",
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            color: Colors.black,
-                            letterSpacing: .5,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold),
-                      )),
-                  Text("$IfscCode",
-                      style: GoogleFonts.openSans(
-                        textStyle: TextStyle(
-                            color: Colors.black, letterSpacing: .5, fontSize: 18),
-                      )),
                 ],
               ),
               SizedBox(
