@@ -477,7 +477,40 @@ class LocalApiRepo {
     }
 
   }
-  Future<void> IPVOTPLocal() async{}
+  Future<String> IPVOTPLocal() async{
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling IPVOTP LOCAL Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("IPVOTP LOCAL for Lead ID : "+lead_id);
+
+    var headers = {
+      'Authorization': 'Bearer $jwt_token',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/in_person_verification/IPV_OTP'));
+    request.body = json.encode({
+      "lead_Id": "$lead_id",
+      "method_Name": "IPV_OTP",
+      "org_Id": ORG_ID
+    });
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      return "valueMap";
+    }
+    else {
+      print(response.reasonPhrase);
+      return "valueMap";
+    }
+  }
+
   Future<void> VerifyIPVOTPLocal() async{}
   Future<void> SaveIPVVideoLocal() async{}
 
@@ -614,12 +647,12 @@ class LocalApiRepo {
 
   Future<void> PanAuthenticationLocal() async{}
 
-  Future<void> PersonalDetailsLocal(String fatherName,String motherName,String income,String gender,String maritalStatus,String politicallyExposed,String occupation,String tradingExperience) async{
+  Future<bool> PersonalDetailsLocal(String fatherName,String motherName,String income,String gender,String maritalStatus,String politicallyExposed,String occupation,String tradingExperience) async{
     String jwt_token= await GetCurrentJWTToken();
-    print("Calling RAZOR PAY STATUS Using API"+jwt_token);
+    print("Calling PERSONAL DETAILS  Using API KEY "+jwt_token);
 
     String lead_id = await GetLeadId();
-    print("RAZOR PAY STATUS for Lead ID : "+lead_id);
+    print("PERSONAL DETAILS for Lead ID : "+lead_id);
 
     var headers = {
       'Authorization': 'Bearer $jwt_token',
@@ -645,10 +678,21 @@ class LocalApiRepo {
     http.StreamedResponse response = await request.send();
 
     if (response.statusCode == 200) {
-      print(await response.stream.bytesToString());
+      String result = await response.stream.bytesToString();
+      Map valueMap = jsonDecode(result);
+      print(valueMap);
+      int result_Id = valueMap["res_Output"][0]["result_Id"];
+      print(result_Id);
+      String stage_id = valueMap["res_Output"][0]["stage_Id"];
+      await SetStageId(stage_id);
+      if(result_Id == 1){
+        return true;
+      }
+      return false;
     }
     else {
       print(response.reasonPhrase);
+      return false;
     }
 
   }

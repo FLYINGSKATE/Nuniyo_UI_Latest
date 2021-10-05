@@ -42,12 +42,7 @@ class _AadharKYCScreenState extends State<AadharKYCScreen> {
     return WillPopScope(onWillPop: _onWillPop,
       child:Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
-        backgroundColor: Color(0xffF0ECFF),
-        elevation: 0,
-      ),
+      appBar: WidgetHelper().NuniyoAppBar(),
       body: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Padding(

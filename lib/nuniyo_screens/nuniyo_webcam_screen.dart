@@ -1,6 +1,7 @@
 ///Static Page
 import 'dart:io';
 
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/extra_demo_screens/FlutCam.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
@@ -50,10 +51,12 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
 
   bool enableRetryBtn = false;
 
+  String ipvOtp = "";
+
   @override
   void initState() {
     super.initState();
-    manageSteps();
+    fetchOTP();
     initializeCamera();
     setState(() {
     });
@@ -90,12 +93,7 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   Widget build(BuildContext context) {
     return WillPopScope(child: Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        leading: Icon(Icons.ac_unit,color: Colors.black,),
-        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
-        backgroundColor: Color(0xffF0ECFF),
-        elevation: 0,
-      ),
+      appBar: WidgetHelper().NuniyoAppBar(),
       body: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Padding(
@@ -402,7 +400,6 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
   /// Display the control bar with buttons to take pictures and record videos.
   Widget _captureControlRowWidget() {
     final CameraController? cameraController = controller;
-
     return Container();
   }
 
@@ -545,6 +542,11 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
         _onWillPop();
       }
     });
+  }
+
+  void fetchOTP() async {
+    print("IPV OTP METHODS");
+    ipvOtp = await LocalApiRepo().IPVOTPLocal();
   }
 
 }

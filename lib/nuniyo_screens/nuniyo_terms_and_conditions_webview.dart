@@ -1,3 +1,4 @@
+import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:webviewx/webviewx.dart';
 
@@ -30,14 +31,7 @@ class _TermsAndConditionsState extends State<TermsAndConditions> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Tech X Labs'),
-        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-        leading: IconButton(
-          onPressed: () {Navigator.pop(context);},
-          icon: Icon(Icons.arrow_back_rounded),
-        ),
-      ),
+      appBar: WidgetHelper().NuniyoAppBar(),
       body: WebViewX(
         key: const ValueKey('webviewx'),
         initialContent: '<h2>Please Wait.......</h2>',

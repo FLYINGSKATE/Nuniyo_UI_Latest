@@ -2,16 +2,11 @@
 //This File also consist of Routes to different different screens
 
 import 'dart:io';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_mobile_validation_screen.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_personal_details_screen.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_splash_screen.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_upload_documents_and_signature.dart';
-import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
-import 'package:angel_broking_demo/utils/Router.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
 import 'package:flutter/material.dart';
 
-import 'extra_demo_screens/sample_datepicker.dart';
-import 'nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
+import 'nuniyo_screens/nuniyo_mobile_validation_screen.dart';
+
 
 void main() {
 
@@ -19,13 +14,13 @@ void main() {
   ErrorWidget.builder = (FlutterErrorDetails details) => Container(
     color : Colors.white,
   );
+
   ///To Override SSL Certificate when used with HTTPS Apis
   HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
 
 class MyHttpOverrides extends HttpOverrides {
-
   @override
   HttpClient createHttpClient(SecurityContext? context) {
     return super.createHttpClient(context)
@@ -68,8 +63,9 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      initialRoute: '/',
-      onGenerateRoute: ScreenRouter.generateRoute,
+      home: MobileValidationLoginScreen(),
+      //initialRoute: '/',
+      //onGenerateRoute: ScreenRouter.generateRoute,
     );
   }
 }

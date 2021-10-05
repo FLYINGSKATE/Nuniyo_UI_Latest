@@ -186,7 +186,7 @@ class _BankPanEmailValidationScreenState
   @override
   void initState() {
     super.initState();
-    manageSteps();
+    //manageSteps();
     _branchNameTextFieldFocusNode = FocusNode();
     _branchLocationTextFieldFocusNode = FocusNode();
     _IFSCCode2TextFieldFocusNode = FocusNode();
@@ -249,22 +249,7 @@ class _BankPanEmailValidationScreenState
     return WillPopScope(
         child: Scaffold(
           resizeToAvoidBottomInset: true,
-          appBar: AppBar(
-            leading: Icon(
-              Icons.ac_unit,
-              color: Colors.black,
-            ),
-            title: Text(
-              'Tech X Labs',
-              style: GoogleFonts.openSans(
-                  textStyle: TextStyle(
-                      color: Colors.black,
-                      letterSpacing: .5,
-                      fontWeight: FontWeight.bold)),
-            ),
-            backgroundColor: Color(0xffF0ECFF),
-            elevation: 0,
-          ),
+          appBar: WidgetHelper().NuniyoAppBar(),
           body: SingleChildScrollView(
             child: IntrinsicHeight(
               child: Padding(
@@ -291,15 +276,16 @@ class _BankPanEmailValidationScreenState
                       onTap: _requestEmailIdTextFieldFocus,
                       decoration: InputDecoration(
                           counter: Offstage(),
-                          suffixIcon:!isValidInputForEmail?Padding(
-                          padding: EdgeInsets.all(5)
-                          ,child:SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    color: _emailTextFieldFocusNode.hasFocus && isValidInputForEmail ?primaryColorOfApp:Colors.transparent,
-                                  ))
-                          ):isEmailValidatedSuccessfully?Icon(Icons.check_circle,color:Colors.green):Icon(Icons.error,color:Colors.red),
+                          suffixIcon: (isValidInputForEmail&&isEmailValidatedSuccessfully)?Icon(Icons.check_circle,color:Colors.green):!isEmailValidatedSuccessfully?Padding(
+                              padding: EdgeInsets.all(8)
+                              ,child:SizedBox(
+                              width: 12,
+                              height: 12,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 3,
+                                color: (_emailTextFieldFocusNode.hasFocus&&isValidInputForEmail)?primaryColorOfApp:Colors.transparent,
+                              ))
+                          ):Icon(Icons.error,color:isValidInputForEmail?Colors.red:Colors.transparent),
                           errorText: showEmailErrorText ? emailErrorText : null,
                           labelText: _emailTextFieldFocusNode.hasFocus
                               ? 'Email ID'
@@ -349,6 +335,9 @@ class _BankPanEmailValidationScreenState
                         onChanged: (_panNumber) async {
                         if (_panNumber.length >= 10) {
                           isValidInputForPan = true;
+                          setState(() {
+
+                          });
                           SharedPreferences prefs = await SharedPreferences.getInstance();
                           //isValidInputForPan = await ApiRepo().VerifyPAN(phoneNumber, _panNumber);
                           isPanValidatedSuccessfully = await LocalApiRepo().NSDLeKYCPanAuthenticationLocal(_panNumber);
@@ -378,15 +367,16 @@ class _BankPanEmailValidationScreenState
                       decoration: InputDecoration(
                           errorText: showPANErrorText ? panErrorText : null,
                           counter: Offstage(),
-                          suffixIcon: !isValidInputForPan?Padding(
-                              padding: EdgeInsets.all(5)
+                          suffixIcon: (isValidInputForPan&&isPanValidatedSuccessfully)?Icon(Icons.check_circle,color:Colors.green):!isPanValidatedSuccessfully?Padding(
+                              padding: EdgeInsets.all(8)
                               ,child:SizedBox(
-                              width: 18,
-                              height: 18,
+                              width: 12,
+                              height: 12,
                               child: CircularProgressIndicator(
-                                color: _panTextFieldFocusNode.hasFocus && isValidInputForPan ?primaryColorOfApp:Colors.transparent,
+                                strokeWidth: 3,
+                                color: (_panTextFieldFocusNode.hasFocus&&isValidInputForPan)?primaryColorOfApp:Colors.transparent,
                               ))
-                          ):isPanValidatedSuccessfully?Icon(Icons.check_circle,color:Colors.green):Icon(Icons.error,color:Colors.red),
+                          ):Icon(Icons.error,color:isValidInputForPan?Colors.red:Colors.transparent),
                           labelText: _panTextFieldFocusNode.hasFocus
                               ? 'Enter PAN Number'
                               : 'Enter PAN Number',
@@ -481,12 +471,16 @@ class _BankPanEmailValidationScreenState
                       decoration: InputDecoration(
                           counter: Offstage(),
                           errorText: showBankAccountNumberErrorText ? "Enter a valid Bank A/C No." : null,
-                          suffixIcon: !showBankAccountNumberErrorText
-                              ? Icon(Icons.check_circle,
-                              color: isValidBankAccount
-                                  ? Colors.green
-                                  : Colors.transparent)
-                              : Icon(Icons.error, color: Colors.red),
+                          suffixIcon:(isValidInputForBank&&isBankValidatedSuccessfully)?Icon(Icons.check_circle,color:Colors.green):!isBankValidatedSuccessfully?Padding(
+                          padding: EdgeInsets.all(8)
+                          ,child:SizedBox(
+                          width: 12,
+                          height: 12,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3,
+                            color: (_bankTextFieldFocusNode.hasFocus&&isValidInputForBank)?primaryColorOfApp:Colors.transparent,
+                          ))
+                      ):Icon(Icons.error,color:isValidInputForBank?Colors.red:Colors.transparent),
                           labelText: _bankTextFieldFocusNode.hasFocus
                               ? 'Enter Bank A/C Number'
                               : 'Enter Bank A/C Number',
@@ -1389,11 +1383,7 @@ class _BankPanEmailValidationScreenState
   }
 
   void selectionChanged(DateRangePickerSelectionChangedArgs args) {
-
-
     //DateTime newDate = DateTime.parse(DateFormat('dd-MM-yyyy').format(args.value));
-
-
     _dateController.text = DateFormat('dd-MM-yyyy').format(args.value);
     SchedulerBinding.instance!.addPostFrameCallback((duration) {
       setState(() {});

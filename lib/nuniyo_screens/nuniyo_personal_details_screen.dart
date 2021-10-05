@@ -26,18 +26,26 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   String gender = 'Male';
   String maritialStatus = 'Single';
   String tradingExperience = 'Beginner';
-  String politicallyExposed = 'Yes';
+  String politicallyExposed = 'No';
   String occupation = 'PRIVATE SECTOR';
   //String education = 'Graduate';
 
   TextEditingController fatherNameTextEditingController = TextEditingController();
   TextEditingController motherNameTextEditingController = TextEditingController();
 
+
+  bool _value = false;
+
+
+
+
   @override
   void initState() {
     super.initState();
     //manageSteps();
     //prefilTexts();
+    fatherNameTextEditingController.text = "Demo Name";
+    motherNameTextEditingController.text = "Demo Name";
     _fatherNameTextFieldFocusNode = FocusNode();
     _tradingExperienceDropDownFocusNode = FocusNode();
     _motherNameTextFieldFocusNode = FocusNode();
@@ -130,12 +138,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
         onWillPop: _onWillPop,
         child:Scaffold(
       resizeToAvoidBottomInset: true,
-      appBar: AppBar(
-        leading: Icon(Icons.ac_unit,color: Colors.black),
-        title: Text('Tech X Labs',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold)),),
-        backgroundColor: Color(0xffF0ECFF),
-        elevation: 0,
-      ),
+      appBar: WidgetHelper().NuniyoAppBar(),
       body: SingleChildScrollView(
         child: IntrinsicHeight(
           child: Padding(
@@ -376,7 +379,44 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   ),
                 ),
                 SizedBox(height: 20,),
-                Container(
+                Center(child:Text("Politically Exposed",style:GoogleFonts.openSans(
+                textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16,fontWeight: FontWeight.bold),),)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(child:ListTile(
+                      title: Text("Yes",style: GoogleFonts.openSans(
+                        textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)),
+                      leading: Radio<String>(
+                        value: "Yes",
+                        groupValue: politicallyExposed,
+                        onChanged: (String? value) {
+                          setState(() {
+                            politicallyExposed = value!;
+                            print(politicallyExposed);
+                          });
+                        },
+                        activeColor: primaryColorOfApp,
+                      ),
+                    )),
+                    Expanded(child: ListTile(
+                      title: Text("No",style: GoogleFonts.openSans(
+                        textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),)),
+                      leading: Radio<String>(
+                        value: "No",
+                        groupValue: politicallyExposed,
+                        onChanged: (String? value) {
+                          setState(() {
+                            politicallyExposed = value!;
+                            print(politicallyExposed);
+                          });
+                        },
+                        activeColor: primaryColorOfApp,
+                      ),
+                    ),)
+                  ],
+                ),
+                /*Container(
                   height: 75.0,
                   child: InputDecorator(
                     decoration: InputDecoration(
@@ -411,7 +451,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       ),
                     ),
                   ),
-                ),
+                ),*/
                 SizedBox(height: 20,),
                 Container(
                   color: Colors.transparent,
@@ -425,7 +465,10 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       LocalApiRepo().PersonalDetailsLocal(fatherNameTextEditingController.text.trim(),motherNameTextEditingController.text.trim(),annualIncome,gender,maritialStatus,politicallyExposed,occupation,tradingExperience);
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
-                      Navigator.pushNamed(context, 'IPV');
+                      String stage_id = prefs.getString(STAGE_KEY);
+                      print("Let\'s go To");
+                      print(stage_id);
+                      Navigator.pushNamed(context, stage_id);
                     },
                     color: primaryColorOfApp,
                     child: Text(

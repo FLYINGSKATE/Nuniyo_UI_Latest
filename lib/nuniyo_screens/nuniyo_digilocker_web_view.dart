@@ -1,4 +1,5 @@
 import 'package:angel_broking_demo/ApiRepository/localapis.dart';
+import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webviewx/webviewx.dart';
@@ -60,16 +61,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(child: Scaffold(
-      appBar: AppBar(
-        title: const Text('Tech X Labs'),
-        // This drop down menu demonstrates that Flutter widgets can be shown over the web view.
-        leading: IconButton(
-          onPressed: () {
-            Navigator.pushNamed(context, 'Personal');
-          },
-          icon: Icon(Icons.arrow_back_rounded),
-        ),
-      ),
+      appBar: WidgetHelper().NuniyoAppBar(),
       body: WebViewX(
         key: const ValueKey('webviewx'),
         initialContent: '<h2>Please Wait.......</h2>',
