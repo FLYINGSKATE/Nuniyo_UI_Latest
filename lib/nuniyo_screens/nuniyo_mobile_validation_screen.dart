@@ -58,12 +58,19 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   bool enablePhoneNumberTextField = true;
 
+  bool showPhoneNumberError = false;
+
+  String phoneNumberError = "Please Enter a Valid Phone Number";
+
   String get resendOTPButtonText =>
       'Wait for :${((_resendOTPIntervalTime - currentSeconds) ~/ 60).toString().padLeft(2, '0')}: ${((_resendOTPIntervalTime - currentSeconds) % 60).toString().padLeft(2, '0')}';
 
   Color primaryColorOfApp = Color(0xff6A4EEE);
 
   late FocusNode _phoneNumberFocusNode,_otpFocusNode,_referralCodeNode;
+
+
+
 
   @override
   void initState() {
@@ -142,6 +149,7 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     focusNode: _phoneNumberFocusNode,
                     onTap: _requestPhoneFocus,
                     decoration: InputDecoration(
+                        errorText: showPhoneNumberError?phoneNumberError:null,
                         counter: Offstage(),
                         isDense: true,
                         enabled: enablePhoneNumberTextField,
@@ -163,7 +171,9 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     onChanged: (_phoneNumber) async {
                       print(_phoneNumber.length);
                       phoneNumberString = _phoneNumber;
-                      if (_phoneNumber.length >= 10) {
+                      if (_phoneNumber.length >= 10 && isvalidphone(phoneNumberString)) {
+                        showPhoneNumberError = false;
+                        isPhoneNumberValid = true;
                         print(_phoneNumber);
                         phoneNumberString = _phoneNumber;
                         //Store Mobile Number in Shared Preferences
@@ -171,36 +181,55 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                         print("Below Given is the Value From Shared Prefereneces");
                         print(this.preferences?.getString(MOBILE_NUMBER_KEY));
                         //isPhoneNumberValid = await ApiRepo().SendMobileNumber(_phoneNumber);
-                        isPhoneNumberValid = await LocalApiRepo().ReadLead(_phoneNumber);
+                        if(howManyTimesResendOTPPressed<=0){
+                          isPhoneNumberValid = await LocalApiRepo().ReadLead(_phoneNumber);
+                          howManyTimesResendOTPPressed ++;
+                        }
+
 
                         SharedPreferences prefs = await SharedPreferences.getInstance();
                         String otp= prefs.getString("MOBILE_OTP");
                         print("OTP INSIDE SHARED PREFERENCES :" + otp);
-                        _otpTextEditingController.text = otp;
-                        isValidOTP = await LocalApiRepo().VerifyOTP(phoneNumberString, _otpTextEditingController.text);
-                        showOTPErrorText= !isValidOTP;
-                        if(isValidOTP){
-                          enableResendOTPButtonm = false;
-                          enableOTPTextField = false;
-                          enablePhoneNumberTextField= false;
+
+                        //Prefill OTP Feature
+
+                        //_otpTextEditingController.text = otp;
+                        //isValidOTP = await LocalApiRepo().VerifyOTP(phoneNumberString, _otpTextEditingController.text);
+                        //showOTPErrorText= !isValidOTP;
+                        //if(isValidOTP){
+                          //enableResendOTPButtonm = false;
+                          //enableOTPTextField = false;
+                          //enablePhoneNumberTextField= false;
 
 
-                        }
-                        setState(() {});
+                        //}
+                        //setState(() {});
+                        ///
 
-                        //OTPFromApi = await ApiRepo().fetchOTP(_phoneNumber);
-                        howManyTimesResendOTPPressed ++;
                         setState((){});
                       }
                       else{
-                        //isPhoneNumberValid = false;
+                        if(phoneNumberString.length>=10){
+                          isPhoneNumberValid = false;
+                          showPhoneNumberError = true;
+                          setState(() {
+                          });
+                        }
                       }
                     },
                   ),
                 ),
+                SizedBox(height: 10,),
                 Flexible(
                     child: TextField(
                       onChanged: (value) async {
+                        if(phoneNumberString.length<10 || !isvalidphone(phoneNumberString)){
+                          showPhoneNumberError = true;
+                          setState(() {
+
+                          });
+                          return;
+                        }
                         if(value.length==6){
                           //isValidOTP = await ApiRepo().VerifyOTP(phoneNumberString, value);
                           isValidOTP = await LocalApiRepo().VerifyOTP(phoneNumberString, value);
@@ -243,12 +272,12 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
                     child: TextButton(
                         child: Text("Resend OTP",style: GoogleFonts.openSans(textStyle: TextStyle(decoration: TextDecoration.underline,fontSize: 18,fontWeight: FontWeight.bold,color:enableResendOTPButtonm?primaryColorOfApp:Colors.black12, letterSpacing: .5),),),
                         onPressed: enableResendOTPButtonm ? () async {
-                          enableResendOTPButtonm = false;
-                          howManyTimesResendOTPPressed ++;
-                          setState((){});
-                          startTimer();
-                          if(phoneNumberString.length==10 && isPhoneNumberValid){
-                            await ApiRepo().SendMobileNumber(phoneNumberString);
+                          if(phoneNumberString.length==10 && isvalidphone(phoneNumberString)){
+                            enableResendOTPButtonm = false;
+                            howManyTimesResendOTPPressed ++;
+                            setState((){});
+                            startTimer();
+                            await LocalApiRepo().ReadLead(phoneNumberString);
                           }
                         }:null),
                   ),
@@ -452,6 +481,14 @@ class _MobileValidationLoginScreenState extends State<MobileValidationLoginScree
 
   Future<bool> _onWillPop() {
     return Future.value(false);
+  }
+
+
+  bool isvalidphone(String? phoneNo) {
+    if (phoneNo == null) return false;
+    phoneNo="+91"+phoneNo;
+    final regExp = RegExp(r'(^(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}$)');
+    return regExp.hasMatch(phoneNo);
   }
 }
 

@@ -298,9 +298,19 @@ class _BankPanEmailValidationScreenState
                           )),
                       onChanged: (_emailID) async {
                         print(_emailID.length);
-                        if (!EmailValidator.validate(_emailID) || _emailID == null) {
+                        if(!_emailID.contains("@")){
+                          return;
+                        }
+                        if(!_emailID.contains(".")){
+                          return;
+                        }
+                        if(_emailID.length<=4){
+                          return;
+                        }
+                        if (!EmailValidator.validate(_emailID)) {
                           print('Enter a valid email address');
                           isValidInputForEmail = false;
+                          showEmailErrorText = true;
                           setState(() {
 
                           });
@@ -313,6 +323,9 @@ class _BankPanEmailValidationScreenState
                           //Send Email ID to APi
                           isEmailValidatedSuccessfully = await LocalApiRepo().Email_Status(_emailID);
                           showEmailErrorText = !isEmailValidatedSuccessfully;
+                          setState(() {
+
+                          });
                           if(isEmailValidatedSuccessfully){
                             await LocalApiRepo().UpdateEmail(_emailID);
                           }
@@ -446,16 +459,17 @@ class _BankPanEmailValidationScreenState
                     ),
                     SizedBox(height: 20,),
                     Flexible(child: TextField(
-                      enabled: enableBankAccountTextField ,
+                      //enabled: enableBankAccountTextField ,
                       textCapitalization: TextCapitalization.characters,
                       controller: _bankTextEditingController,
                       onChanged: (value) async {
                         if(value.length>18 || value.length>9){
                           print("Verifying Bank Account");
                           isValidBankAccount = true;
+                          isValidInputForBank = true;
+                          isBankValidatedSuccessfully = true;
                           showBankAccountNumberErrorText = !isValidBankAccount;
                           enableIFSCCodeTextField = true;
-                          _requestIfscTextFieldFocus();
                           setState((){});
                         }
                       },
@@ -503,7 +517,7 @@ class _BankPanEmailValidationScreenState
                               fontSize: 14,
                               fontWeight: FontWeight.bold)),
                       focusNode: _ifscTextFieldFocusNode,
-                      enabled: enableIFSCCodeTextField,
+                      //enabled: enableIFSCCodeTextField,
                       onTap: _requestIfscTextFieldFocus,
                       onChanged: (value) {
                         if(!isIFSCValidatedSuccessfully){
@@ -626,6 +640,7 @@ class _BankPanEmailValidationScreenState
 
   void openIFSCConfirmDialogBox(String _ifscCodeR, String _bankNameR, String _addressR) {
     String confirmBtnText = "Confirm";
+    bool enableConfirmButton = true;
     showGeneralDialog(
       barrierLabel: "Barrier",
       barrierDismissible: false,
@@ -633,9 +648,8 @@ class _BankPanEmailValidationScreenState
       transitionDuration: Duration(milliseconds: 700),
       context: context,
       pageBuilder: (_, __, ___) {
-        return Align(
-          alignment: Alignment.center,
-          child: Container(
+        return StatefulBuilder(builder: (context,setState){
+          return Align(alignment: Alignment.center,child:Container(
             height: 450,
             child: SingleChildScrollView(
               child: Padding(
@@ -736,13 +750,13 @@ class _BankPanEmailValidationScreenState
                                   )),
                               Flexible(
                                 child: Align(alignment: Alignment.centerRight,child:Padding(padding:EdgeInsets.only(right: 20,left:34),child:Text(_addressR,
-                                    style: GoogleFonts.openSans(
+                                  style: GoogleFonts.openSans(
                                       textStyle: TextStyle(
                                           color: Colors.black,
                                           letterSpacing: .5,
                                           fontSize: 16)),
-                                    )),
-                              ),)
+                                )),
+                                ),)
                             ],
                           ),
                           SizedBox(height: 20.0),
@@ -754,11 +768,18 @@ class _BankPanEmailValidationScreenState
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              onPressed: () async {
+                              onPressed: enableConfirmButton ?() async {
+                                enableConfirmButton = false;
                                 confirmBtnText = "Please Wait ";
-                                setState(() {});
+                                setState((){});
                                 //Penny Drop Api Will Come here till then suppose it is valid
                                 isBankValidatedSuccessfully = await LocalApiRepo().verifyBankAccountLocal(_bankTextEditingController.text.trim(), _ifscCodeTextEditingController.text.trim());
+                                if(!isBankValidatedSuccessfully){
+                                  showBankAccountNumberErrorText = true;
+                                  Navigator.pop(context);
+                                  setState(() {});
+                                  return;
+                                }
                                 if(isBankValidatedSuccessfully){
                                   isValidIFSCCode = true;
                                   isValidInputForIFSC = true;
@@ -772,7 +793,9 @@ class _BankPanEmailValidationScreenState
 
                                 });
                                 //validateIFSC(_ifscCodeTextEditingController.text);
-                              },
+                              }:null,
+                              disabledColor: Colors.black12,
+                              disabledTextColor: Colors.white,
                               color: primaryColorOfApp,
                               child: Text("$confirmBtnText",
                                   style: GoogleFonts.openSans(
@@ -826,8 +849,8 @@ class _BankPanEmailValidationScreenState
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
             ),
-          ),
-        );
+          ));
+        });
       },
       transitionBuilder: (_, anim, __, child) {
         return SlideTransition(
@@ -1090,7 +1113,7 @@ class _BankPanEmailValidationScreenState
   }
 
   Future<void> manageSteps() async {
-    String currentRouteName = '/bankemailpanvalidationscreen';
+    String currentRouteName = 'Email';
     await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);
     String routeName = await StoreLocal().getRouteNameFromLocalStorage();
     print("YOU ARE ON THIS STEP : "+routeName);
@@ -1330,12 +1353,11 @@ class _BankPanEmailValidationScreenState
     print(phoneNumber);
     if(isPanValidatedSuccessfully){
       ///If only 18
-      enableDatePicker = false;
+      //enableDatePicker = false;
       enableBankAccountTextField = true;
       await LocalApiRepo().SolicitPANDetailsFetchALLKRALocal(_panTextEditingController.text, _dateController.text);
-      enableDatePicker = false;
+      //enableDatePicker = false;
       enableBankAccountTextField = true;
-      _requestBankTextFieldFocus();
       setState(() {
 
       });

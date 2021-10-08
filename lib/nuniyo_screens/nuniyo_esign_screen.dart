@@ -27,7 +27,7 @@ class _EsignScreenState extends State<EsignScreen> {
   @override
   void initState() {
     super.initState();
-    manageSteps();
+    //manageSteps();
     fetchDetails();
   }
 
@@ -79,7 +79,7 @@ class _EsignScreenState extends State<EsignScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () {Navigator.pushNamed(context, '/congratsscreen');},
+                    onPressed: () {Navigator.pushNamed(context, 'UCC');},
                     color: primaryColorOfApp,
                     child: Text(
                         "eSign",
@@ -184,18 +184,6 @@ class _EsignScreenState extends State<EsignScreen> {
   }
 
   Future<void> manageSteps() async {
-    ///REFERENCE
-    //'/mobilevalidationscreen'
-    //'/bankemailpanvalidationscreen'
-    //'/uploaddocumentscreen'
-    //'/personaldetailsscreen'
-    //'/optionsscreen'
-    //'/optionsscreen'
-    //'/aadharkycscreen'
-    //'/esignscreen'
-    //'/webcamscreen'
-    //'/congratsscreen'
-
     ///SET STEP ID HERE
     String currentRouteName = 'Esign';
     await StoreLocal().StoreRouteNameToLocalStorage(currentRouteName);

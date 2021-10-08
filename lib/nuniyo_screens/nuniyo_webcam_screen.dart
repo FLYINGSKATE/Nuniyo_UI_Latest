@@ -164,6 +164,96 @@ class _WebCamScreenState extends State<WebCamScreen> with WidgetsBindingObserver
                   ),
                 ),
                 SizedBox(height: 20,),
+                Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                    height: 150.0,
+                    width: MediaQuery.of(context).size.width/1.1,
+                    child: Container(
+                      height: 80,
+                      child: Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Expanded(child:Container(
+                                color: Colors.black26,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(Icons.wb_sunny_outlined,size: 54,),
+                                    SizedBox(height: 10,),
+                                    Stack(
+                                      children: [
+                                        Align(alignment:Alignment.bottomCenter,child:Container(color: Colors.white,
+                                            width: MediaQuery.of(context).size.width,
+                                            height: 50,
+                                            child: Center(child:Padding(padding: EdgeInsets.only(top: 20),child:Text("Bright Light",textAlign: TextAlign.center,style: GoogleFonts.openSans(
+                                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
+                                            ),),))),),
+                                        Align(alignment:Alignment.topCenter,child:Padding(padding: EdgeInsets.only(bottom: 0),child:Icon(Icons.check_circle,color: Colors.green,),),)
+
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              )),
+                              SizedBox(width: 10,),
+                              Expanded(child:Container(
+                                color: Colors.black26,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(CupertinoIcons.eyeglasses ,size: 54,),
+                                    SizedBox(height: 10,),
+                                    Stack(
+                                      children: [
+                                        Align(alignment:Alignment.bottomCenter,child:Container(color: Colors.white,
+                                            width: MediaQuery.of(context).size.width,
+                                            height: 50,
+                                            child: Center(child:Padding(padding: EdgeInsets.only(top: 20),child:Text("No Glasses",textAlign: TextAlign.center,style: GoogleFonts.openSans(
+                                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
+                                            ),),))),),
+                                        Align(alignment:Alignment.topCenter,child:Padding(padding: EdgeInsets.only(bottom: 0),child:Icon(CupertinoIcons.clear_circled_solid,color: Colors.red,),),)
+
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              )),
+                              SizedBox(width: 10,),
+                              Expanded(child:Container(
+                                color: Colors.black26,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.end,
+                                  children: [
+                                    Icon(CupertinoIcons.capsule,size: 54,),
+                                    SizedBox(height: 10,),
+                                    Stack(
+                                      children: [
+                                        Align(alignment:Alignment.bottomCenter,child:Container(color: Colors.white,
+                                            width: MediaQuery.of(context).size.width,
+                                            height: 50,
+                                            child: Center(child:Padding(padding: EdgeInsets.only(top: 20),child:Text("No Hat",textAlign: TextAlign.center,style: GoogleFonts.openSans(
+                                              textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 16),
+                                            ),),))),),
+                                        Align(alignment:Alignment.topCenter,child:Padding(padding: EdgeInsets.only(bottom: 0),child:Icon(CupertinoIcons.clear_circled_solid,color: Colors.red,),),)
+
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              )),
+                            ],
+                          )
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20,),
                 ///Video Camera
                 Expanded(
                   child: Container(

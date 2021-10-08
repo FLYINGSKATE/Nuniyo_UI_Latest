@@ -2,14 +2,20 @@
 //This File also consist of Routes to different different screens
 
 import 'dart:io';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_aadhar_kyc_screen.dart';
 import 'package:angel_broking_demo/nuniyo_screens/nuniyo_bank_email_pan_validation_screen.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_options_screen.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_personal_details_screen.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_upload_documents_and_signature.dart';
+import 'package:angel_broking_demo/nuniyo_screens/nuniyo_webcam_screen.dart';
+import 'package:angel_broking_demo/utils/Router.dart';
 import 'package:flutter/material.dart';
+
 
 import 'nuniyo_screens/nuniyo_mobile_validation_screen.dart';
 
 
 void main() {
-
   ///TO hide Red Screen of Death!
   ErrorWidget.builder = (FlutterErrorDetails details) => Container(
     color : Colors.white,
@@ -35,7 +41,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Tech X ProtoType',
+      title: 'Mangal Keshav',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         inputDecorationTheme: InputDecorationTheme(
@@ -63,7 +69,7 @@ class MyApp extends StatelessWidget {
         //#6A4EEE
         primaryColor: Color(0xff6A4EEE),
       ),
-      home: MobileValidationLoginScreen(),
+      home: BankPanEmailValidationScreen(),
       //initialRoute: '/',
       //onGenerateRoute: ScreenRouter.generateRoute,
     );

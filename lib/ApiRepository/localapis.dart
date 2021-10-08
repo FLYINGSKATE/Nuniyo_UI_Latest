@@ -151,14 +151,13 @@ class LocalApiRepo {
   }
 
   ///Verify Bank Details
-
   Future<bool> verifyBankAccountLocal(String accountNo,String ifscNo) async{
 
     String jwt_token= await GetCurrentJWTToken();
-    print("Calling Get Pan Status Using API"+jwt_token);
+    print("Calling Penny Drop Using API"+jwt_token);
 
     String lead_id = await GetLeadId();
-    print("Get Pan Status for Lead ID : "+lead_id);
+    print("Get Penny Drop for Lead ID : "+lead_id);
 
     var headers = {
       'Authorization': 'Bearer $jwt_token',
@@ -227,7 +226,12 @@ class LocalApiRepo {
       String result = await response.stream.bytesToString();
       //GET IFSC DATA HERE
       print(result);
-      return result;
+      if(result=="\"Not Found\"" || result =="Not Found"){
+        return "Not Found";
+      }
+      else{
+        return result;
+      }
     }
     else {
       print(response.reasonPhrase);
@@ -236,6 +240,38 @@ class LocalApiRepo {
   }
 
   Future<void> ConfirmIFSCDetailsLocal() async{}
+
+
+  Future<Map<dynamic,dynamic>> GetPersonalDetails() async{
+    Map valueMap = Map();
+    String jwt_token= await GetCurrentJWTToken();
+    print("Calling Get Personal Details Status Using API"+jwt_token);
+
+    String lead_id = await GetLeadId();
+    print("Get Personal Details for Lead ID : "+lead_id);
+
+    var headers = {
+      'Authorization': 'Bearer $jwt_token',
+      'Content-Type': 'application/json'
+    };
+    var request = http.Request('POST', Uri.parse('$BASE_API_LINK_URL/api/personal/Get_Personal_Details?Lead_Id=$lead_id'));
+    request.headers.addAll(headers);
+
+    http.StreamedResponse response = await request.send();
+
+    if (response.statusCode == 200) {
+      String result = await response.stream.bytesToString();
+      print(result);
+      valueMap = jsonDecode(result);
+      print(valueMap);
+      print(result);
+      return valueMap;
+    }
+    else {
+      print(response.reasonPhrase);
+      return valueMap;
+    }
+  }
 
   Future<bool> GetPanStatusLocal(String panCardNumber) async{
     String jwt_token= await GetCurrentJWTToken();
@@ -325,10 +361,13 @@ class LocalApiRepo {
   Future<void> DocumentUploadLocal() async{}
 
   Future<bool> DocumentUploadPANLocal(var imageP) async{
+
+
+
     List<int> _selectedFile = await imageP.readAsBytes();
     var request;
     if(kIsWeb){
-      request = http.MultipartRequest('POST', Uri.parse('http://localhost:44330/v1/api/documentupload/Document_Upload_PAN'));
+      request = http.MultipartRequest('POST', Uri.parse('$BASE_API_LINK_URL/api/documentupload/Document_Upload_PAN'));
       request.files.add(await http.MultipartFile.fromBytes('front_part', _selectedFile,
           contentType: new MediaType('application', 'octet-stream'),
           filename: "file_up"));
@@ -592,8 +631,6 @@ class LocalApiRepo {
       await SetStageId(stage_id);
 
       await SetJwtToken(jwt_token);
-
-
 
       if(result_Id==1){
         return true;

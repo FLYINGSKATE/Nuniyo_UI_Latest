@@ -67,6 +67,7 @@ dependencies:
   flushbar: ^1.10.4
   email_validator: ^2.0.1
   syncfusion_flutter_datepicker: ^19.2.62
+  flutter_svg: ^0.22.0
 
 
 

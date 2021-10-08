@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:ui' as ui;
 import 'dart:ui';
 import 'package:angel_broking_demo/ApiRepository/apirepository.dart';
+import 'package:angel_broking_demo/ApiRepository/localapis.dart';
 import 'package:angel_broking_demo/utils/localstorage.dart';
 import 'package:angel_broking_demo/widgets/widgets.dart';
 import 'package:file_picker/file_picker.dart';
@@ -397,9 +398,11 @@ class _UploadDocumentScreenState extends State<UploadDocumentScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed:(tempDigitalPadUploaded&&tempPanUploaded)?() {
+                    onPressed:(tempPanUploaded&&tempDigitalPadUploaded)?() {
                         if(imageFilePan!=null){
                           //CALL APIS TO UPLOAD
+                          print("Calling Upload Image API");
+                          LocalApiRepo().DocumentUploadPANLocal(imageFilePan);
                         }
                         else if(imageFileDigitalSignature!=null){
 

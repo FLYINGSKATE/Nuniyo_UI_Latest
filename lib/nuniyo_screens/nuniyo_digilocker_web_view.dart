@@ -64,7 +64,7 @@ class _BrowserViewXState extends State<BrowserViewX> {
       appBar: WidgetHelper().NuniyoAppBar(),
       body: WebViewX(
         key: const ValueKey('webviewx'),
-        initialContent: '<h2>Please Wait.......</h2>',
+        initialContent: '<h2>Please Wait........</h2>',
         initialSourceType: SourceType.html,
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,

@@ -36,6 +36,13 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
 
   bool _value = false;
 
+  bool nationality = false;
+
+  bool showNationalityError = false;
+
+  bool declaration = false;
+  bool showDeclarationError = false;
+
 
 
 
@@ -43,9 +50,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
   void initState() {
     super.initState();
     //manageSteps();
-    //prefilTexts();
-    fatherNameTextEditingController.text = "Demo Name";
-    motherNameTextEditingController.text = "Demo Name";
+    prefillTexts();
     _fatherNameTextFieldFocusNode = FocusNode();
     _tradingExperienceDropDownFocusNode = FocusNode();
     _motherNameTextFieldFocusNode = FocusNode();
@@ -153,7 +158,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     child: Container(
                       height: 80,
                       child: TextField(
-                        enabled: false,
+                        enabled: fatherNameTextEditingController.text.isEmpty,
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _fatherNameTextFieldFocusNode,
@@ -175,7 +180,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     child: Container(
                       height: 80,
                       child: TextField(
-                        enabled: false,
+                        enabled: motherNameTextEditingController.text.isEmpty,
                         cursorColor: primaryColorOfApp,
                         style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: 0.5,fontSize: 14,fontWeight: FontWeight.bold)),
                         focusNode: _motherNameTextFieldFocusNode,
@@ -453,6 +458,60 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                   ),
                 ),*/
                 SizedBox(height: 20,),
+                Row(
+                  children: [
+                    SizedBox(
+                      height: 24.0,
+                      width: 24.0,
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom:12,right: 10),
+                        child:Checkbox(
+                        value: this.nationality,
+                        checkColor: Colors.white,
+                        activeColor: primaryColorOfApp,
+                        fillColor: showNationalityError?MaterialStateProperty.all(Colors.red):null,
+                        onChanged: (value) {
+                          setState(() {
+                            this.nationality = value!;
+                            if(nationality==true){
+                              showNationalityError = false;
+                            }
+                            print(nationality);
+                          });
+                        },
+                      ),)
+                    ),
+                    Expanded(child:Text("I was born in India, my nationality is Indian & my country of tax in India.",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(fontSize: 12,color:Colors.black, letterSpacing: .5),),),)
+                  ],
+                ),
+                SizedBox(height: 20,),
+                Row(
+                  children: [
+                    SizedBox(
+                        height: 24.0,
+                        width: 24.0,
+                        child: Padding(
+                          padding: EdgeInsets.only(bottom:12,right: 10),
+                          child:Checkbox(
+                            value: this.declaration,
+                            checkColor: Colors.white,
+                            activeColor: primaryColorOfApp,
+                            fillColor: showDeclarationError?MaterialStateProperty.all(Colors.red):null,
+                            onChanged: (value) {
+                              setState(() {
+                                this.declaration = value!;
+                                if(declaration==true){
+                                  showDeclarationError = false;
+                                }
+                                print(declaration);
+                              });
+                            },
+                          ),)
+                    ),
+                    Expanded(child:Text("I have read and accepted the declaration and I am neither mentally challenged nor a politically exposed person.",textAlign:TextAlign.left,style: GoogleFonts.openSans(textStyle: TextStyle(fontSize: 12,color:Colors.black, letterSpacing: .5),),),)
+                  ],
+                ),
+                SizedBox(height: 20,),
                 Container(
                   color: Colors.transparent,
                   width: MediaQuery.of(context).size.width,
@@ -461,7 +520,7 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    onPressed: () async {
+                    onPressed: (declaration&&nationality)?() async {
                       LocalApiRepo().PersonalDetailsLocal(fatherNameTextEditingController.text.trim(),motherNameTextEditingController.text.trim(),annualIncome,gender,maritialStatus,politicallyExposed,occupation,tradingExperience);
                       SharedPreferences prefs = await SharedPreferences.getInstance();
                       prefs.setString("GENDER",gender);
@@ -469,7 +528,9 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
                       print("Let\'s go To");
                       print(stage_id);
                       Navigator.pushNamed(context, stage_id);
-                    },
+                    }:null,
+                    disabledTextColor: Colors.blue,
+                    disabledColor: Color(0xffD2D0E1),
                     color: primaryColorOfApp,
                     child: Text(
                         "Proceed",
@@ -494,13 +555,27 @@ class _PersonalDetailsScreenState extends State<PersonalDetailsScreen> {
     print("YOU ARE ON THIS STEP : "+routeName);
   }
 
-  Future<void> prefilTexts() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String father_name = prefs.getString(FATHER_NAME_KEY);
-    print(father_name+"I'm Your Father");
+  Future<void> prefillTexts() async {
+    Map valueMap = await LocalApiRepo().GetPersonalDetails();
+    if(valueMap.isNotEmpty){
+      String father_Name = valueMap["res_Output"][0]["father_Name"];
+      String mother_Name = valueMap["res_Output"][0]["mother_Name"];
+      String income = valueMap["res_Output"][0]["income"];
+      String gender = valueMap["res_Output"][0]["gender"];
+      String marital_Status = valueMap["res_Output"][0]["marital_Status"];
+      String occupation = valueMap["res_Output"][0]["occupation"];
+      String trading_Experience = valueMap["res_Output"][0]["trading_Experience"];
 
-    fatherNameTextEditingController.text = father_name;
+      fatherNameTextEditingController.text = father_Name;
+      motherNameTextEditingController.text = mother_Name;
+      this.gender = gender;
+      this.occupation = occupation;
+      this.tradingExperience = trading_Experience;
+      this.maritialStatus = marital_Status;
+      this.annualIncome = income;
 
+      setState(() {});
+    }
   }
 
 }

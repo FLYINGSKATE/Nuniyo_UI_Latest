@@ -3,6 +3,7 @@
 // By the overall screens of App
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class WidgetHelper extends StatefulWidget {
   const WidgetHelper({Key? key}) : super(key: key);
@@ -38,8 +39,10 @@ class WidgetHelper extends StatefulWidget {
 
   AppBar NuniyoAppBar(){
     return AppBar(
-      leading: Padding(child:Image.asset('assets/images/Logo.png') ,padding: EdgeInsets.only(left: 10),),
-      title: Text('Mangal Keshav',style: GoogleFonts.openSans(textStyle: TextStyle(color: Colors.black, letterSpacing: .5,fontWeight: FontWeight.bold))),
+      leading: Padding(child:SvgPicture.asset(
+        'assets/images/logo.svg',
+      ),padding: EdgeInsets.only(left: 25),),
+      title: Text('Nuniyo',style: GoogleFonts.openSans(fontSize: 24,textStyle: TextStyle(color: Color(0xff6A4EEE), letterSpacing: .5,fontWeight: FontWeight.bold))),
       backgroundColor: Color(0xffF0ECFF),
       elevation: 0,
     );

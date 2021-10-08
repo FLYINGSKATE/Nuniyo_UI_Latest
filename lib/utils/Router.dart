@@ -58,7 +58,7 @@ class ScreenRouter {
       case 'Esign':
         return MaterialPageRoute(builder: (_) => EsignScreen());
       //8
-      case '/congratsscreen':
+      case 'UCC':
         return MaterialPageRoute(builder: (_) => CongratsScreen());
       //EXTRA
       case '/webview':
